@@ -19,7 +19,14 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+
+            $table->string('role')->default('user');
+            $table->text('bio')->nullable();
+            $table->string('study_field')->nullable();
+            $table->integer('reputation_points')->default(0);
+            $table->string('avatar')->nullable();
         });
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

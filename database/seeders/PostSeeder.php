@@ -1,0 +1,20 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Post;
+use App\Models\Tag;
+
+class PostSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // 30 Posts
+        Post::factory()->count(30)->create()->each(function ($post) {
+            // Attach 1‑3 Tags with every post
+            $tags = Tag::inRandomOrder()->take(rand(1, 3))->pluck('id');
+            $post->tags()->attach($tags);
+        });
+    }
+}
