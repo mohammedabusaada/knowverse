@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\Comment;
 use App\Models\Post;
 
+// NOTE: This seeder is based on an older schema version.
+// It will be updated to match the final database structure soon.
 class CommentSeeder extends Seeder
 {
     public function run(): void

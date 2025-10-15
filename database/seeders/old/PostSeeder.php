@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\Post;
 use App\Models\Tag;
 
+// NOTE: This seeder is based on an older schema version.
+// It will be updated to match the final database structure soon.
 class PostSeeder extends Seeder
 {
     public function run(): void

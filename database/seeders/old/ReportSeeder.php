@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Report;
 
+// NOTE: This seeder is based on an older schema version.
+// It will be updated to match the final database structure soon.
 class ReportSeeder extends Seeder
 {
     public function run(): void
