@@ -2,12 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-// NOTE: This seeder is based on an older schema version.
-// It will be updated to match the final database structure soon.
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -15,7 +11,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Temporarily disabled old seeders.
+        // 1. Seed the essential roles table FIRST.
+        // This ensures the foreign key constraint (role_id) is satisfied.
+        $this->call([
+            RoleSeeder::class,
+        ]);
+
+        // 2. You can enable other seeders here once they are ready.
+        // Note: Any seeders that create Users (like UserSeeder) must run AFTER RoleSeeder.
         // $this->call([
         //     UserSeeder::class,
         //     TagSeeder::class,
