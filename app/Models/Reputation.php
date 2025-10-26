@@ -11,6 +11,8 @@ class Reputation extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     // ------------------------------------------------------------------
     // Mass Assignable Attributes
     // ------------------------------------------------------------------

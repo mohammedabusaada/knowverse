@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserActivity extends Model
 {
-    
+
     use HasFactory;
+
+    public $timestamps = false;
 
     // ------------------------------------------------------------------
     // Mass Assignable Attributes

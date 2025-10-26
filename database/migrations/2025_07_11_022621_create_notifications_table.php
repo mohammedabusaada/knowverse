@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->comment('Recipient');
             $table->foreignId('actor_id')->nullable()->constrained('users')->cascadeOnDelete()->comment('Triggering user (e.g., the user who commented)');
 
-            $table->morphs('related_content'); // Polymorphic link to post/comment/user
+            $table->nullableMorphs('related_content'); // Polymorphic link to post/comment/user
 
             $table->enum('type', ['comment', 'vote', 'follow', 'system'])->default('system');
             $table->text('message')->nullable();
