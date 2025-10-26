@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -13,28 +13,27 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Using raw SQL or truncate/unguard is often necessary when manually
-        // setting IDs, which is necessary here to ensure the 'user' role is ID 1.
-
+        // Disable FK checks temporarily (safe for local dev)
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Role::truncate();
+        DB::table('roles')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Create the roles, ensuring 'user' is the first one inserted.
-        // The first insert will typically receive ID 1, which matches the hidden
-        // input value of '1' we used in the registration form.
-        Role::create([
-            'id' => 1,
-            'name' => 'user',
-            'description' => 'Standard platform user with basic permissions.',
+        // Seed roles with fixed IDs to ensure consistent FK references
+        Role::insert([
+            [
+                'id' => 1,
+                'name' => 'user',
+                'description' => 'Standard platform user with basic permissions.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 2,
+                'name' => 'admin',
+                'description' => 'System administrator with full control.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
-
-        Role::create([
-            'id' => 2,
-            'name' => 'admin',
-            'description' => 'System administrator with full control.',
-        ]);
-
-        // Other roles here...
     }
 }
