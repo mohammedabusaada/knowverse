@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\{
+    BelongsTo,
+    MorphTo
+};
 
 class Reputation extends Model
 {
@@ -13,40 +15,56 @@ class Reputation extends Model
 
     public $timestamps = false;
 
-    // ------------------------------------------------------------------
-    // Mass Assignable Attributes
-    // ------------------------------------------------------------------
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'user_id',      // The user who earned or lost reputation
-        'action',       // The action that caused the change
-        'delta',        // The reputation points gained/lost
-        'source_id',    // The related model ID (post/comment/etc.)
-        'source_type',  // The related model type
-        'note',         // Optional note or explanation
+        'user_id',
+        'action',
+        'delta',
+        'source_id',
+        'source_type',
+        'note',
+    ];
+
+    protected $casts = [
+        'delta' => 'integer',
+        'created_at' => 'datetime',
     ];
 
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
 
-    /**
-     * Get the user associated with this reputation record.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the source (post, comment, etc.) that caused the reputation change.
-     */
     public function source(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    // ------------------------------------------------------------------
+    // Scopes
+    // ------------------------------------------------------------------
+
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId)->orderByDesc('created_at');
+    }
+
+    // ------------------------------------------------------------------
+    // Utility
+    // ------------------------------------------------------------------
+
+    public static function record(int $userId, string $action, int $delta, ?Model $source = null, ?string $note = null): self
+    {
+        return self::create([
+            'user_id' => $userId,
+            'action' => $action,
+            'delta' => $delta,
+            'source_id' => $source?->id,
+            'source_type' => $source ? get_class($source) : null,
+            'note' => $note,
+        ]);
     }
 }

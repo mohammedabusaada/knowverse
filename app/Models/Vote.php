@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\{
+    BelongsTo,
+    MorphTo
+};
 
 class Vote extends Model
 {
@@ -13,38 +15,45 @@ class Vote extends Model
 
     public $timestamps = false;
 
-    // ------------------------------------------------------------------
-    // Mass Assignable Attributes
-    // ------------------------------------------------------------------
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'user_id',      // The user who cast the vote
-        'target_id',    // ID of the target model (post/comment/etc.)
-        'target_type',  // Type of the target model (for polymorphic relation)
-        'value',        // Vote value (+1 or -1)
+        'user_id',
+        'target_id',
+        'target_type',
+        'value',
+    ];
+
+    protected $casts = [
+        'value' => 'integer',
+        'created_at' => 'datetime',
     ];
 
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
 
-    /**
-     * Get the user who cast this vote.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the target content that was voted on.
-     */
     public function target(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    // ------------------------------------------------------------------
+    // Utility
+    // ------------------------------------------------------------------
+
+    public static function toggle(User $user, Model $target, int $value): self
+    {
+        return static::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'target_id' => $target->id,
+                'target_type' => get_class($target),
+            ],
+            ['value' => $value]
+        );
     }
 }

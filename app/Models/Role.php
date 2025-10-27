@@ -10,11 +10,6 @@ class Role extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'description',
@@ -24,11 +19,27 @@ class Role extends Model
     // Relationships
     // ------------------------------------------------------------------
 
-    /**
-     * Get the users that belong to this role.
-     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    // ------------------------------------------------------------------
+    // Scopes
+    // ------------------------------------------------------------------
+
+    public function scopeAdmin($query)
+    {
+        return $query->where('name', 'admin');
+    }
+
+    public function scopeModerator($query)
+    {
+        return $query->where('name', 'moderator');
+    }
+
+    public function scopeRegular($query)
+    {
+        return $query->where('name', 'user');
     }
 }

@@ -4,42 +4,69 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\{
+    BelongsTo,
+    MorphTo
+};
 
 class UserActivity extends Model
 {
-
     use HasFactory;
 
     public $timestamps = false;
 
-    // ------------------------------------------------------------------
-    // Mass Assignable Attributes
-    // ------------------------------------------------------------------
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'user_id',       // The user who performed the action
-        'action',        // Type of action (post, comment, vote, follow, etc.)
-        'target_id',     // The ID of the related record (optional)
-        'target_type',   // The type of the related model (Post, Comment, etc.)
-        'details',       // Additional details about the activity (optional)
+        'user_id',
+        'action',
+        'target_id',
+        'target_type',
+        'details',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
     ];
 
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
-    /**
-     * Get the user associated with this activity.
-     *
-     * Defines an inverse one-to-many (belongsTo) relationship
-     * with the User model.
-     */
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function target(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    // ------------------------------------------------------------------
+    // Scopes
+    // ------------------------------------------------------------------
+
+    public function scopeRecent($query, int $limit = 10)
+    {
+        return $query->orderByDesc('created_at')->limit($limit);
+    }
+
+    public function scopeByAction($query, string $action)
+    {
+        return $query->where('action', $action);
+    }
+
+    // ------------------------------------------------------------------
+    // Utility
+    // ------------------------------------------------------------------
+
+    public static function log(User $user, string $action, ?Model $target = null, ?string $details = null): self
+    {
+        return self::create([
+            'user_id' => $user->id,
+            'action' => $action,
+            'target_id' => $target?->id,
+            'target_type' => $target ? get_class($target) : null,
+            'details' => $details,
+        ]);
     }
 }
