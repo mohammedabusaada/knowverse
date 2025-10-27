@@ -4,58 +4,78 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-
+use Illuminate\Database\Eloquent\Relations\{
+    BelongsTo,
+    MorphTo
+};
 
 class Notification extends Model
 {
-    
     use HasFactory;
 
     // ------------------------------------------------------------------
-    // Mass Assignable Attributes
+    // Constants
     // ------------------------------------------------------------------
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public const TYPE_COMMENT = 'comment';
+    public const TYPE_VOTE = 'vote';
+    public const TYPE_FOLLOW = 'follow';
+    public const TYPE_SYSTEM = 'system';
+
     protected $fillable = [
-        'user_id',             // Recipient of the notification
-        'actor_id',            // The user who triggered the action (optional)
-        'related_content_id',  // ID of the related content (post/comment/etc.)
-        'related_content_type', // Model type for polymorphic relation
-        'type',                // Notification type (comment, vote, follow, system)
-        'message',             // Notification message text
-        'is_read',             // Read status (true/false)
+        'user_id',             // Recipient
+        'actor_id',            // The user who triggered this notification
+        'related_content_id',  // ID of related entity
+        'related_content_type',// Polymorphic type (post/comment/etc.)
+        'type',                // Notification type
+        'message',             // Notification text
+        'is_read',             // Read/unread flag
+    ];
+
+    protected $casts = [
+        'is_read' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
 
-    /**
-     * Get the user who received this notification.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the user who triggered this notification (actor).
-     */
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');
     }
 
-    /**
-     * Get the related content (e.g., post, comment) for this notification.
-     */
     public function relatedContent(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    // ------------------------------------------------------------------
+    // Scopes
+    // ------------------------------------------------------------------
+
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query->orderByDesc('created_at');
+    }
+
+    // ------------------------------------------------------------------
+    // Utility
+    // ------------------------------------------------------------------
+
+    public function markAsRead(): void
+    {
+        $this->update(['is_read' => true]);
     }
 }
