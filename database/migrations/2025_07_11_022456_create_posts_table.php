@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
-            $table->id(); // Laravel PK (can be $table->id('post_id') for DBML match)
+            $table->id();
 
             $table->foreignId('user_id')
                 ->constrained('users')
@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('body')->comment('Main content');
             $table->string('image')->nullable()->comment('Optional image path or URL');
+
             $table->enum('status', ['draft', 'published', 'archived'])
                 ->default('published')
                 ->comment('Post visibility status');
@@ -25,10 +26,6 @@ return new class extends Migration
             $table->unsignedBigInteger('best_comment_id')
                 ->nullable()
                 ->comment('Optional: best comment chosen by post author');
-            $table->foreign('best_comment_id')
-                ->references('id')
-                ->on('comments')
-                ->nullOnDelete();
 
             $table->integer('view_count')->default(0);
             $table->integer('upvote_count')->default(0);
