@@ -2,59 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Show the authenticated user's profile.
      */
-    public function edit(Request $request): View
+    public function show()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = Auth::user();
+        return view('profiles.show', compact('user'));
     }
 
     /**
-     * Update the user's profile information.
+     * Show edit profile page.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function edit()
     {
-        $request->user()->fill($request->validated());
+        $user = Auth::user();
+        return view('profiles.edit', compact('user'));
+    }
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    /**
+     * Update the profile.
+     */
+    public function update(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Use fields that exist in your User model
+        $validated = $request->validate([
+            'full_name'       => ['required', 'string', 'max:255'],
+            'academic_title'  => ['nullable', 'string', 'max:255'],
+            'bio'             => ['nullable', 'string', 'max:2000'],
+            'profile_picture' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        // Handle avatar upload
+        if ($request->hasFile('profile_picture')) {
+
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+
+            $validated['profile_picture'] = $request->file('profile_picture')
+                ->store('avatars', 'public');
         }
 
-        $request->user()->save();
+        $user->update($validated);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return redirect()
+            ->route('profile.show')
+            ->with('status', 'Profile updated successfully.');
     }
 }
