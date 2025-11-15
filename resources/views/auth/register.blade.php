@@ -13,29 +13,34 @@
   </head>
   <body class="min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-gray-100">
 
-    <!-- القسم الأيسر -->
+    <!-- Left Section -->
     <div class="hidden md:flex w-1/2 bg-gradient-to-br from-[#d3cdc7] to-[#bfb9b3] text-gray-900 flex-col justify-center items-center px-10 py-16 shadow-inner">
       <img src="{{ asset('logo.jpg') }}" alt="KnowVerse Logo"
            class="w-32 mb-6 rounded-2xl shadow-xl hover:scale-105 transform transition duration-300" />
-      <h1 class="text-4xl font-extrabold mb-4 tracking-tight">Join <span class="text-gray-800">KnowVerse</span></h1>
+
+      <h1 class="text-4xl font-extrabold mb-4 tracking-tight">
+        Join <span class="text-gray-800">KnowVerse</span>
+      </h1>
+
       <p class="text-lg text-gray-700 text-center max-w-sm leading-relaxed">
         Create an account and start exploring knowledge together.
       </p>
     </div>
 
-    <!-- القسم الأيمن -->
+    <!-- Right Section -->
     <div class="flex w-full md:w-1/2 justify-center items-center bg-white px-8 py-12">
       <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 hover:shadow-gray-300/40 transition-shadow duration-300">
+
         <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Create your account</h2>
 
-        {{-- رسائل فلاش --}}
+        {{-- Flash Messages --}}
         @if (session('status'))
           <div class="mb-4 p-3 rounded-lg bg-green-100 text-green-800 text-sm text-center shadow-sm">
             {{ session('status') }}
           </div>
         @endif
 
-        {{-- أخطاء --}}
+        {{-- Validation Errors --}}
         @if ($errors->any())
           <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-800 text-sm shadow-sm">
             <ul class="list-disc list-inside space-y-1">
@@ -49,15 +54,28 @@
         <form action="{{ route('register') }}" method="POST" class="space-y-6" novalidate>
           @csrf
 
-          <!-- Name -->
+          <!-- Username -->
           <div>
-            <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+            <label for="username" class="block text-gray-700 font-semibold mb-2">Username</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value="{{ old('name') }}"
+              id="username"
+              name="username"
+              value="{{ old('username') }}"
               required
+              placeholder="your-username"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-400 placeholder-gray-400"
+            />
+          </div>
+
+          <!-- Full Name -->
+          <div>
+            <label for="full_name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+            <input
+              type="text"
+              id="full_name"
+              name="full_name"
+              value="{{ old('full_name') }}"
               placeholder="John Doe"
               class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-400 placeholder-gray-400"
             />
@@ -103,7 +121,7 @@
             />
           </div>
 
-          <!-- زر التسجيل -->
+          <!-- Submit Button -->
           <button
             type="submit"
             class="w-full bg-[#1a1a1a] hover:bg-gray-900 text-white font-semibold py-3 rounded-full shadow-md hover:shadow-lg focus:ring-4 focus:ring-gray-300 transition-transform hover:-translate-y-0.5"
@@ -118,6 +136,7 @@
             Sign in
           </a>
         </p>
+
       </div>
     </div>
   </body>
