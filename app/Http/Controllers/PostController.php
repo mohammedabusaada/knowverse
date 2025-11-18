@@ -50,6 +50,8 @@ class PostController extends Controller
 
         $post = Post::create($validated);
 
+        $post->tags()->sync($request->tags ?? []);
+
         return redirect()
             ->route('posts.show', $post)
             ->with('status', 'Post created successfully.');
@@ -100,6 +102,8 @@ class PostController extends Controller
         }
 
         $post->update($validated);
+
+        $post->tags()->sync($request->tags ?? []);
 
         return redirect()
             ->route('posts.show', $post)

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\{
     HasMany,
     MorphMany
 };
+use League\CommonMark\CommonMarkConverter;
 
 class Comment extends Model
 {
@@ -86,5 +87,15 @@ class Comment extends Model
     public function isReply(): bool
     {
         return !is_null($this->parent_id);
+    }
+
+    public function getBodyHtmlAttribute()
+    {
+        $converter = new CommonMarkConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+
+        return $converter->convert($this->body)->getContent();
     }
 }
