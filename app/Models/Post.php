@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\{
     HasMany,
     MorphMany
 };
+use League\CommonMark\CommonMarkConverter;
 
 class Post extends Model
 {
@@ -117,5 +118,26 @@ class Post extends Model
     public function totalVotes(): int
     {
         return $this->upvote_count - $this->downvote_count;
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        return asset('storage/' . $this->image);
+    }
+
+
+
+    public function getFormattedBodyAttribute(): string
+    {
+        $converter = new CommonMarkConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+
+        return $converter->convert($this->body)->getContent();
     }
 }

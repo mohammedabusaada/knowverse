@@ -28,7 +28,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->role_id === 1; // admin role = 1?
+        return $user->id === $post->user_id || $user->isAdmin();
     }
 
     /**
@@ -36,6 +36,6 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->role_id === 1;
+        return $user->id === $post->user_id || $user->isAdmin();
     }
 }
