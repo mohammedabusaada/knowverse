@@ -5,6 +5,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TagController;
 
 
 // ---------------------------------------------------------
@@ -56,8 +57,31 @@ Route::middleware('auth')->group(function () {
     // ----------------------
     Route::resource('comments', CommentController::class)
         ->only(['store', 'update', 'destroy']);
-});
 
+
+    // -----------------------------------------------------
+    // TAGS (feature/tags-controller)
+    // -----------------------------------------------------
+
+    // CRUD (admin only - apply middleware/authorization in controller)
+    Route::post('/tags', [TagController::class, 'store']);
+    Route::put('/tags/{tag}', [TagController::class, 'update']);
+    Route::delete('/tags/{tag}', [TagController::class, 'destroy']);
+
+    // List all tags
+    Route::get('/tags', [TagController::class, 'index']);
+
+    // API: Search tags (for autocomplete)
+    Route::get('/tags/search', [TagController::class, 'search']);
+
+    // Attach tags to a post
+    Route::post('/posts/{post}/tags', [TagController::class, 'attachTags']);
+
+    // Follow a Tag
+    Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
+    Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
+
+});
 // ----------------------
 // Search
 // ----------------------
