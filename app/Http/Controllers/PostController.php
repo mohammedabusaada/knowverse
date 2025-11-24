@@ -11,10 +11,12 @@ class PostController extends Controller
     /**
      * List all published posts.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $tagIds = $request->query('tag_ids'); // array of tag IDs
         $posts = Post::with('user')
             ->published()
+            ->filterByTags($tagIds)   // ← Required by the sprint
             ->latest()
             ->paginate(10);
 
@@ -38,6 +40,9 @@ class PostController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'body'  => ['required', 'string'],
             'image' => ['nullable', 'image', 'max:4096'],
+            // Required for tag logic
+            'tag_ids'   => ['array'],
+            'tag_ids.*' => ['integer', 'exists:tags,id'],
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -50,7 +55,8 @@ class PostController extends Controller
 
         $post = Post::create($validated);
 
-        $post->tags()->sync($request->tags ?? []);
+         // Attach tags (required by deliverables)
+        $post->tags()->sync($request->tag_ids ?? []);
 
         return redirect()
             ->route('posts.show', $post)
@@ -95,6 +101,9 @@ class PostController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'body'  => ['required', 'string'],
             'image' => ['nullable', 'image', 'max:4096'],
+            // Required for tag logic
+            'tag_ids'   => ['array'],
+            'tag_ids.*' => ['integer', 'exists:tags,id']
         ]);
 
         if ($request->hasFile('image')) {
@@ -102,8 +111,8 @@ class PostController extends Controller
         }
 
         $post->update($validated);
-
-        $post->tags()->sync($request->tags ?? []);
+        // Sync tags on update (required)
+        $post->tags()->sync($request->tag_ids ?? []);
 
         return redirect()
             ->route('posts.show', $post)

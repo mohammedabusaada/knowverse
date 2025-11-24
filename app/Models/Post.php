@@ -105,6 +105,21 @@ class Post extends Model
     {
         return $query->orderByDesc('view_count');
     }
+      /**
+     * Required by feature/tags-controller
+     * Filter posts by given tag IDs
+     */
+    public function scopeFilterByTags($query, ?array $tagIds = null)
+    {
+        if (!$tagIds) {
+            return $query;
+        }
+
+        return $query->whereHas('tags', function ($tagQuery) use ($tagIds) {
+            $tagQuery->whereIn('tags.id', $tagIds);
+        });
+    }
+
 
     // ------------------------------------------------------------------
     // Utility Methods
