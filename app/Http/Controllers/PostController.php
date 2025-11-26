@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Tag;
 
 class PostController extends Controller
 {
@@ -14,13 +15,24 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $tagIds = $request->query('tag_ids'); // array of tag IDs
+         $selectedTags = $request->get('tags', []); // مصفوفة
         $posts = Post::with('user')
             ->published()
             ->filterByTags($tagIds)   // ← Required by the sprint
             ->latest()
             ->paginate(10);
+        $tag = $request->get('tag');
+        $tags = \App\Models\Tag::all();
+        $posts = \App\Models\Post::when($selectedTags, function ($query) use ($selectedTags) {
+        $query->whereHas('tags', function ($q) use ($selectedTags) {
+            $q->whereIn('name', $selectedTags);
+        });
+    })
+    ->latest()
+    ->paginate(9)
+    ->withQueryString(); // حتى لا تضيع الفلاتر عند التنقل بين الصفحات
 
-        return view('posts.index', compact('posts'));
+    return view('posts.index', compact('posts', 'tags', 'selectedTags'));
     }
 
     /**
@@ -28,7 +40,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        $tags = Tag::all();
+        return view('posts.create', compact('tags'));
     }
 
     /**
@@ -55,7 +68,7 @@ class PostController extends Controller
 
         $post = Post::create($validated);
 
-         // Attach tags (required by deliverables)
+        // Attach tags (required by deliverables)
         $post->tags()->sync($request->tag_ids ?? []);
 
         return redirect()
@@ -69,17 +82,16 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->incrementViewCount();
+         $comments = $post->comments;
 
         $post->load([
             'user',
-            'tags',
             'comments.user',
             'comments.replies.user',
+            'tags'
         ]);
 
-        // Sort comments: best comment first
-        $sortedComments = $post->comments->sortByDesc(fn ($comment) => $comment->id === $post->best_comment_id);
-        return view('posts.show', ['post' => $post, 'comments' => $sortedComments]);
+        return view('posts.show', compact('post','comments'));
     }
 
     /**

@@ -25,6 +25,15 @@
             value="{{ old('title') }}"
             required />
 
+       <!-- Title -->
+        <x-tag-input
+            label="Tag"
+            name="tag_id"
+            :options="$tags"
+            :selected="old('tag_id')"
+            required />
+
+
         <!-- Body (Markdown) -->
         <x-textarea
             label="Body (Markdown supported)"
