@@ -58,6 +58,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('comments', CommentController::class)
         ->only(['store', 'update', 'destroy']);
 
+    // Best Comment routes
+    Route::post('/comments/{comment}/best', [CommentController::class, 'markAsBest'])
+    ->name('comments.best');
+
+    Route::post('/comments/{comment}/unbest', [CommentController::class, 'unmarkBest'])
+    ->name('comments.unbest');
+
 
     // -----------------------------------------------------
     // TAGS (feature/tags-controller)
@@ -81,7 +88,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
     Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
 
-});
+}); // This is the single, correct closing bracket for the 'auth' middleware group.
 // ----------------------
 // Search
 // ----------------------

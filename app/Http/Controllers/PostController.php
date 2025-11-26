@@ -72,12 +72,14 @@ class PostController extends Controller
 
         $post->load([
             'user',
+            'tags',
             'comments.user',
             'comments.replies.user',
-            'tags'
         ]);
 
-        return view('posts.show', compact('post'));
+        // Sort comments: best comment first
+        $sortedComments = $post->comments->sortByDesc(fn ($comment) => $comment->id === $post->best_comment_id);
+        return view('posts.show', ['post' => $post, 'comments' => $sortedComments]);
     }
 
     /**

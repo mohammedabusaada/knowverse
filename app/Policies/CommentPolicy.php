@@ -22,4 +22,16 @@ class CommentPolicy
     {
         return $user->id === $comment->user_id || $user->isAdmin();
     }
+
+    public function markBest(User $user, Comment $comment): bool
+{
+    // Only the author of the post can select a best comment
+    return $comment->post->user_id === $user->id;
+}
+
+public function unmarkBest(User $user, Comment $comment): bool
+{
+    return $comment->post->user_id === $user->id;
+}
+
 }
