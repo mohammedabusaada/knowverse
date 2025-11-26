@@ -53,4 +53,33 @@ class CommentController extends Controller
 
         return back()->with('status', 'Comment deleted.');
     }
+
+
+    public function markAsBest(Comment $comment)
+{
+    $this->authorize('markBest', $comment);
+
+    // Update post's best comment
+    $comment->post->update([
+        'best_comment_id' => $comment->id,
+    ]);
+
+    return back()->with('status', 'Best comment selected.');
+}
+
+public function unmarkBest(Comment $comment)
+{
+    $this->authorize('unmarkBest', $comment);
+
+    // Only remove if this comment is the currently selected best
+    if ($comment->post->best_comment_id === $comment->id) {
+        $comment->post->update([
+            'best_comment_id' => null,
+        ]);
+    }
+
+    return back()->with('status', 'Best comment removed.');
+}
+
+
 }

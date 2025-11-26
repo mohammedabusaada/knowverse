@@ -39,7 +39,7 @@
         @if ($post->tags->count())
         <div class="flex flex-wrap gap-2 mb-6">
             @foreach($post->tags as $tag)
-            <x-tag-badge :tag="$tag->name" />
+            <x-tag-badge :label="$tag->name" />
             @endforeach
         </div>
         @endif
@@ -109,7 +109,7 @@
 
         <!-- Comments List -->
         <div class="space-y-6">
-            @foreach ($post->comments()->whereNull('parent_id')->get() as $comment)
+            @foreach ($comments as $comment)
             <x-comment :comment="$comment" />
             @endforeach
         </div>
