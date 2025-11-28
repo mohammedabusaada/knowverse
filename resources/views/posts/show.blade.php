@@ -7,66 +7,86 @@
     <!-- Back Link -->
     <div class="mb-6">
         <a href="{{ route('posts.index') }}"
-            class="text-blue-600 hover:underline dark:text-blue-400">
+           class="text-blue-600 hover:underline dark:text-blue-400">
             ← Back to Posts
         </a>
     </div>
 
     <!-- Post Container -->
     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                rounded-xl shadow p-6">
+                rounded-2xl shadow-sm p-8">
 
         <!-- Title -->
-        <h1 class="text-3xl font-bold mb-4 dark:text-white">
+        <h1 class="text-4xl font-bold mb-4 text-gray-900 dark:text-white leading-tight">
             {{ $post->title }}
         </h1>
 
-        <!-- Author -->
-        <x-post-author :user="$post->user" :date="$post->created_at" />
+        <!-- Author + Meta Info -->
+        <div class="flex items-center justify-between mb-6 text-sm text-gray-600 dark:text-gray-400">
+
+            <x-post-author :user="$post->user" :date="$post->created_at" />
+
+            <div class="flex items-center gap-4">
+
+                <div class="flex items-center gap-1">
+                    <x-icons.eye class="w-4 h-4" />
+                    {{ number_format($post->view_count) }}
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <x-icons.chat class="w-4 h-4" />
+                    {{ $post->comments()->count() }}
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <x-icons.arrow-up class="w-4 h-4" />
+                    {{ $post->upvote_count - $post->downvote_count }}
+                </div>
+
+            </div>
+        </div>
 
         <!-- Image -->
         @if ($post->image)
-        <img src="{{ asset('storage/'.$post->image) }}"
-            class="rounded-lg mb-6 shadow max-h-96 object-cover w-full">
+            <div class="mb-8">
+                <img src="{{ asset('storage/'.$post->image) }}"
+                     class="rounded-xl shadow max-h-[450px] w-full object-cover">
+            </div>
         @endif
 
         <!-- Body -->
-        <div class="prose dark:prose-invert max-w-none mb-6">
+        <div class="prose dark:prose-invert max-w-none text-lg leading-relaxed mb-8">
             <x-markdown :text="$post->body" />
         </div>
 
         <!-- Tags -->
         @if ($post->tags->count())
-        <div class="flex flex-wrap gap-2 mb-6">
-            @foreach($post->tags as $tag)
-            <x-tag-badge :label="$tag->name" />
-            @endforeach
-        </div>
+            <div class="flex flex-wrap gap-2 mb-8">
+                @foreach($post->tags as $tag)
+                    <x-tag-badge :label="$tag->name" />
+                @endforeach
+            </div>
         @endif
 
-        <!-- Stats (views, comments, votes) -->
-        <x-post-stats
-            :views="$post->view_count"
-            :comments="$post->comments()->count()"
-            :votes="$post->upvote_count - $post->downvote_count" />
-
-        <!-- Edit/Delete Actions -->
+        <!-- Post Actions (Edit/Delete) -->
         @can('update', $post)
-        <div class="mt-6 flex gap-4">
+        <div class="mt-8 flex gap-3 pt-6 border-t border-gray-300 dark:border-gray-700">
 
             <x-button tag="a"
-                href="{{ route('posts.edit', $post) }}"
-                class="bg-yellow-500 hover:bg-yellow-600">
+                      href="{{ route('posts.edit', $post) }}"
+                      class="bg-yellow-500 hover:bg-yellow-600">
                 Edit Post
             </x-button>
 
             <form action="{{ route('posts.destroy', $post) }}"
-                method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this post?');">
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this post?');">
                 @csrf
                 @method('DELETE')
 
-                <x-button class="bg-red-600 hover:bg-red-700">Delete</x-button>
+                <x-button class="bg-red-600 hover:bg-red-700">
+                    Delete
+                </x-button>
             </form>
 
         </div>
@@ -75,42 +95,60 @@
     </div>
 
     <!-- Comments Section -->
-    <div class="mt-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                rounded-xl shadow p-6">
+    <div class="mt-12 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                rounded-2xl shadow-sm p-8">
 
-        <h2 class="text-2xl font-semibold mb-6 dark:text-white">
-            Comments ({{ $post->comments()->count() }})
-        </h2>
+        <!-- Heading -->
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold dark:text-white">Comments</h2>
+
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+                {{ $post->comments()->count() }} total
+            </span>
+        </div>
 
         <!-- Add Comment -->
         @auth
-        <form action="{{ route('comments.store') }}" method="POST" class="mb-8">
-            @csrf
+        <div class="mb-9 p-4 rounded-xl border border-gray-300 dark:border-gray-700 
+                    bg-gray-50 dark:bg-gray-700/30">
 
-            <input type="hidden" name="post_id" value="{{ $post->id }}">
+            <form action="{{ route('comments.store') }}" method="POST">
+                @csrf
 
-            <x-textarea
-                name="body"
-                placeholder="Write a comment..."
-                rows="3"
-                required></x-textarea>
+                <input type="hidden" name="post_id" value="{{ $post->id }}">
 
-            <x-button primary class="mt-3">Post Comment</x-button>
-        </form>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Add a Comment
+                </label>
+
+                <x-textarea
+                    name="body"
+                    rows="3"
+                    placeholder="Write something..."
+                    required></x-textarea>
+
+                <div class="flex justify-end mt-3">
+                    <x-button class="bg-blue-600 hover:bg-blue-700">
+                        Post Comment
+                    </x-button>
+                </div>
+            </form>
+
+        </div>
         @endauth
 
         @guest
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
-            <a href="{{ route('login') }}"
-                class="text-blue-600 dark:text-blue-400 underline">Login</a>
-            to post a comment.
-        </p>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+                <a href="{{ route('login') }}"
+                   class="text-blue-600 dark:text-blue-400 underline">Login</a>
+                to post a comment.
+            </p>
         @endguest
 
         <!-- Comments List -->
-        <div class="space-y-6">
+        <div class="space-y-8">
             @foreach ($comments as $comment)
-            <x-comment :comment="$comment" />
+                <x-comment :comment="$comment" />
             @endforeach
         </div>
 
