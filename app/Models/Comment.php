@@ -16,7 +16,6 @@ class Comment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $with = ['post'];
 
     protected $fillable = [
         'post_id',
@@ -100,4 +99,16 @@ class Comment extends Model
 
         return $converter->convert($this->body)->getContent();
     }
+
+    public function updateVoteCounts(): void
+{
+    $up = $this->votes()->where('value', 1)->count();
+    $down = $this->votes()->where('value', -1)->count();
+
+    $this->update([
+        'upvote_count'   => $up,
+        'downvote_count' => $down,
+    ]);
+}
+
 }
