@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -47,9 +48,9 @@ class User extends Authenticatable implements AuthorizableContract
         'deleted_at'        => 'datetime',
     ];
 
-    // ============================================================
+    // ============================================
     // Relationships
-    // ============================================================
+    // ============================================
 
     public function role(): BelongsTo
     {
@@ -61,10 +62,16 @@ class User extends Authenticatable implements AuthorizableContract
         return $this->hasMany(Post::class);
     }
 
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
+    public function parentComments(): HasMany
+{
+    return $this->hasMany(Comment::class)
+                ->whereNull('parent_id'); // count only top-level comments
+}
+
+public function allComments(): HasMany
+{
+    return $this->hasMany(Comment::class);
+}
 
     public function votes(): HasMany
     {
@@ -105,19 +112,17 @@ class User extends Authenticatable implements AuthorizableContract
 
     public function savedPosts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'saved_posts')
-            ->withTimestamps();
+        return $this->belongsToMany(Post::class, 'saved_posts')->withTimestamps();
     }
 
     public function followedTags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, 'tag_follows')
-            ->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'tag_follows')->withTimestamps();
     }
 
-    // ============================================================
+    // ============================================
     // Accessors
-    // ============================================================
+    // ============================================
 
     public function getDisplayNameAttribute(): string
     {
@@ -130,7 +135,6 @@ class User extends Authenticatable implements AuthorizableContract
             return asset('images/default-avatar.png');
         }
 
-        // fallback if file missing
         if (!file_exists(public_path('storage/' . $this->profile_picture))) {
             return asset('images/default-avatar.png');
         }
@@ -140,38 +144,33 @@ class User extends Authenticatable implements AuthorizableContract
 
     public function getJoinedDateAttribute(): string
     {
-        return $this->created_at->format('F Y'); // Example: "January 2025"
+        return $this->created_at->format('F Y');
     }
 
-    // ============================================================
-    // Scopes
-    // ============================================================
-
-    public function scopeActive($query)
-    {
-        return $query->whereNull('deleted_at');
-    }
-
-    public function scopeTopContributors($query, int $limit = 10)
-    {
-        return $query->orderByDesc('reputation_points')
-            ->limit($limit);
-    }
-
-    // ============================================================
-    // Utility methods
-    // ============================================================
-
-    public function isFollowing(User $user): bool
-    {
-        return $this->following()
-            ->where('followed_id', $user->id)
-            ->exists();
-    }
+    // ============================================
+    // Utility
+    // ============================================
 
     public function isAdmin(): bool
     {
-        // safer → do not rely on magic hard-coded ID
         return optional($this->role)->name === 'admin';
     }
+
+public function addReputation(string $action, ?int $points = null, ?Model $source = null)
+{
+    return app(\App\Services\ReputationService::class)
+        ->award($this, $action, $points, $source);
+}
+
+    public function totalReputation(): int
+    {
+        return $this->reputation_points;
+    }
+
+    public function removeReputation(string $action, ?Model $source = null)
+{
+    return app(\App\Services\ReputationService::class)
+        ->remove($this, $action, $source);
+}
+
 }

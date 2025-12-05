@@ -6,7 +6,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TagController;
-
+use App\Http\Controllers\VoteController;
+use App\Http\Controllers\ReputationController;
 
 // ---------------------------------------------------------
 // Home Page
@@ -25,7 +26,7 @@ Route::get('/dashboard', function () {
 
 
 // ---------------------------------------------------------
-// PUBLIC PROFILE ROUTE (e.g., /@mohammed)
+// PUBLIC PROFILE ROUTES (e.g., /@mohammed)
 // ---------------------------------------------------------
 Route::get('/@{username}', [ProfileController::class, 'show'])
     ->name('profiles.show');
@@ -45,6 +46,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
 
+    // ----------------------
+    // Reputation History
+    // ----------------------
+    Route::get('/@{user:username}/reputation', [ReputationController::class, 'index'])
+    ->name('reputation.index');
 
     // ----------------------
     // Posts (full CRUD)
@@ -64,6 +70,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/comments/{comment}/unbest', [CommentController::class, 'unmarkBest'])
     ->name('comments.unbest');
+
+
+    // ----------------------
+    // Voting (for posts/comments)
+    // ----------------------
+    Route::post('/vote', [VoteController::class, 'vote'])
+        ->name('vote');
 
 
     // -----------------------------------------------------
@@ -88,7 +101,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
     Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
 
-}); // This is the single, correct closing bracket for the 'auth' middleware group.
+});
+
 // ----------------------
 // Search
 // ----------------------

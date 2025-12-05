@@ -26,21 +26,21 @@
 
             <x-post-author :user="$post->user" :date="$post->created_at" />
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-8">
 
+                <!-- VOTING -->
+                <x-post-vote :post="$post" />
+
+                <!-- Views -->
                 <div class="flex items-center gap-1">
                     <x-icons.eye class="w-4 h-4" />
                     {{ number_format($post->view_count) }}
                 </div>
 
+                <!-- Comments Count -->
                 <div class="flex items-center gap-1">
                     <x-icons.chat class="w-4 h-4" />
-                    {{ $post->comments()->count() }}
-                </div>
-
-                <div class="flex items-center gap-1">
-                    <x-icons.arrow-up class="w-4 h-4" />
-                    {{ $post->upvote_count - $post->downvote_count }}
+                    {{ $post->allComments()->count() }}
                 </div>
 
             </div>
@@ -103,7 +103,7 @@
             <h2 class="text-2xl font-semibold dark:text-white">Comments</h2>
 
             <span class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $post->comments()->count() }} total
+                {{ $post->allComments()->count() }} total
             </span>
         </div>
 

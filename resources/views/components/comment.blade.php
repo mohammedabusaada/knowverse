@@ -8,6 +8,9 @@
     <!-- HEADER -->
     <div class="flex items-start gap-4">
 
+        <!-- Voting (NEW) -->
+        <x-comment-vote :comment="$comment" />
+
         <!-- Avatar -->
         <x-user-avatar :src="$comment->user->profile_picture_url" size="10" />
 
@@ -17,7 +20,6 @@
             <div class="flex items-center justify-between">
 
                 <div class="flex flex-col">
-
                     <div class="flex items-center gap-2">
 
                         <span class="font-semibold text-gray-900 dark:text-gray-100">
@@ -28,21 +30,21 @@
                             {{ $comment->created_at->diffForHumans() }}
                         </span>
 
-                        <!-- Best Comment Badge (small + elegant) -->
+                        <!-- Best Comment Badge -->
                         @if ($comment->post->best_comment_id === $comment->id)
                             <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md 
                                          bg-green-200 text-green-800 dark:bg-green-700 dark:text-white">
                                 ✓ Best Answer
                             </span>
                         @endif
-                    </div>
 
+                    </div>
                 </div>
 
                 <!-- ACTION BUTTONS -->
                 <div class="flex items-center gap-3 text-sm">
 
-                    {{-- MARK AS BEST / REMOVE BEST --}}
+                    {{-- MARK AS BEST (Post owner only) --}}
                     @if(auth()->id() === $comment->post->user_id && is_null($comment->parent_id))
 
                         @if ($comment->post->best_comment_id === $comment->id)
@@ -127,12 +129,12 @@
 
             <!-- REPLY BUTTON -->
             @auth
-            <button 
-                @click="showReply = !showReply"
-                class="mt-4 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-            >
-                Reply
-            </button>
+                <button 
+                    @click="showReply = !showReply"
+                    class="mt-4 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                >
+                    Reply
+                </button>
             @endauth
 
             <!-- REPLY FORM -->
@@ -169,8 +171,7 @@
     <!-- REPLIES -->
     @if ($comment->replies->count())
         <div 
-            class="mt-6 ml-8 pl-6 border-l border-gray-300 dark:border-gray-700
-                   space-y-6"
+            class="mt-6 ml-12 pl-6 border-l border-gray-300 dark:border-gray-700 space-y-6"
         >
             @foreach ($comment->replies as $reply)
                 <x-comment :comment="$reply" />
