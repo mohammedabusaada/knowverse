@@ -38,4 +38,12 @@ class UserPolicy
     {
         return $auth->role_id === 2;
     }
+        /**
+     * تعطي صلاحية manage-reports للمستخدم الذي role_id = 2
+     */
+    public function manageReports(User $auth): bool
+    {
+        return $auth->role_id === 2;
+    }
 }
+

@@ -23,5 +23,6 @@ class AppServiceProvider extends ServiceProvider
         Vote::observe(VoteObserver::class);
         Post::observe(PostObserver::class);
         Comment::observe(CommentObserver::class);
+
     }
 }
