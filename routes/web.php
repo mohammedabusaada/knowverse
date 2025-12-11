@@ -8,6 +8,8 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\ReputationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\ReportModerationController;
 
 // ---------------------------------------------------------
 // Home Page
@@ -112,3 +114,23 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // Auth routes (Breeze)
 // ---------------------------------------------------------
 require __DIR__ . '/auth.php';
+// Report submission
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+});
+
+// Admin panel for moderation
+Route::middleware(['auth','can:manage-reports'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+    Route::get('/reports', [ReportModerationController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [ReportModerationController::class, 'show'])->name('reports.show');
+    Route::patch('/reports/{report}/review', [ReportModerationController::class, 'review'])->name('reports.review');
+    Route::patch('/reports/{report}/dismiss', [ReportModerationController::class, 'dismiss'])->name('reports.dismiss');
+});
+Route::get('/test-report', function () {
+    return view('test-report');
+});
+
