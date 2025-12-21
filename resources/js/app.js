@@ -8,3 +8,6 @@ Alpine.start();
 
 import EasyMDE from "easymde";
 window.EasyMDE = EasyMDE;
+
+import './vote.js';
+

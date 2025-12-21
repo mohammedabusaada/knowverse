@@ -16,6 +16,9 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
 
+        // Eager load counts (MUCH faster + fixes the 0 problem)
+        $user->loadCount(['posts', 'allComments', 'followers']);
+
         return view('profiles.show', compact('user'));
     }
 
@@ -24,9 +27,9 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        $user = Auth::user();
-
-        return view('profiles.edit', compact('user'));
+        return view('profiles.edit', [
+            'user' => Auth::user()
+        ]);
     }
 
     /**
@@ -43,14 +46,13 @@ class ProfileController extends Controller
             'profile_picture' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        // Handle profile picture upload correctly
+        // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
-            // delete previous one if exists
+
             if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
                 Storage::disk('public')->delete($user->profile_picture);
             }
 
-            // store new file
             $validated['profile_picture'] = $request->file('profile_picture')
                 ->store('avatars', 'public');
         }
@@ -58,7 +60,7 @@ class ProfileController extends Controller
         $user->update($validated);
 
         return redirect()
-            ->route('profiles.show', $user->username) // FIXED
+            ->route('profiles.show', $user->username)
             ->with('status', 'Profile updated successfully.');
     }
 }

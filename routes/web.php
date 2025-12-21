@@ -6,7 +6,10 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TagController;
-
+use App\Http\Controllers\VoteController;
+use App\Http\Controllers\ReputationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\ReportModerationController;
 
 // ---------------------------------------------------------
 // Home Page
@@ -25,7 +28,7 @@ Route::get('/dashboard', function () {
 
 
 // ---------------------------------------------------------
-// PUBLIC PROFILE ROUTE (e.g., /@mohammed)
+// PUBLIC PROFILE ROUTES (e.g., /@mohammed)
 // ---------------------------------------------------------
 Route::get('/@{username}', [ProfileController::class, 'show'])
     ->name('profiles.show');
@@ -45,6 +48,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
 
+    // ----------------------
+    // Reputation History
+    // ----------------------
+    Route::get('/@{user:username}/reputation', [ReputationController::class, 'index'])
+    ->name('reputation.index');
 
     // ----------------------
     // Posts (full CRUD)
@@ -64,6 +72,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/comments/{comment}/unbest', [CommentController::class, 'unmarkBest'])
     ->name('comments.unbest');
+
+
+    // ----------------------
+    // Voting (for posts/comments)
+    // ----------------------
+    Route::post('/vote', [VoteController::class, 'vote'])
+        ->name('vote');
 
 
     // -----------------------------------------------------
@@ -88,7 +103,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
     Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
 
-}); // This is the single, correct closing bracket for the 'auth' middleware group.
+});
+
 // ----------------------
 // Search
 // ----------------------
@@ -98,3 +114,23 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // Auth routes (Breeze)
 // ---------------------------------------------------------
 require __DIR__ . '/auth.php';
+// Report submission
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+});
+
+// Admin panel for moderation
+Route::middleware(['auth','can:manage-reports'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+    Route::get('/reports', [ReportModerationController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [ReportModerationController::class, 'show'])->name('reports.show');
+    Route::patch('/reports/{report}/review', [ReportModerationController::class, 'review'])->name('reports.review');
+    Route::patch('/reports/{report}/dismiss', [ReportModerationController::class, 'dismiss'])->name('reports.dismiss');
+});
+Route::get('/test-report', function () {
+    return view('test-report');
+});
+

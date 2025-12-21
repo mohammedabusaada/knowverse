@@ -21,7 +21,10 @@ class CommentController extends Controller
 
         $validated['user_id'] = Auth::id();
 
-        Comment::create($validated);
+        $comment = Comment::create($validated);
+
+        // ★ Give reputation for writing a comment
+        $comment->user->addReputation('comment_created', null, $comment);
 
         return back()->with('status', 'Comment added.');
     }
@@ -54,32 +57,49 @@ class CommentController extends Controller
         return back()->with('status', 'Comment deleted.');
     }
 
-
+    /**
+     * Mark comment as best.
+     */
     public function markAsBest(Comment $comment)
-{
-    $this->authorize('markBest', $comment);
+    {
+        $this->authorize('markBest', $comment);
 
-    // Update post's best comment
-    $comment->post->update([
-        'best_comment_id' => $comment->id,
-    ]);
+        $post = $comment->post;
 
-    return back()->with('status', 'Best comment selected.');
-}
+        // Update post's best comment
+        $post->update([
+            'best_comment_id' => $comment->id,
+        ]);
 
-public function unmarkBest(Comment $comment)
+        // ★ Reputation logic
+        // Awarded to comment author (best answer received)
+        $comment->user->addReputation('best_answer_received', null, $comment);
+
+        // Awarded to post author (best answer awarded)
+        $post->user->addReputation('best_answer_awarded', null, $comment);
+
+        return back()->with('status', 'Best comment selected.');
+    }
+
+    public function unmarkBest(Comment $comment)
 {
     $this->authorize('unmarkBest', $comment);
 
-    // Only remove if this comment is the currently selected best
-    if ($comment->post->best_comment_id === $comment->id) {
-        $comment->post->update([
-            'best_comment_id' => null,
-        ]);
+    $post = $comment->post;
+
+    if ($post->best_comment_id === $comment->id) {
+
+        // Undo rep for comment author
+        $comment->user->removeReputation('best_answer_received', $comment);
+
+        // Undo rep for post author
+        $post->user->removeReputation('best_answer_awarded', $comment);
+
+        // Remove best comment
+        $post->update(['best_comment_id' => null]);
     }
 
     return back()->with('status', 'Best comment removed.');
 }
-
 
 }

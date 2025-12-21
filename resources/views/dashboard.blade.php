@@ -58,7 +58,7 @@
 
         <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm text-center border border-gray-200 dark:border-gray-700">
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ auth()->user()->comments()->count() }}
+                {{ auth()->user()->parentComments()->count() }}
             </div>
             <div class="text-gray-600 dark:text-gray-400 mt-1">Comments</div>
         </div>
