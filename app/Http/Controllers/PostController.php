@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,20 +11,28 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
-        $tagIds = $request->query('tag_ids');
+        $selectedTags = $request->get('tags', []);
 
         $posts = Post::with('user')
             ->published()
-            ->filterByTags($tagIds)
+            ->when($selectedTags, function ($query) use ($selectedTags) {
+                $query->whereHas('tags', function ($q) use ($selectedTags) {
+                    $q->whereIn('name', $selectedTags);
+                });
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(9)
+            ->withQueryString();
 
-        return view('posts.index', compact('posts'));
+        $tags = Tag::all();
+
+        return view('posts.index', compact('posts', 'tags', 'selectedTags'));
     }
 
     public function create()
     {
-        return view('posts.create');
+        $tags = Tag::all();
+        return view('posts.create', compact('tags'));
     }
 
     public function store(Request $request)
@@ -40,18 +49,13 @@ class PostController extends Controller
         $validated['status']  = Post::STATUS_PUBLISHED;
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')
-                ->store('post_images', 'public');
+            $validated['image'] = $request->file('image')->store('post_images', 'public');
         }
 
         $post = Post::create($validated);
-
-        // Attach tags
         $post->tags()->sync($request->tag_ids ?? []);
 
-        // ★ Give reputation for writing a post
         $post->user->addReputation('post_created', null, $post);
-
 
         return redirect()
             ->route('posts.show', $post)
@@ -69,21 +73,22 @@ class PostController extends Controller
             'comments.replies.user',
         ]);
 
-        // ★ Sort comments: best comment first
         $sortedComments = $post->comments->sortByDesc(
             fn ($comment) => $comment->id === $post->best_comment_id
         );
 
         return view('posts.show', [
-            'post'      => $post,
-            'comments'  => $sortedComments,
+            'post' => $post,
+            'comments' => $sortedComments,
         ]);
     }
 
     public function edit(Post $post)
     {
         $this->authorize('update', $post);
-        return view('posts.edit', compact('post'));
+        $tags = Tag::all();
+
+        return view('posts.edit', compact('post', 'tags'));
     }
 
     public function update(Request $request, Post $post)
@@ -99,8 +104,7 @@ class PostController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')
-                ->store('post_images', 'public');
+            $validated['image'] = $request->file('image')->store('post_images', 'public');
         }
 
         $post->update($validated);
@@ -114,7 +118,6 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
-
         $post->delete();
 
         return redirect()
