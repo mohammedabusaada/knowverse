@@ -10,6 +10,10 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\ReputationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ReportModerationController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AdminPostController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminReportController;
 
 // ---------------------------------------------------------
 // Home Page
@@ -133,4 +137,12 @@ Route::middleware(['auth','can:manage-reports'])
 Route::get('/test-report', function () {
     return view('test-report');
 });
+
+
+Route::middleware(['auth', 'is_admin'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
+    });
 
