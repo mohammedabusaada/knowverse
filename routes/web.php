@@ -10,7 +10,9 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\ReputationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ReportModerationController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\HomeController;
+
 
 // ---------------------------------------------------------
 // 1. Static & Fixed Routes (Highest Priority)
@@ -28,7 +30,7 @@ Route::get('/dashboard', function () {
 // ---------------------------------------------------------
 // 2. Authentication System (Breeze/Jetstream)
 // ---------------------------------------------------------
-// We require this BEFORE the profile wildcard so that /login and /register 
+// We require this BEFORE the profile wildcard so that /login and /register
 // are caught by the auth controller, not the profile controller.
 require __DIR__ . '/auth.php';
 
@@ -75,7 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/tags', [TagController::class, 'attachTags']);
     Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
     Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
-    
+
     // Reputation History
     Route::get('/{user:username}/reputation', [ReputationController::class, 'index'])->name('reputation.index');
 });
@@ -92,4 +94,16 @@ Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profil
 // ---------------------------------------------------------
 Route::get('/test-report', function () {
     return view('test-report');
+
 });
+
+
+Route::middleware(['auth', 'is_admin'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
+    });
+
+
+
