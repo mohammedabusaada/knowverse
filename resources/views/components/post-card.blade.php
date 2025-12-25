@@ -1,50 +1,71 @@
-@props(['post'])
+@props(['post', 'compact' => false])
 
-<a href="{{ route('posts.show', $post) }}"
-   class="block rounded-xl overflow-hidden shadow hover:shadow-lg transition 
-          transform hover:-translate-y-1 bg-white dark:bg-gray-800
-          border border-gray-200 dark:border-gray-700">
-
-    <div class="p-6">
-
-        <!-- Title -->
-        <h2 class="text-xl font-semibold mb-2 dark:text-white line-clamp-1">
-            {{ $post->title }}
-        </h2>
-
-        <!-- Author -->
-        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <x-user-avatar :src="$post->user->profile_picture_url" size="sm" class="mr-3" />
-            <div>
-                <p class="font-medium">{{ $post->user->display_name }}</p>
-                <p class="text-xs">{{ $post->created_at->diffForHumans() }}</p>
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 transition-colors shadow-sm overflow-visible mb-4">
+    <div class="p-4 md:p-5 flex gap-4">
+        
+        {{-- Sidebar Stats --}}
+        <div class="hidden md:flex flex-col items-center w-12 text-gray-500 dark:text-gray-400">
+            <div class="text-center">
+                <span class="block text-lg font-bold text-gray-900 dark:text-white">
+                    {{ $post->upvote_count - $post->downvote_count }}
+                </span>
+                <span class="text-[10px] uppercase font-bold tracking-tighter">Votes</span>
+            </div>
+            <div class="mt-4 text-center opacity-60">
+                <span class="block text-sm font-semibold">{{ $post->allComments()->count() }}</span>
+                <span class="text-[10px] uppercase font-bold tracking-tighter">Replies</span>
             </div>
         </div>
 
-        <!-- Body Preview -->
-        <p class="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
-            {{ Str::limit(strip_tags($post->body), 150) }}
-        </p>
-
-        <!-- Tags -->
-        @if ($post->tags->count())
-            <div class="flex flex-wrap gap-2 mb-4">
-                @foreach($post->tags as $tag)
-                    <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 
-                                 text-gray-700 dark:text-gray-300
-                                 text-xs rounded-md">
-                        #{{ $tag->name }}
-                    </span>
-                @endforeach
+        <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2 text-xs text-gray-500">
+                <x-user-avatar :src="$post->user->profile_picture_url" size="xs" />
+                <x-user-hover-card :user="$post->user" />
+                <span>•</span>
+                <span>{{ $post->created_at->diffForHumans() }}</span>
             </div>
-        @endif
 
-        <x-post-stats 
-            :views="$post->view_count"
-            :comments="$post->comments_count ?? $post->comments->count()"
-            :votes="$post->upvote_count - $post->downvote_count"
-        />
+            <a href="{{ route('posts.show', $post) }}" class="block group">
+                <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                    {{-- Highlight Title if search query exists --}}
+                    @if(request('q'))
+                        @highlight($post->title)
+                    @else
+                        {{ $post->title }}
+                    @endif
+                </h2>
 
+                <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 leading-relaxed mb-4">
+                    {{-- Highlight Body snippet if search query exists --}}
+                    @php 
+                        $plainText = strip_tags($post->body);
+                        $truncated = Str::limit($plainText, 160);
+                    @endphp
+
+                    @if(request('q'))
+                        @highlight($truncated)
+                    @else
+                        {{ $truncated }}
+                    @endif
+                </p>
+            </a>
+
+            <div class="flex items-center justify-between">
+                <div class="flex flex-wrap gap-2">
+                    @foreach($post->tags->take(3) as $tag)
+                        {{-- FIXED LINK: Sends an array with one tag to match the Controller logic --}}
+                        <a href="{{ route('posts.index', ['tags' => [$tag->name]]) }}" 
+                           class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                            #{{ $tag->name }}
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="flex md:hidden gap-4 text-xs font-bold text-gray-500">
+                    <span>▲ {{ $post->upvote_count - $post->downvote_count }}</span>
+                    <span>💬 {{ $post->allComments()->count() }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-
-</a>
+</div>

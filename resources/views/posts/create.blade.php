@@ -26,12 +26,12 @@
             required />
 
        <!-- Title -->
-        <x-tag-input
-            label="Tag"
-            name="tag_id"
-            :options="$tags"
-            :selected="old('tag_id')"
-            required />
+<x-tag-multiselect
+    label="Topics"
+    :options="$tags"
+    :selected="old('tag_ids', [])"
+    max="5" />
+
 
 
         <!-- Body (Markdown) -->

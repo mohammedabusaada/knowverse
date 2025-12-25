@@ -75,8 +75,8 @@ class TagController extends Controller
     {
         $this->authorize('update', $post);
         $request->validate([
-            'tag_ids' => 'required|array',
-            'tag_ids.*' => 'exists:tags,id'
+'tag_ids'   => ['required', 'array', 'max:5'], 
+        'tag_ids.*' => 'exists:tags,id'
         ]);
 
         $post->tags()->sync($request->tag_ids);
