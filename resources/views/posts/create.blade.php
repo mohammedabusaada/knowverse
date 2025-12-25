@@ -25,6 +25,15 @@
             value="{{ old('title') }}"
             required />
 
+       <!-- Title -->
+<x-tag-multiselect
+    label="Topics"
+    :options="$tags"
+    :selected="old('tag_ids', [])"
+    max="5" />
+
+
+
         <!-- Body (Markdown) -->
         <x-textarea
             label="Body (Markdown supported)"

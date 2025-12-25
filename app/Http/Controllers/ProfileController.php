@@ -3,27 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\ReservedUsername;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
     /**
-     * Public profile page: /@username
+     * Display the public profile page: /{username}
      */
-    public function show(string $username)
+    public function show(User $user)
     {
-        $user = User::where('username', $username)->firstOrFail();
-
-        // Eager load counts (MUCH faster + fixes the 0 problem)
         $user->loadCount(['posts', 'allComments', 'followers']);
-
         return view('profiles.show', compact('user'));
     }
 
     /**
-     * Edit the authenticated user profile.
+     * Show the form for editing the profile.
      */
     public function edit()
     {
@@ -33,7 +31,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the authenticated user's profile.
+     * Update the profile.
      */
     public function update(Request $request)
     {
@@ -44,17 +42,21 @@ class ProfileController extends Controller
             'academic_title'  => ['nullable', 'string', 'max:255'],
             'bio'             => ['nullable', 'string', 'max:2000'],
             'profile_picture' => ['nullable', 'image', 'max:2048'],
+            'username'        => [
+                'sometimes', 
+                'string', 
+                'max:50', 
+                'alpha_dash:ascii', 
+                Rule::unique('users')->ignore($user->id),
+                new ReservedUsername(),
+            ],
         ]);
 
-        // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
-
             if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
                 Storage::disk('public')->delete($user->profile_picture);
             }
-
-            $validated['profile_picture'] = $request->file('profile_picture')
-                ->store('avatars', 'public');
+            $validated['profile_picture'] = $request->file('profile_picture')->store('avatars', 'public');
         }
 
         $user->update($validated);
