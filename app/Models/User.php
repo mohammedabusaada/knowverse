@@ -173,4 +173,7 @@ public function addReputation(string $action, ?int $points = null, ?Model $sourc
         ->remove($this, $action, $source);
 }
 
+
+public function getRouteKeyName() { return 'username'; }
+
 }

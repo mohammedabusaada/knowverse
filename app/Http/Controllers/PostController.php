@@ -11,9 +11,17 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
+        // Allow 'tags' to be a single string (from a link) or an array (from checkboxes)
         $selectedTags = $request->get('tags', []);
+        
+        if (is_string($selectedTags)) {
+            $selectedTags = [$selectedTags];
+        }
 
-        $posts = Post::with('user')
+        $posts = Post::with(['user' => function($q) {
+                // Optimization for the User Hover Card stats
+                $q->withCount(['posts', 'followers']);
+            }, 'tags'])
             ->published()
             ->when($selectedTags, function ($query) use ($selectedTags) {
                 $query->whereHas('tags', function ($q) use ($selectedTags) {
@@ -67,7 +75,9 @@ class PostController extends Controller
         $post->incrementViewCount();
 
         $post->load([
-            'user',
+            'user' => function($q) {
+                $q->withCount(['posts', 'followers']);
+            },
             'tags',
             'comments.user',
             'comments.replies.user',

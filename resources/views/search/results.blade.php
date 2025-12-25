@@ -3,111 +3,68 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-10">
 
-    {{-- Search header --}}
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold dark:text-white">Search results</h1>
-        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Showing results for: <span class="font-medium">{{ $q }}</span></p>
-    </div>
-
-    {{-- Search bar (prefilled) --}}
+    {{-- Header --}}
     <div class="mb-6">
-        <form action="{{ route('search') }}" method="GET" class="flex gap-2">
-            <input name="q" value="{{ old('q', $q) }}" placeholder="Search posts, tags, users..."
-                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white"
-                autofocus>
-            <button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">Search</button>
-        </form>
+    <h1 class="text-2xl font-bold dark:text-white">Search results</h1>
+    <div class="flex items-center gap-2 mt-1">
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+            Found {{ number_format($counts[$type]) }} {{ str($type)->singular($counts[$type]) }} 
+            for <span class="font-semibold text-blue-600">"{{ $q }}"</span>
+        </p>
+    </div>
+</div>
+
+    {{-- Search bar --}}
+    <div class="mb-6">
+        <x-search-bar
+            placeholder="Search posts, users, tags..."
+            :value="$q" />
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {{-- Posts column (main) --}}
-        <div class="lg:col-span-2 space-y-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold dark:text-white">Posts</h2>
-                @if($posts instanceof \Illuminate\Support\Collection && $posts->isEmpty())
-                <span class="text-sm text-gray-500 dark:text-gray-400">No results</span>
-                @endif
-            </div>
-
-            @if($posts instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            @foreach ($posts as $post)
-            <a href="{{ route('posts.show', $post) }}" class="block p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-lg font-semibold dark:text-white">{{ $post->title }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            by {{ $post->user->display_name }} · {{ $post->created_at->diffForHumans() }}
-                        </p>
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                        👁 {{ $post->view_count }}
-                    </div>
-                </div>
-
-                {{-- snippet with highlight --}}
-                @php
-                $snippet = Str::limit(strip_tags($post->body), 220);
-                $escaped = e($snippet);
-                $pattern = '/' . preg_quote($q, '/') . '/i';
-                $highlighted = preg_replace($pattern, '<mark class="bg-yellow-200 dark:bg-yellow-600">$0</mark>', $escaped);
-                @endphp
-                <p class="mt-3 text-gray-700 dark:text-gray-300 prose max-w-none">
-                    {!! $highlighted !!}
-                </p>
-            </a>
+    {{-- Active Tag Filters --}}
+    @if(!empty($selectedTags))
+        <div class="flex flex-wrap gap-2 mb-6 items-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Active Tags:</span>
+            @foreach($selectedTags as $tagName)
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                    #{{ $tagName }}
+                    <a href="{{ route('search', array_merge(request()->query(), ['tags' => array_diff($selectedTags, [$tagName])])) }}" class="ml-2 hover:text-red-500 transition-colors">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/></svg>
+                    </a>
+                </span>
             @endforeach
+            <a href="{{ route('search', ['q' => $q]) }}" class="text-xs text-gray-500 hover:text-red-500 underline ml-2">Clear all</a>
+        </div>
+    @endif
 
-            <div class="mt-6">
-                {{ $posts->links() }}
-            </div>
-            @else
-            {{-- no posts result --}}
-            <div class="text-gray-600 dark:text-gray-300">No posts found.</div>
-            @endif
+    <div x-data="searchTabs('{{ $type }}')">
+        {{-- Tabs --}}
+        <div class="mb-8 border-b dark:border-gray-700 flex gap-6">
+            @foreach (['posts' => 'Posts', 'users' => 'Users', 'tags' => 'Tags'] as $key => $label)
+                <a 
+                    {{-- array_merge keeps our 'tags[]' in the URL when switching tabs --}}
+                    href="{{ route('search', array_merge(request()->query(), ['type' => $key])) }}"
+                    class="pb-3 font-medium transition border-b-2 {{ $type === $key 
+                        ? 'border-blue-600 text-blue-600' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300' 
+                    }}"
+                >
+                    {{ $label }} 
+                    <span class="text-xs ml-1 opacity-70">({{ $counts[$key] }})</span>
+                </a>
+            @endforeach
         </div>
 
-        {{-- Sidebar: users + tags --}}
-        <aside class="space-y-6">
-
-            {{-- Users --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold mb-3 dark:text-white">Users</h3>
-
-                @if($users->isEmpty())
-                <p class="text-sm text-gray-500 dark:text-gray-400">No users found.</p>
-                @else
-                <ul class="space-y-3">
-                    @foreach($users as $user)
-                    <li class="flex items-center gap-3">
-                        <img src="{{ $user->profile_picture_url }}" class="w-10 h-10 rounded-full object-cover">
-                        <div>
-                            <a href="{{ route('profiles.show', $user->username) }}" class="font-medium dark:text-white">{{ $user->display_name }}</a>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ '@' . $user->username }}</div>
-                        </div>
-                    </li>
-                    @endforeach
-                </ul>
-                @endif
-            </div>
-
-            {{-- Tags --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold mb-3 dark:text-white">Tags</h3>
-
-                @if($tags->isEmpty())
-                <p class="text-sm text-gray-500 dark:text-gray-400">No tags found.</p>
-                @else
-                <div class="flex flex-wrap gap-2">
-                    @foreach($tags as $tag)
-                    <a href="{{ route('posts.index') . '?tag=' . urlencode($tag->name) }}" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm dark:text-gray-200">
-                        #{{ $tag->name }}
-                    </a>
-                    @endforeach
-                </div>
-                @endif
-            </div>
-        </aside>
+        {{-- Results Content --}}
+        <div class="mt-6">
+            @if($type === 'posts')
+                @include('search.partials.posts')
+            @elseif($type === 'users')
+                @include('search.partials.users')
+            @elseif($type === 'tags')
+                @include('search.partials.tags')
+            @endif
+        </div>
     </div>
 </div>
 @endsection
