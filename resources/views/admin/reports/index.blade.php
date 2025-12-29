@@ -25,9 +25,7 @@
             <tbody class="divide-y">
                 @forelse ($reports as $report)
                     <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="openModal({{ $report->id }})">
-                        <td class="px-6 py-4 text-sm text-gray-700">
-                            {{ $report->reporter->username ?? 'Unknown' }}
-                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $report->reporter->username ?? 'Unknown' }}</td>
                         <td class="px-6 py-4 text-sm text-gray-700 truncate max-w-xs">
                             @if($report->target)
                                 @if($report->target_type === \App\Models\Post::class)
@@ -41,17 +39,13 @@
                                 Deleted
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">
-                            {{ $report->reason }}
-                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">{{ $report->reason }}</td>
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                                 @if($report->status === 'pending') bg-yellow-100 text-yellow-700
                                 @elseif($report->status === 'reviewed') bg-green-100 text-green-700
                                 @else bg-red-100 text-red-700
-                                @endif">
-                                {{ ucfirst($report->status) }}
-                            </span>
+                                @endif">{{ ucfirst($report->status) }}</span>
                         </td>
                         <td class="px-6 py-4 text-center">
                             @if($report->status === 'pending')
@@ -98,9 +92,7 @@
                                     @if($report->status === 'pending') bg-yellow-100 text-yellow-700
                                     @elseif($report->status === 'reviewed') bg-green-100 text-green-700
                                     @else bg-red-100 text-red-700
-                                    @endif">
-                                    {{ ucfirst($report->status) }}
-                                </span>
+                                    @endif">{{ ucfirst($report->status) }}</span>
                             </p>
                             <div class="mt-4 flex gap-2">
                                 @if($report->status === 'pending')
@@ -140,9 +132,7 @@
                         @if($report->status === 'pending') bg-yellow-100 text-yellow-700
                         @elseif($report->status === 'reviewed') bg-green-100 text-green-700
                         @else bg-red-100 text-red-700
-                        @endif">
-                        {{ ucfirst($report->status) }}
-                    </span>
+                        @endif">{{ ucfirst($report->status) }}</span>
                 </div>
                 <div class="text-sm text-gray-600"><strong>Target:</strong>
                     @if($report->target)
