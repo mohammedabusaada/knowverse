@@ -11,29 +11,35 @@ return new class extends Migration
         Schema::create('user_activities', function (Blueprint $table) {
             $table->id();
 
-            // User performing the action
+            // The Actor
             $table->foreignId('user_id')
-                ->constrained('users')
+                ->constrained()
                 ->cascadeOnDelete();
 
-            // The type of action
-            $table->enum('action', [
-                'post', 'comment', 'vote', 'follow',
-                'report', 'login', 'logout'
-            ])->comment('Type of user action');
+            // The Action
+            $table->string('action', 64)
+                ->index()
+                ->comment('Activity action identifier (e.g. post_created, vote_up)');
 
-            // Polymorphic target (what the action was performed on)
-            $table->nullableMorphs('target'); // Entity the action was performed on
+            // Polymorphic Target (Post, Comment, etc.)
+            $table->nullableMorphs('target');
 
-            // Optional details (e.g., post title or short description)
-            $table->text('details')->nullable()->comment('Additional context about the activity');
+            // Metadata
+            $table->text('details')
+                ->nullable()
+                ->comment('Additional context (title, delta, etc.)');
 
+            // Timestamp
             $table->timestamp('created_at')->useCurrent();
 
-            // --- Indexes ---
-            $table->index(['user_id', 'created_at']); // activity feed
-            $table->index('action');                  // analytics
-            // index(target_type, target_id) auto-created by nullableMorphs()
+            // --- INDEXES ---
+            
+            // 1. For showing a specific user's activity feed (Latest first)
+            $table->index(['user_id', 'created_at']);
+
+            // 2. For showing the history/timeline of a specific Post or Comment
+            // This replaces the standard morph index with a more powerful version
+            $table->index(['target_type', 'target_id', 'created_at'], 'target_history_timeline');
         });
     }
 

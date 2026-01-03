@@ -56,6 +56,33 @@ class UserActivity extends Model
     }
 
     // ------------------------------------------------------------------
+// Feed Scopes
+// ------------------------------------------------------------------
+
+public function scopeForUser($query, User $user)
+{
+    return $query->where('user_id', $user->id);
+}
+
+public function scopeFeed($query)
+{
+    return $query->orderByDesc('created_at');
+}
+
+public function scopeWithTargets($query)
+{
+    return $query->with([
+        'target' => function ($morph) {
+            $morph->morphWith([
+                \App\Models\Post::class => ['user', 'tags'],
+                \App\Models\Comment::class => ['user', 'post'],
+            ]);
+        }
+    ]);
+}
+
+
+    // ------------------------------------------------------------------
     // Utility
     // ------------------------------------------------------------------
 
@@ -69,4 +96,9 @@ class UserActivity extends Model
             'details' => $details,
         ]);
     }
+
+    public function isPublic(): bool
+{
+    return \App\Support\ActivityVisibility::for($this->action) === 'public';
+}
 }

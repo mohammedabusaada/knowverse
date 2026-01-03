@@ -14,27 +14,34 @@ class UserActivityFactory extends Factory
 
     public function definition(): array
     {
-        $actions = ['post', 'comment', 'vote', 'follow', 'report', 'login', 'logout'];
+        $actions = [
+            'post_created',
+            'comment_created',
+            'vote_up',
+            'vote_down',
+            'vote_removed',
+            'best_answer_selected',
+            'reputation_changed',
+            'login',
+            'logout',
+        ];
+
         $action = $this->faker->randomElement($actions);
 
-        $target_id = null;
-        $target_type = null;
-        $details = null;
-
-        if (in_array($action, ['post', 'comment', 'vote', 'report'])) {
-            $target_type = $this->faker->randomElement([Post::class, Comment::class]);
-            $target = $target_type::inRandomOrder()->first();
-            $target_id = $target->id;
-            $details = "Action: $action on " . class_basename($target_type) . " #$target_id";
+        $target = null;
+        if (str_contains($action, 'post')) {
+            $target = Post::inRandomOrder()->first();
+        } elseif (str_contains($action, 'comment') || str_contains($action, 'vote')) {
+            $target = Comment::inRandomOrder()->first();
         }
 
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
-            'action' => $action,
-            'target_id' => $target_id,
-            'target_type' => $target_type,
-            'details' => $details,
-            'created_at' => now()->format('Y-m-d H:i:s'),
+            'user_id'     => User::inRandomOrder()->first()->id,
+            'action'      => $action,
+            'target_id'   => $target?->id,
+            'target_type' => $target ? get_class($target) : null,
+            'details'     => $this->faker->sentence(),
+            'created_at'  => $this->faker->dateTimeBetween('-30 days'),
         ];
     }
 }

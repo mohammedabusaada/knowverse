@@ -3,32 +3,63 @@
 namespace App\Observers;
 
 use App\Models\Post;
+use App\Services\ActivityService;
 
 class PostObserver
 {
-    public function deleting(Post $post)
+    /**
+     * Post created.
+     */
+    public function created(Post $post): void
     {
         $author = $post->user;
 
-        // Undo: post_created
-        $author->removeReputation('post_created', $post);
+        ActivityService::postCreated($author, $post);
 
-        // Undo: best answer awarded
-        if ($post->best_comment_id) {
-            // Undo for post author
-            $author->removeReputation('best_answer_awarded', $post->bestComment);
+        $author->addReputation(
+            'post_created',
+            null,
+            $post
+        );
+    }
 
-            // Undo for comment author
-            $post->bestComment->user->removeReputation('best_answer_received', $post->bestComment);
+    /**
+     * Post soft deleted.
+     */
+    public function deleting(Post $post): void
+    {
+        $author = $post->user;
+
+        // Undo: post creation reputation
+        $author->removeReputation(
+            'post_created',
+            $post
+        );
+
+        // Undo: best answer effects
+        if ($post->bestComment) {
+
+            // Post author
+            $author->removeReputation(
+                'best_answer_awarded',
+                $post->bestComment
+            );
+
+            // Comment author
+            $post->bestComment->user->removeReputation(
+                'best_answer_received',
+                $post->bestComment
+            );
         }
 
-        // Undo: votes on post
+        // Undo: votes reputation
         foreach ($post->votes as $vote) {
-            if ($vote->value === 1) {
-                $post->user->removeReputation('post_upvoted', $post);
-            } elseif ($vote->value === -1) {
-                $post->user->removeReputation('post_downvoted', $post);
-            }
+            $author->removeReputation(
+                $vote->value === 1
+                    ? 'post_voted_up'
+                    : 'post_voted_down',
+                $post
+            );
         }
     }
 }
