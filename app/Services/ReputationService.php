@@ -5,17 +5,13 @@ namespace App\Services;
 use App\Models\Reputation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use App\Services\ActivityService;
 
 class ReputationService
 {
     /**
      * Award reputation to a user for a specific action.
-     *
-     * @param User        $user
-     * @param string      $action
-     * @param int|null    $customDelta
-     * @param Model|null  $source
-     * @param string|null $note
      */
     public function award(
         User $user,
@@ -24,57 +20,97 @@ class ReputationService
         ?Model $source = null,
         ?string $note = null
     ): Reputation {
+        return DB::transaction(function () use (
+            $user,
+            $action,
+            $customDelta,
+            $source,
+            $note
+        ) {
 
-        // Determine the number of points to award
-        $delta = $customDelta ?? config("reputation.points.$action", 0);
+            $delta = $customDelta
+                ?? config("reputation.points.$action", 0);
 
-        // Create entry in reputation log
-        $record = Reputation::create([
-            'user_id'     => $user->id,
-            'action'      => $action,
-            'delta'       => $delta,
-            'source_id'   => $source?->id,
-            'source_type' => $source ? get_class($source) : null,
-            'note'        => $note,
-        ]);
+            // Create reputation log entry
+            $record = Reputation::create([
+                'user_id'     => $user->id,
+                'action'      => $action,
+                'delta'       => $delta,
+                'source_id'   => $source?->id,
+                'source_type' => $source ? get_class($source) : null,
+                'note'        => $note,
+            ]);
 
-        // Update cached total
-        $user->increment('reputation_points', $delta);
+            // Update cached reputation
+            if ($delta !== 0) {
+                $user->increment('reputation_points', $delta);
+            }
 
-        return $record;
+            // Log activity (single source of truth)
+            ActivityService::reputationChanged(
+                $user,
+                $delta,
+                $source,
+                $action
+            );
+
+            return $record;
+        });
     }
 
     /**
-     * Remove reputation for a specific action + source.
+     * Remove reputation for a specific action (+ optional source).
      */
-    public function remove(User $user, string $action, ?Model $source = null): void
-{
-    $query = Reputation::where('user_id', $user->id)
-        ->where('action', $action);
+    public function remove(
+        User $user,
+        string $action,
+        ?Model $source = null
+    ): void {
+        DB::transaction(function () use ($user, $action, $source) {
 
-    if ($source) {
-        $query->where('source_id', $source->id)
-              ->where('source_type', get_class($source));
+            $query = Reputation::where('user_id', $user->id)
+                ->where('action', $action);
+
+            if ($source) {
+                $query->where('source_id', $source->id)
+                      ->where('source_type', get_class($source));
+            }
+
+            $sum = (int) $query->sum('delta');
+
+            if ($sum === 0) {
+                return;
+            }
+
+            // Delete reputation logs
+            $query->delete();
+
+            // Update cached reputation
+            $user->decrement('reputation_points', $sum);
+
+            // Log reversal as activity
+            ActivityService::reputationChanged(
+                $user,
+                -$sum,
+                $source,
+                "{$action}_reverted"
+            );
+        });
     }
 
-    // Get total delta removed
-    $sum = $query->sum('delta');
-
-    // Delete logs
-    $query->delete();
-
-    // Decrease user's cached reputation
-    $user->decrement('reputation_points', $sum);
-}
-
-
     /**
-     * Recalculate user's total reputation from log table.
+     * Recalculate user's reputation from logs (admin/debug tool).
      */
     public function recalc(User $user): void
     {
-        $total = Reputation::where('user_id', $user->id)->sum('delta');
+        DB::transaction(function () use ($user) {
 
-        $user->update(['reputation_points' => $total]);
+            $total = Reputation::where('user_id', $user->id)
+                ->sum('delta');
+
+            $user->update([
+                'reputation_points' => $total,
+            ]);
+        });
     }
 }

@@ -10,13 +10,11 @@ class UserActivitySeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::all();
-
-        foreach ($users as $user) {
-            // Each user performs 5–15 actions
+        User::all()->each(function ($user) {
             UserActivity::factory(rand(5, 15))->create([
                 'user_id' => $user->id,
             ]);
-        }
+        });
     }
 }
+

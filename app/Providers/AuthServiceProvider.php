@@ -12,6 +12,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Post::class    => \App\Policies\PostPolicy::class,
         \App\Models\Comment::class => \App\Policies\CommentPolicy::class,
         \App\Models\User::class    => \App\Policies\UserPolicy::class,
+        \App\Models\UserActivity::class => \App\Policies\UserActivityPolicy::class,
     ];
 
     public function boot(): void

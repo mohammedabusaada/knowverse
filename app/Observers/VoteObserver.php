@@ -3,115 +3,95 @@
 namespace App\Observers;
 
 use App\Models\Vote;
+use App\Services\ActivityService;
+use App\Models\Post;
+use App\Models\Comment;
 
 class VoteObserver
 {
-    /**
-     * When a vote is first created.
-     */
-    public function created(Vote $vote)
+    public function created(Vote $vote): void
     {
-        $this->applyNewVoteReputation($vote);
-        $vote->target->updateVoteCounts();
+        $this->applyVote($vote);
     }
 
-    /**
-     * When a vote changes (up → down, or vote → unvote).
-     */
-    public function updated(Vote $vote)
+    public function updated(Vote $vote): void
     {
         if ($vote->isDirty('value')) {
-
-            $old = $vote->getOriginal('value'); // previous value
-            $new = $vote->value;                // new value
-
-            // 1. Undo old reputation
-            $this->undoVoteReputation($vote, $old);
-
-            // 2. Apply new reputation (if any)
-            $this->applyNewVoteReputation($vote);
+            $this->undoVote($vote, $vote->getOriginal('value'));
+            $this->applyVote($vote);
         }
-
-        $vote->target->updateVoteCounts();
     }
 
-    /**
-     * When a vote is removed entirely.
-     */
-    public function deleted(Vote $vote)
+    public function deleted(Vote $vote): void
     {
-        $this->undoVoteReputation($vote, $vote->value);
-        $vote->target->updateVoteCounts();
+        $this->undoVote($vote, $vote->value);
     }
 
+    // ==========================================================
+    // INTERNAL
+    // ==========================================================
 
-    // ============================================================
-    //  REPUTATION LOGIC
-    // ============================================================
-
-    /**
-     * Apply reputation for a newly applied vote (created or updated).
-     */
-    private function applyNewVoteReputation(Vote $vote): void
+    private function applyVote(Vote $vote): void
     {
         $target = $vote->target;
         $owner  = $target->user;
 
-        // Upvote applied
         if ($vote->value === 1) {
             $owner->addReputation(
-                $this->getActionName('up', $target),
+                $this->actionName('up', $target),
                 null,
                 $target
             );
         }
 
-        // Downvote applied
-        elseif ($vote->value === -1) {
+        if ($vote->value === -1) {
             $owner->addReputation(
-                $this->getActionName('down', $target),
+                $this->actionName('down', $target),
                 null,
                 $target
             );
         }
+
+        ActivityService::voteCast(
+            $vote->user,
+            $target,
+            $vote->value
+        );
+
+        $target->updateVoteCounts();
     }
 
-    /**
-     * Undo reputation from the previous vote value.
-     */
-    private function undoVoteReputation(Vote $vote, int $oldValue): void
+    private function undoVote(Vote $vote, int $value): void
     {
         $target = $vote->target;
+        $owner  = $target->user;
 
-        // Undo old upvote
-        if ($oldValue === 1) {
-            $vote->target->user->removeReputation(
-                $this->getActionName('up', $target),
+        if ($value === 1) {
+            $owner->removeReputation(
+                $this->actionName('up', $target),
                 $target
             );
         }
 
-        // Undo old downvote
-        elseif ($oldValue === -1) {
-            $vote->target->user->removeReputation(
-                $this->getActionName('down', $target),
+        if ($value === -1) {
+            $owner->removeReputation(
+                $this->actionName('down', $target),
                 $target
             );
         }
+
+        ActivityService::voteRemoved(
+            $vote->user,
+            $target
+        );
+
+        $target->updateVoteCounts();
     }
 
-    /**
-     * Determine action names based on target type.
-     *
-     * post_upvoted
-     * post_downvoted
-     * comment_upvoted
-     * comment_downvoted
-     */
-    private function getActionName(string $direction, $target): string
+    private function actionName(string $direction, $target): string
     {
-        $type = $target instanceof \App\Models\Post ? 'post' : 'comment';
-
-        return $type . "_voted_" . $direction;
+        return $target instanceof Post
+            ? "post_voted_{$direction}"
+            : "comment_voted_{$direction}";
     }
 }
