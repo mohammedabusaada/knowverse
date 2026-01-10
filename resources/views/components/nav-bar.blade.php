@@ -1,27 +1,37 @@
-<nav 
+<nav
     x-data="{
         mobileOpen: false,
         darkMode: localStorage.getItem('theme') === 'dark'
     }"
-    x-init="
-        document.documentElement.classList.toggle('dark', darkMode);
-    "
-    class="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700"
+    x-init="document.documentElement.classList.toggle('dark', darkMode)"
+    class="sticky top-0 z-40
+           bg-black text-white
+
+           backdrop-blur
+           border-b border-gray-200 dark:border-gray-700"
 >
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="flex justify-between items-center h-16">
+<!-- Logo -->
+<a href="/" class="flex items-center space-x-1 group">
+    <span class="text-3xl font-extrabold tracking-tight
+                 text-white dark:text-black
+                 transition duration-300">
+        Know
+    </span>
 
-            <!-- Left: Logo -->
-            <a href="/" class="flex items-center gap-2">
-                <span class="text-2xl font-extrabold text-blue-600 dark:text-blue-400">
-                    Knowverse
-                </span>
-            </a>
+    <span class="text-3xl font-extrabold tracking-tight
+                 text-white dark:text-black
+                 transition duration-300
+                 ">
+        Verse
+    </span>
+</a>
 
-            <!-- Center: Desktop Search -->
-            <div class="hidden md:flex flex-1 justify-center px-6">
+            <!-- Desktop Search -->
+            <div class="hidden md:flex flex-1 justify-center px-8">
                 <x-search-bar placeholder="Search knowledge, posts, tags..." />
             </div>
 
@@ -35,7 +45,9 @@
                         localStorage.setItem('theme', darkMode ? 'dark' : 'light');
                         document.documentElement.classList.toggle('dark');
                     "
-                    class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                    class="p-2 rounded-full
+                           hover:bg-gray-200 dark:hover:bg-gray-700
+                           transition"
                 >
                     <template x-if="!darkMode">
                         <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,18 +58,20 @@
 
                     <template x-if="darkMode">
                         <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-width="2" d="M21 12.79A9 9 0 0112.21 3c-.49 0-.97.04-1.44.12a9 9 0 1010.23 10.23c.08-.47.12-.95.12-1.44z"/>
+                            <path stroke-width="2" d="M21 12.79A9 9 0 0112.21 3a9 9 0 100 18c4.42 0 8.21-3.05 8.79-7.21z"/>
                         </svg>
                     </template>
                 </button>
 
-                <!-- Authenticated User -->
+                <!-- Auth User -->
                 @auth
                 <div x-data="{ open: false }" class="relative">
 
-                    <button @click="open = !open" class="flex items-center">
+                    <button @click="open = !open">
                         <img src="{{ auth()->user()->profile_picture_url }}"
-                            class="w-9 h-9 rounded-full object-cover border shadow">
+                             class="w-9 h-9 rounded-full object-cover
+                                    border border-gray-300 dark:border-gray-600
+                                    shadow-sm">
                     </button>
 
                     <!-- Dropdown -->
@@ -65,27 +79,31 @@
                         x-show="open"
                         @click.away="open = false"
                         x-transition
-                        class="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200
-                               dark:border-gray-700 rounded-xl shadow-lg py-2 z-50"
+                        class="absolute right-0 mt-3 w-48
+                               bg-white dark:bg-gray-800
+                               border border-gray-200 dark:border-gray-700
+                               rounded-xl shadow-lg py-2"
                     >
                         <a href="{{ route('profiles.show', auth()->user()->username) }}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                           class="text-black dark:text-white block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                             My Profile
                         </a>
 
                         <a href="{{ route('profile.edit') }}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                           class="text-black dark:text-white block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                             Edit Profile
                         </a>
 
                         <a href="{{ route('dashboard') }}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                           class="text-black dark:text-white block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ">
                             Dashboard
                         </a>
 
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                            <button class="w-full text-left px-4 py-2
+                                           text-red-600 hover:bg-red-50
+                                           dark:hover:bg-red-900/20">
                                 Logout
                             </button>
                         </form>
@@ -94,22 +112,41 @@
                 </div>
                 @endauth
 
+                <!-- Guest -->
                 @guest
-                    <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-200 hover:underline">
+                    <a href="{{ route('login') }}"
+                       class="px-4 py-2 rounded-lg
+                              bg-black text-white
+                            hover:bg-gradient-to-r
+                            hover:from-gray-800 hover:to-gray-600
+                            hover:text-white
+                            hover:shadow-md
+                            hover:scale-105
+                            transition-all duration-200
+                            ">
                         Login
                     </a>
+
                     <a href="{{ route('register') }}"
-                       class="px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+                       class="px-4 py-2 rounded-lg
+                              bg-black text-white
+                            hover:bg-gradient-to-r
+                            hover:from-gray-800 hover:to-gray-600
+                            hover:text-white
+                            hover:shadow-md
+                            hover:scale-105
+                            transition-all duration-200">
                         Register
                     </a>
                 @endguest
             </div>
 
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden flex items-center">
+            <!-- Mobile Button -->
+            <div class="md:hidden">
                 <button @click="mobileOpen = !mobileOpen"
-                        class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-                    <span class="text-3xl">☰</span>
+                        class="p-2 rounded-md
+                               hover:bg-gray-200 dark:hover:bg-gray-700">
+                    ☰
                 </button>
             </div>
 
@@ -119,59 +156,39 @@
     <!-- Mobile Menu -->
     <div x-show="mobileOpen"
          x-transition
-         class="md:hidden border-t bg-white dark:bg-gray-900 dark:border-gray-700">
+         class="md:hidden bg-white dark:bg-gray-900
+                border-t border-gray-200 dark:border-gray-700">
 
-        <!-- Search -->
-        <div class="px-4 py-3">
+        <div class="px-4 py-4 space-y-4">
+
             <x-search-bar placeholder="Search..." />
-        </div>
-
-        <!-- Links -->
-        <div class="px-4 py-3 space-y-3">
 
             @auth
-                <a href="{{ route('profiles.show', auth()->user()->username) }}"
-                   class="block py-2 text-gray-700 dark:text-gray-200">
-                   My Profile
-                </a>
+                <a href="{{ route('profiles.show', auth()->user()->username) }}" class="block">My Profile</a>
+                <a href="{{ route('profile.edit') }}" class="block">Edit Profile</a>
+                <a href="{{ route('dashboard') }}" class="block">Dashboard</a>
 
-                <a href="{{ route('profile.edit') }}"
-                   class="block py-2 text-gray-700 dark:text-gray-200">
-                   Edit Profile
-                </a>
-
-                <a href="{{ route('dashboard') }}"
-                   class="block py-2 text-gray-700 dark:text-gray-200">
-                   Dashboard
-                </a>
-
-                <!-- Dark Mode -->
                 <button
                     @click="
                         darkMode = !darkMode;
                         localStorage.setItem('theme', darkMode ? 'dark' : 'light');
                         document.documentElement.classList.toggle('dark');
                     "
-                    class="block w-full text-left py-2 text-gray-700 dark:text-gray-200"
-                >
-                    <span x-show="!darkMode">🌙 Enable Dark Mode</span>
-                    <span x-show="darkMode">☀️ Disable Dark Mode</span>
+                    class="block w-full text-left">
+                    <span x-show="!darkMode">🌙 Dark Mode</span>
+                    <span x-show="darkMode">☀️ Light Mode</span>
                 </button>
 
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button class="block w-full text-left py-2 text-red-600">
-                        Logout
-                    </button>
+                    <button class="text-red-600">Logout</button>
                 </form>
-
             @endauth
 
             @guest
-                <a href="{{ route('login') }}" class="block py-2">Login</a>
-                <a href="{{ route('register') }}" class="block py-2">Register</a>
+                <a href="{{ route('login') }}" class="block">Login</a>
+                <a href="{{ route('register') }}" class="block">Register</a>
             @endguest
-
         </div>
     </div>
 
