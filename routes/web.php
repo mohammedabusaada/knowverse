@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    
+
     /*
     | Profile settings (own account only)
     */
@@ -145,6 +145,7 @@ Route::middleware('auth')->group(function () {
 |   /username/activity
 */
 
+
 Route::get('/{user:username}/activity', [UserActivityController::class, 'index'])
     ->name('activity.index');
 
@@ -160,3 +161,11 @@ Route::get('/{user:username}', [ProfileController::class, 'show'])
 Route::get('/test-report', function () {
     return view('test-report');
 });
+
+Route::middleware(['auth', 'is_admin'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
+    });
+
