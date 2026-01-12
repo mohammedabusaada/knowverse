@@ -9,23 +9,40 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
+    $table->id();
 
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->comment('Recipient');
-            $table->foreignId('actor_id')->nullable()->constrained('users')->cascadeOnDelete()->comment('Triggering user (e.g., the user who commented)');
+    // Recipient
+    $table->foreignId('user_id')
+        ->constrained()
+        ->cascadeOnDelete();
 
-            $table->nullableMorphs('related_content'); // Polymorphic link to post/comment/user
+    // Actor (who triggered it)
+    $table->foreignId('actor_id')
+        ->nullable()
+        ->constrained('users')
+        ->cascadeOnDelete();
 
-            $table->enum('type', ['comment', 'vote', 'follow', 'system'])->default('system');
-            $table->text('message')->nullable();
+    // Target entity (post, comment, user, etc.)
+    $table->nullableMorphs('target');
 
-            $table->boolean('is_read')->default(false);
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+    // Event-based type identifier
+    $table->string('type', 64)
+        ->index()
+        ->comment('Event identifier (e.g. post_commented, vote_up)');
 
-            // Index for fetching unread/read notifications efficiently
-            $table->index(['user_id', 'is_read', 'created_at'], 'user_read_time_index');
-        });
+    // Optional presentation text (fallback)
+    $table->text('message')->nullable();
+
+    // Read state
+    $table->boolean('is_read')->default(false);
+    $table->timestamp('read_at')->nullable();
+
+    $table->timestamps();
+
+    // Feed optimization
+    $table->index(['user_id', 'is_read', 'created_at']);
+});
+
     }
 
     public function down(): void

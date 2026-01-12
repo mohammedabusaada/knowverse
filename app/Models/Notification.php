@@ -22,19 +22,19 @@ class Notification extends Model
     public const TYPE_SYSTEM = 'system';
 
     protected $fillable = [
-        'user_id',             // Recipient
-        'actor_id',            // The user who triggered this notification
-        'related_content_id',  // ID of related entity
-        'related_content_type',// Polymorphic type (post/comment/etc.)
-        'type',                // Notification type
-        'message',             // Notification text
-        'is_read',             // Read/unread flag
+        'user_id',
+        'actor_id',
+        'type',
+        'message',
+        'is_read',
+        'read_at',
+        'target_id',
+        'target_type',
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'read_at' => 'datetime',
     ];
 
     // ------------------------------------------------------------------
@@ -51,7 +51,7 @@ class Notification extends Model
         return $this->belongsTo(User::class, 'actor_id');
     }
 
-    public function relatedContent(): MorphTo
+    public function target(): MorphTo
     {
         return $this->morphTo();
     }
@@ -76,6 +76,11 @@ class Notification extends Model
 
     public function markAsRead(): void
     {
-        $this->update(['is_read' => true]);
+        if (! $this->is_read) {
+            $this->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+        }
     }
 }
