@@ -10,44 +10,46 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NotificationFactory extends Factory
 {
-    protected $model = Notification::class;
 
+    protected $model = Notification::class;
+    
     public function definition(): array
     {
-        $types = ['comment', 'vote', 'follow', 'system'];
+        $types = ['post_commented', 'post_voted', 'user_followed', 'system_alert'];
         $type = $this->faker->randomElement($types);
 
-        // --- Actor and recipient (memory-efficient, safe) ---
-        $actor = User::inRandomOrder()->first();
-        $recipient = User::where('id', '!=', $actor->id)->inRandomOrder()->first() ?? $actor;
+        $actor = User::inRandomOrder()->first() ?? User::factory()->create();
+        
+        $targetId = null;
+        $targetType = null;
 
-        // --- Initialize related content ---
-        $related_id = null;
-        $related_type = null;
-
-        if (in_array($type, ['comment', 'vote'])) {
-            $targetType = $this->faker->randomElement([Post::class, Comment::class]);
-            $target = $targetType::inRandomOrder()->first();
+        // Handle polymorphic target assignment based on event type
+        if (in_array($type, ['post_commented', 'post_voted'])) {
+            $morphTarget = $this->faker->randomElement([Post::class, Comment::class]);
+            $target = $morphTarget::inRandomOrder()->first();
 
             if ($target) {
-                $related_id = $target->id;
-                $related_type = $targetType;
+                $targetId = $target->id;
+                $targetType = $morphTarget;
             }
-        } elseif ($type === 'follow') {
-            $related_id = $actor->id;
-            $related_type = User::class;
+        } elseif ($type === 'user_followed') {
+            $targetId = $actor->id;
+            $targetType = User::class;
         }
 
+        $isRead = $this->faker->boolean(70);
+
         return [
-            'user_id' => $recipient->id,
+            'user_id' => User::inRandomOrder()->first()->id ?? User::factory(),
             'actor_id' => $actor->id,
-            'related_content_id' => $related_id,
-            'related_content_type' => $related_type,
+            'target_id' => $targetId,
+            'target_type' => $targetType,
             'type' => $type,
             'message' => $this->faker->sentence(),
-            'is_read' => $this->faker->boolean(70),
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
+            'is_read' => $isRead,
+            'read_at' => $isRead ? $this->faker->dateTimeBetween('-1 month', 'now') : null,
+            'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'updated_at' => now(),
         ];
     }
 }
