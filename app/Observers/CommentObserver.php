@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Models\Comment;
 use App\Services\ActivityService;
+use App\Services\NotificationService;
+use App\Support\NotificationType;
 
 class CommentObserver
 {
@@ -14,13 +16,54 @@ class CommentObserver
     {
         $author = $comment->user;
 
+        // ----------------------------
+        // Activity
+        // ----------------------------
         ActivityService::commentCreated($author, $comment);
 
+        // ----------------------------
+        // Reputation
+        // ----------------------------
         $author->addReputation(
             'comment_created',
             null,
             $comment
         );
+
+        $notificationService = app(NotificationService::class);
+
+        $postAuthor = $comment->post->user;
+
+        // ----------------------------
+        // Notify post author
+        // ----------------------------
+        if ($postAuthor->id !== $author->id) {
+            $notificationService->notify(
+                recipient: $postAuthor,
+                type: NotificationType::POST_COMMENTED,
+                actor: $author,
+                target: $comment
+            );
+        }
+
+        // ----------------------------
+        // Notify parent comment author (reply)
+        // ----------------------------
+        if ($comment->parent) {
+            $parentAuthor = $comment->parent->user;
+
+            if (
+                $parentAuthor->id !== $author->id &&
+                $parentAuthor->id !== $postAuthor->id
+            ) {
+                $notificationService->notify(
+                    recipient: $parentAuthor,
+                    type: NotificationType::COMMENT_REPLIED,
+                    actor: $author,
+                    target: $comment
+                );
+            }
+        }
     }
 
     /**
