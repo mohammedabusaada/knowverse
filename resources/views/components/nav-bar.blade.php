@@ -63,6 +63,12 @@
                     </template>
                 </button>
 
+
+    <!-- Notifications -->
+    @auth
+        <x-notification-dropdown />
+    @endauth
+
                 <!-- Auth User -->
                 @auth
                 <div x-data="{ open: false }" class="relative">

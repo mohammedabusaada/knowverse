@@ -8,18 +8,11 @@ use Illuminate\Database\Eloquent\Relations\{
     BelongsTo,
     MorphTo
 };
+use App\Presenters\NotificationPresenter;
 
 class Notification extends Model
 {
     use HasFactory;
-
-    // ------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------
-    public const TYPE_COMMENT = 'comment';
-    public const TYPE_VOTE = 'vote';
-    public const TYPE_FOLLOW = 'follow';
-    public const TYPE_SYSTEM = 'system';
 
     protected $fillable = [
         'user_id',
@@ -82,5 +75,10 @@ class Notification extends Model
                 'read_at' => now(),
             ]);
         }
+    }
+
+    public function presenter(): NotificationPresenter
+    {
+        return new NotificationPresenter($this);
     }
 }

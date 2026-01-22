@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@keyframes pulseHighlight {
+    0% {
+        background-color: rgba(59, 130, 246, 0.25);
+        /* blue-500 */
+    }
+
+    50% {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.pulse-comment {
+    animation: pulseHighlight 1.2s ease-out 1;
+    border-radius: 0.375rem;
+}
+
+html {
+    scroll-behavior: smooth;
+}

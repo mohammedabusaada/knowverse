@@ -3,9 +3,11 @@
 namespace App\Observers;
 
 use App\Models\Vote;
-use App\Services\ActivityService;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Services\ActivityService;
+use App\Services\NotificationService;
+use App\Support\NotificationType;
 
 class VoteObserver
 {
@@ -36,6 +38,16 @@ class VoteObserver
         $target = $vote->target;
         $owner  = $target->user;
 
+        // ----------------------------
+        // Prevent self-vote notification
+        // ----------------------------
+        if ($vote->user_id === $owner->id) {
+            return;
+        }
+
+        // ----------------------------
+        // Reputation
+        // ----------------------------
         if ($vote->value === 1) {
             $owner->addReputation(
                 $this->actionName('up', $target),
@@ -52,10 +64,31 @@ class VoteObserver
             );
         }
 
+        // ----------------------------
+        // Activity
+        // ----------------------------
         ActivityService::voteCast(
             $vote->user,
             $target,
             $vote->value
+        );
+
+        // ----------------------------
+        // Notification
+        // ----------------------------
+        $notificationService = app(NotificationService::class);
+
+        $notificationService->notify(
+            recipient: $owner,
+            type: $target instanceof Post
+                ? ($vote->value === 1
+                    ? NotificationType::POST_UPVOTED
+                    : NotificationType::POST_DOWNVOTED)
+                : ($vote->value === 1
+                    ? NotificationType::COMMENT_UPVOTED
+                    : NotificationType::COMMENT_DOWNVOTED),
+            actor: $vote->user,
+            target: $target
         );
 
         $target->updateVoteCounts();
