@@ -17,6 +17,7 @@ use App\Http\Controllers\UserActivityController;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportModerationController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -128,6 +129,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/tags/{tag}/follow', [TagController::class, 'follow']);
     Route::post('/tags/{tag}/unfollow', [TagController::class, 'unfollow']);
+/*
+| Notification Preferences
+*/
+Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])
+    ->name('settings.notifications');
+
+Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])
+    ->name('settings.notifications.update');
 
     /*
     | Reputation
