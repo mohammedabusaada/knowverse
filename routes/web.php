@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-/** * Controllers 
+/** * Controllers
  */
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
@@ -17,6 +17,7 @@ use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportModerationController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,7 +93,7 @@ Route::middleware('auth')->group(function () {
 
     // Interactions
     Route::post('/vote', [VoteController::class, 'vote'])->name('vote');
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
 
     // Tags Management
     Route::prefix('tags')->name('tags.')->group(function () {
@@ -104,6 +105,26 @@ Route::middleware('auth')->group(function () {
         Route::post('/{tag}/follow', [TagController::class, 'follow'])->name('follow');
         Route::post('/{tag}/unfollow', [TagController::class, 'unfollow'])->name('unfollow');
     });
+
+
+    Route::post('/reports', [ReportController::class, 'store'])
+        ->name('reports.store');
+
+
+/*
+| Notification Preferences
+*/
+Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])
+    ->name('settings.notifications');
+
+Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])
+    ->name('settings.notifications.update');
+
+    /*
+    | Reputation
+    */
+    Route::get('/{user:username}/reputation', [ReputationController::class, 'index'])
+        ->name('reputation.index');
 
     Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
 });

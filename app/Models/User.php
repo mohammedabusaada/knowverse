@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use App\Models\NotificationPreference;
 
 use Illuminate\Database\Eloquent\Relations\{
     BelongsTo,
@@ -150,6 +151,16 @@ public function allComments(): HasMany
     // ============================================
     // Utility
     // ============================================
+   public function notificationEnabled(string $type): bool
+     {
+    $preference = $this->notificationPreferences
+        ->where('type', $type)
+        ->first();
+
+    return $preference?->enabled ?? true;
+}
+
+
 
     public function isAdmin(): bool
     {
@@ -175,5 +186,10 @@ public function addReputation(string $action, ?int $points = null, ?Model $sourc
 
 
 public function getRouteKeyName() { return 'username'; }
+
+public function notificationPreferences(): HasMany
+{
+    return $this->hasMany(NotificationPreference::class);
+}
 
 }
