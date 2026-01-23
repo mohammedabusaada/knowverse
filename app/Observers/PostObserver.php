@@ -14,8 +14,14 @@ class PostObserver
     {
         $author = $post->user;
 
+        // ----------------------------
+        // Activity
+        // ----------------------------
         ActivityService::postCreated($author, $post);
 
+        // ----------------------------
+        // Reputation
+        // ----------------------------
         $author->addReputation(
             'post_created',
             null,
