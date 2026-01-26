@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Presenters;
 
 use App\Models\UserActivity;
 use Illuminate\Support\Str;
@@ -43,11 +43,11 @@ class ActivityPresenter
 
         return match (true) {
             $activity->action === 'post_created'
-                => route('posts.show', $target),
+            => route('posts.show', $target),
 
             $activity->action === 'comment_created'
                 && method_exists($target, 'post')
-                => route('posts.show', $target->post) . "#comment-{$target->id}",
+            => route('posts.show', $target->post) . "#comment-{$target->id}",
 
             default => null,
         };

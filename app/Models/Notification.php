@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{
     MorphTo
 };
 use App\Presenters\NotificationPresenter;
+use App\Enums\NotificationType;
 
 class Notification extends Model
 {
@@ -26,6 +27,7 @@ class Notification extends Model
     ];
 
     protected $casts = [
+        'type' => NotificationType::class,
         'is_read' => 'boolean',
         'read_at' => 'datetime',
     ];

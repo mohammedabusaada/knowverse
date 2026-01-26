@@ -5,7 +5,7 @@ namespace App\Observers;
 use App\Models\Comment;
 use App\Services\ActivityService;
 use App\Services\NotificationService;
-use App\Support\NotificationType;
+use App\Enums\NotificationType;
 
 class CommentObserver
 {
@@ -99,8 +99,8 @@ class CommentObserver
         foreach ($comment->votes as $vote) {
             $author->removeReputation(
                 $vote->value === 1
-                    ? 'comment_voted_up'
-                    : 'comment_voted_down',
+                    ? 'comment_upvoted'
+                    : 'comment_downvoted',
                 $comment
             );
         }

@@ -1,73 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto py-6">
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Notifications</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Stay updated with your latest interactions.</p>
+        </div>
 
-    {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-semibold">Notifications</h1>
-
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
             <form method="POST" action="{{ route('notifications.readAll') }}">
                 @csrf
-                <button class="text-sm text-blue-600 hover:underline">
-                    Mark all as read
+                <button class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition">
+                    Mark all read
                 </button>
             </form>
 
-            <form method="POST"
-                action="{{ route('notifications.clear') }}"
-                onsubmit="return confirm('Clear all notifications?');">
-                @csrf
-                @method('DELETE')
-                <button class="text-sm text-red-600 hover:underline">
+            <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Clear all?');">
+                @csrf @method('DELETE')
+                <button class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition">
                     Clear all
                 </button>
             </form>
         </div>
     </div>
 
-    {{-- Notifications --}}
-    @forelse ($notifications as $notification)
-    <div
-        x-data="{ seen: false }"
-        x-intersect.once="
-                if (!seen && {{ $notification->is_read ? 'false' : 'true' }}) {
-                    seen = true;
-                    fetch('{{ route('notifications.read', $notification) }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    });
-                }
-            "
-        class="border-b py-4 transition
-                   {{ $notification->is_read ? 'opacity-60' : 'bg-blue-50/50' }}">
-        <div class="flex items-start gap-3 text-sm">
-            <span class="text-lg leading-none">
-                {{ $notification->presenter()->icon() }}
-            </span>
-
-            <a
-                href="{{ route('notifications.visit', $notification) }}"
-                class="hover:underline">
-                {{ $notification->presenter()->message() }}
-            </a>
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
+        @forelse ($notifications as $notification)
+        @include('notifications.partials.notification-item', ['notification' => $notification])
+        @empty
+        <div class="py-20 text-center">
+            <div class="text-5xl mb-4">🔔</div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">No notifications yet</h3>
+            <p class="text-gray-500 dark:text-gray-400">We'll let you know when something happens.</p>
         </div>
-
-        <div class="text-xs text-gray-500 mt-1 ml-8">
-            {{ $notification->created_at->diffForHumans() }}
-        </div>
+        @endforelse
     </div>
-    @empty
-    <p class="text-gray-500">No notifications yet.</p>
-    @endforelse
 
-    <div class="mt-6">
+    <div class="mt-8">
         {{ $notifications->links() }}
     </div>
-
 </div>
 @endsection
