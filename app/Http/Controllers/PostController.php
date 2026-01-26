@@ -13,15 +13,15 @@ class PostController extends Controller
     {
         // Allow 'tags' to be a single string (from a link) or an array (from checkboxes)
         $selectedTags = $request->get('tags', []);
-        
+
         if (is_string($selectedTags)) {
             $selectedTags = [$selectedTags];
         }
 
-        $posts = Post::with(['user' => function($q) {
-                // Optimization for the User Hover Card stats
-                $q->withCount(['posts', 'followers']);
-            }, 'tags'])
+        $posts = Post::with(['user' => function ($q) {
+            // Optimization for the User Hover Card stats
+            $q->withCount(['posts', 'followers']);
+        }, 'tags'])
             ->published()
             ->when($selectedTags, function ($query) use ($selectedTags) {
                 $query->whereHas('tags', function ($q) use ($selectedTags) {
@@ -63,8 +63,6 @@ class PostController extends Controller
         $post = Post::create($validated);
         $post->tags()->sync($request->tag_ids ?? []);
 
-        $post->user->addReputation('post_created', null, $post);
-
         return redirect()
             ->route('posts.show', $post)
             ->with('status', 'Post created successfully.');
@@ -75,7 +73,7 @@ class PostController extends Controller
         $post->incrementViewCount();
 
         $post->load([
-            'user' => function($q) {
+            'user' => function ($q) {
                 $q->withCount(['posts', 'followers']);
             },
             'tags',
@@ -84,7 +82,7 @@ class PostController extends Controller
         ]);
 
         $sortedComments = $post->comments->sortByDesc(
-            fn ($comment) => $comment->id === $post->best_comment_id
+            fn($comment) => $comment->id === $post->best_comment_id
         );
 
         return view('posts.show', [

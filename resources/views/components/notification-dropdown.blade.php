@@ -1,81 +1,32 @@
 <div class="relative" x-data="{ open: false }">
-
-    {{-- Bell Icon --}}
-    <button
-        @click="open = !open"
-        class="relative p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-        🔔
+    <button @click="open = !open" class="relative p-2 text-gray-400 transition-colors hover:text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
 
         @if ($unreadCount > 0)
-        <span
-            class="absolute -top-1 -right-1 text-xs bg-red-600 text-white rounded-full px-1">
+        <span class="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 border-2 border-black rounded-full">
             {{ $unreadCount }}
         </span>
         @endif
     </button>
 
-    {{-- Dropdown --}}
-    <div
-        x-show="open"
-        @click.outside="open = false"
-        x-transition
-        class="absolute right-0 mt-2 w-80
-               bg-white dark:bg-gray-800
-               border border-gray-200 dark:border-gray-700
-               shadow-lg rounded-lg z-50">
+    <div x-show="open" @click.outside="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
+        class="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl overflow-hidden z-50">
 
-        {{-- Header --}}
-        <div class="p-3 border-b dark:border-gray-700 flex justify-between">
-            <span class="font-semibold text-sm">Notifications</span>
-
-            <a href="{{ route('notifications.index') }}"
-                class="text-xs text-blue-600 hover:underline">
-                View all
-            </a>
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Activity</h3>
+            <a href="{{ route('notifications.index') }}" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">View All</a>
         </div>
 
-        {{-- List --}}
-        <div class="max-h-96 overflow-y-auto">
-
+        <div class="max-h-[400px] overflow-y-auto custom-scrollbar">
             @forelse ($notifications as $notification)
-            <div
-                class="p-3 border-b dark:border-gray-700
-                           {{ $notification->is_read ? 'opacity-60' : 'bg-blue-50/50' }}">
-                <div class="flex items-start gap-2 text-sm">
-                    <span class="text-lg leading-none">
-                        {{ $notification->presenter()->icon() }}
-                    </span>
-
-                    <a
-                        href="{{ route('notifications.visit', $notification) }}"
-                        class="hover:underline">
-                        {{ $notification->presenter()->message() }}
-                    </a>
-                </div>
-
-                <div class="text-xs text-gray-500 mt-1 ml-6">
-                    {{ $notification->created_at->diffForHumans() }}
-                </div>
-
-                @if (! $notification->is_read)
-                <form
-                    method="POST"
-                    action="{{ route('notifications.read', $notification) }}"
-                    class="mt-2 ml-6">
-                    @csrf
-                    <button class="text-xs text-blue-600 hover:underline">
-                        Mark as read
-                    </button>
-                </form>
-                @endif
-            </div>
+            @include('notifications.partials.notification-item', ['notification' => $notification])
             @empty
-            <div class="p-4 text-sm text-gray-500 text-center">
-                No notifications
+            <div class="p-10 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">All caught up! 🎉</p>
             </div>
             @endforelse
-
         </div>
     </div>
-
 </div>

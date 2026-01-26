@@ -1,12 +1,12 @@
 @props(['activity'])
 
 @php
-    use App\Support\ActivityPresenter;
+use App\Presenters\ActivityPresenter;
 
-    $title    = ActivityPresenter::title($activity);
-    $color    = ActivityPresenter::color($activity);
-    $link     = ActivityPresenter::link($activity);
-    $linkText = ActivityPresenter::linkText($activity);
+$title = ActivityPresenter::title($activity);
+$color = ActivityPresenter::color($activity);
+$link = ActivityPresenter::link($activity);
+$linkText = ActivityPresenter::linkText($activity);
 @endphp
 
 <div class="flex gap-4 py-4 border-b dark:border-gray-700">
@@ -24,17 +24,17 @@
             <span class="font-medium">{{ $title }}</span>
 
             @if ($link && $linkText)
-                —
-                <a href="{{ $link }}"
-                   class="text-blue-600 dark:text-blue-400 hover:underline">
-                    {{ $linkText }}
-                </a>
+            —
+            <a href="{{ $link }}"
+                class="text-blue-600 dark:text-blue-400 hover:underline">
+                {{ $linkText }}
+            </a>
             @endif
 
             @if ($activity->details)
-                <span class="text-gray-500">
-                    {{ $activity->details }}
-                </span>
+            <span class="text-gray-500">
+                {{ $activity->details }}
+            </span>
             @endif
         </div>
 

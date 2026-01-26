@@ -11,24 +11,24 @@ function activity_description(UserActivity $activity): string
     return match ($activity->action) {
 
         'post_created' =>
-            "Created a post: <strong>{$target->title}</strong>",
+        "Created a post: <strong>{$target->title}</strong>",
 
         'comment_created' =>
-            "Commented on <strong>{$target->post->title}</strong>",
+        "Commented on <strong>" . e($target->post?->title ?? 'a post') . "</strong>",
 
         'vote_up' =>
-            "Upvoted a " . class_basename($target),
+        "Upvoted a " . class_basename($target),
 
         'vote_down' =>
-            "Downvoted a " . class_basename($target),
+        "Downvoted a " . class_basename($target),
 
         'best_answer_selected' =>
-            "Selected a best answer",
+        "Selected a best answer",
 
         'reputation_changed' =>
-            "Reputation changed {$activity->details}",
+        "Reputation changed {$activity->details}",
 
         default =>
-            Str::headline($activity->action),
+        Str::headline($activity->action),
     };
 }

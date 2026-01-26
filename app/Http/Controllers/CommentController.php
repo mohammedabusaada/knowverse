@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
+use App\Services\ActivityService;
+use App\Enums\NotificationType;
 
 class CommentController extends Controller
 {
@@ -22,9 +25,6 @@ class CommentController extends Controller
         $validated['user_id'] = Auth::id();
 
         $comment = Comment::create($validated);
-
-        // ★ Give reputation for writing a comment
-        $comment->user->addReputation('comment_created', null, $comment);
 
         return back()->with('status', 'Comment added.');
     }
@@ -60,46 +60,98 @@ class CommentController extends Controller
     /**
      * Mark comment as best.
      */
+    /**
+     * Mark comment as best.
+     */
     public function markAsBest(Comment $comment)
     {
         $this->authorize('markBest', $comment);
 
         $post = $comment->post;
 
-        // Update post's best comment
+        // Prevent re-selecting
+        if ($post->best_comment_id === $comment->id) {
+            return back();
+        }
+
+        // Set best comment
         $post->update([
             'best_comment_id' => $comment->id,
         ]);
 
-        // ★ Reputation logic
-        // Awarded to comment author (best answer received)
-        $comment->user->addReputation('best_answer_received', null, $comment);
+        // --------------------------------------------------
+        // Reputation
+        // --------------------------------------------------
 
-        // Awarded to post author (best answer awarded)
-        $post->user->addReputation('best_answer_awarded', null, $comment);
+        // Comment owner (receiver)
+        $comment->user->addReputation(
+            'best_answer_received',
+            null,
+            $comment
+        );
+
+        // Post owner (actor)
+        $post->user->addReputation(
+            'best_answer_awarded',
+            null,
+            $comment
+        );
+
+        // --------------------------------------------------
+        // Activity (public)
+        // --------------------------------------------------
+        ActivityService::bestAnswerSelected(
+            $post->user,
+            $comment
+        );
+
+        // --------------------------------------------------
+        // Notification (ONLY receiver)
+        // --------------------------------------------------
+        app(NotificationService::class)->notify(
+            recipient: $comment->user,
+            type: NotificationType::BEST_ANSWER_RECEIVED,
+            actor: $post->user,
+            target: $comment
+        );
+
+        // Check if the current logged-in user ID matches the post owner ID to show the reputation toast
+        if ($post->user_id === Auth::id()) {
+            return back()->with([
+                'status' => 'Best comment selected.',
+                'reputation_delta' => config('reputation.points.best_answer_awarded', 2),
+            ]);
+        }
 
         return back()->with('status', 'Best comment selected.');
     }
 
     public function unmarkBest(Comment $comment)
-{
-    $this->authorize('unmarkBest', $comment);
+    {
+        $this->authorize('unmarkBest', $comment);
 
-    $post = $comment->post;
+        $post = $comment->post;
 
-    if ($post->best_comment_id === $comment->id) {
+        if ($post->best_comment_id === $comment->id) {
 
-        // Undo rep for comment author
-        $comment->user->removeReputation('best_answer_received', $comment);
+            // Undo rep for comment author
+            $comment->user->removeReputation('best_answer_received', $comment);
 
-        // Undo rep for post author
-        $post->user->removeReputation('best_answer_awarded', $comment);
+            // Undo rep for post author
+            $post->user->removeReputation('best_answer_awarded', $comment);
 
-        // Remove best comment
-        $post->update(['best_comment_id' => null]);
+            // Remove best comment
+            $post->update(['best_comment_id' => null]);
+
+            // Compare IDs to ensure only the actor sees the reputation deduction toast
+            if ($post->user_id === Auth::id()) {
+                return back()->with([
+                    'status' => 'Best comment removed.',
+                    'reputation_delta' => -abs(config('reputation.points.best_answer_awarded', 2)),
+                ]);
+            }
+        }
+
+        return back()->with('status', 'Best comment removed.');
     }
-
-    return back()->with('status', 'Best comment removed.');
-}
-
 }

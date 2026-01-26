@@ -5,6 +5,7 @@ namespace App\Presenters;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Enums\NotificationType;
 use Illuminate\Support\Str;
 
 class NotificationPresenter
@@ -25,40 +26,37 @@ class NotificationPresenter
             // -------------------------
             // Comments
             // -------------------------
-            'post_commented' =>
+            NotificationType::POST_COMMENTED =>
             "{$actor} commented on your post",
 
-            'comment_replied' =>
+            NotificationType::COMMENT_REPLIED =>
             "{$actor} replied to your comment",
 
             // -------------------------
             // Votes
             // -------------------------
-            'post_voted_up' =>
+            NotificationType::POST_UPVOTED =>
             "{$actor} upvoted your post",
 
-            'post_voted_down' =>
+            NotificationType::POST_DOWNVOTED =>
             "{$actor} downvoted your post",
 
-            'comment_voted_up' =>
+            NotificationType::COMMENT_UPVOTED =>
             "{$actor} upvoted your comment",
 
-            'comment_voted_down' =>
+            NotificationType::COMMENT_DOWNVOTED =>
             "{$actor} downvoted your comment",
 
             // -------------------------
             // Best Answer
             // -------------------------
-            'best_answer_received' =>
+            NotificationType::BEST_ANSWER_RECEIVED =>
             "Your comment was marked as best answer",
-
-            'best_answer_awarded' =>
-            "You awarded a best answer",
 
             // -------------------------
             // Follow
             // -------------------------
-            'user_followed' =>
+            NotificationType::USER_FOLLOWED =>
             "{$actor} started following you",
 
             // -------------------------
@@ -104,22 +102,23 @@ class NotificationPresenter
         return match ($this->notification->type) {
 
             // Comments
-            'post_commented',
-            'comment_replied' => '💬',
+            NotificationType::POST_COMMENTED,
+            NotificationType::COMMENT_REPLIED => '💬',
+
 
             // Votes
-            'post_voted_up',
-            'comment_voted_up' => '👍',
+            NotificationType::POST_UPVOTED,
+            NotificationType::COMMENT_UPVOTED => '👍',
 
-            'post_voted_down',
-            'comment_voted_down' => '👎',
+            NotificationType::POST_DOWNVOTED,
+            NotificationType::COMMENT_DOWNVOTED => '👎',
 
             // Best answer
-            'best_answer_received',
-            'best_answer_awarded' => '🏆',
+            NotificationType::BEST_ANSWER_RECEIVED => '🏆',
+
 
             // Follow
-            'user_followed' => '👤',
+            NotificationType::USER_FOLLOWED => '👤',
 
             // System / fallback
             default => '🔔',

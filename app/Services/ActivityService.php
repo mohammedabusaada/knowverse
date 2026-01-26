@@ -54,7 +54,7 @@ class ActivityService
     {
         self::log(
             $user,
-            $value === 1 ? 'vote_cast_up' : 'vote_cast_down',
+            $value === 1 ? 'vote_up' : 'vote_down',
             $target
         );
     }

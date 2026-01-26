@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('Tag display name');
             $table->string('slug')->unique()->comment('URL-friendly unique identifier');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            
+            $table->timestamps();
+            $table->softDeletes();
 
             $table->index('name');
         });

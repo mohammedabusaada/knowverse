@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @keyframes pulseHighlight {
     0% {
         background-color: rgba(59, 130, 246, 0.25);
-        /* blue-500 */
     }
 
     50% {

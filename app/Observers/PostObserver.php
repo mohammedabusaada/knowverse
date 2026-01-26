@@ -62,8 +62,8 @@ class PostObserver
         foreach ($post->votes as $vote) {
             $author->removeReputation(
                 $vote->value === 1
-                    ? 'post_voted_up'
-                    : 'post_voted_down',
+                    ? 'post_upvoted'
+                    : 'post_downvoted',
                 $post
             );
         }
