@@ -73,7 +73,7 @@ class ReputationService
 
             if ($source) {
                 $query->where('source_id', $source->id)
-                      ->where('source_type', get_class($source));
+                    ->where('source_type', get_class($source));
             }
 
             $sum = (int) $query->sum('delta');

@@ -7,7 +7,7 @@ use App\Models\Post;
 use App\Models\Comment;
 use App\Services\ActivityService;
 use App\Services\NotificationService;
-use App\Support\NotificationType;
+use App\Enums\NotificationType;
 
 class VoteObserver
 {
@@ -124,7 +124,7 @@ class VoteObserver
     private function actionName(string $direction, $target): string
     {
         return $target instanceof Post
-            ? "post_voted_{$direction}"
-            : "comment_voted_{$direction}";
+            ? "post_{$direction}voted"
+            : "comment_{$direction}voted";
     }
 }

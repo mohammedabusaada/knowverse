@@ -1,158 +1,56 @@
-<!-- Blur Overlay -->
-<div
-  id="overlay"
-  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition"
-></div>
-
-<!-- Notification Wrapper -->
-<div class="relative z-50 w-fit">
-
-  <!-- Bell Icon Button -->
-  <button
-    type="button"
-    onclick="toggleDropdown()"
-    class="relative p-3 rounded-full bg-white shadow hover:bg-gray-100 transition"
-  >
-    🔔
-    <span id="bell-dot" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-  </button>
-
-  <!-- Dropdown -->
-  <div
-    id="dropdown"
-    class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden"
-  >
-    <!-- Loading State -->
-    <div id="loader" class="p-4 space-y-3 animate-pulse">
-      <div class="h-4 bg-gray-300 rounded w-3/4"></div>
-      <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-      <div class="h-4 bg-gray-300 rounded w-2/3"></div>
+<div class="relative" x-data="{ open: false, loading: false }">
+    <div 
+        x-show="open" 
+        x-transition.opacity
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40">
     </div>
 
-    <!-- Notifications -->
-    <div id="content" class="hidden max-h-80 overflow-y-auto divide-y">
+    <button 
+        @click="open = !open; if(open) { loading = true; setTimeout(() => loading = false, 500); }" 
+        class="relative z-50 p-2 text-gray-400 transition-colors hover:text-white focus:outline-none"
+    >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
 
-      <!-- Mark all read button -->
-      <div class="p-3 text-center border-b">
-        <button
-          onclick="markAllRead()"
-          class="text-sm text-blue-600 hover:underline font-medium"
-        >
-          Mark all as read
-        </button>
-      </div>
+        @if ($unreadCount > 0)
+        <span class="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 border-2 border-black rounded-full">
+            {{ $unreadCount }}
+        </span>
+        @endif
+    </button>
 
-      <!-- Notification Items -->
-      <div id="notifications-container"></div>
+    <div 
+        x-show="open" 
+        @click.outside="open = false" 
+        x-transition:enter="transition ease-out duration-200" 
+        x-transition:enter-start="opacity-0 scale-95"
+        class="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl overflow-hidden z-50"
+    >
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Activity</h3>
+            <button class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Mark all read</button>
+        </div>
+
+        <div x-show="loading" class="p-4 space-y-3 animate-pulse">
+            <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
+            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+        </div>
+
+        <div x-show="!loading" class="max-h-[400px] overflow-y-auto custom-scrollbar">
+            @forelse ($notifications as $notification)
+                @include('notifications.partials.notification-item', ['notification' => $notification])
+            @empty
+                <div class="p-10 text-center">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">All caught up! 🎉</p>
+                </div>
+            @endforelse
+        </div>
+
+        <div class="p-3 text-center border-t border-gray-100 dark:border-gray-700">
+            <a href="{{ route('notifications.index') }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                See all notifications
+            </a>
+        </div>
     </div>
-
-    <!-- Footer -->
-    <div class="p-3 text-center border-t">
-      <a
-        href="/notifications"
-        onclick="goToNotifications(event)"
-        class="text-sm text-blue-600 hover:underline font-medium"
-      >
-        See all notifications
-      </a>
-    </div>
-  </div>
 </div>
-
-<script>
-  const notifications = [
-    { icon: '💬', text: 'Someone replied to your post', read: false },
-    { icon: '👍', text: 'Someone liked your answer', read: true },
-    { icon: '👤', text: 'Someone started following you', read: false },
-    { icon: '⚠️', text: 'Your post was reported', read: true },
-  ];
-
-  const container = document.getElementById('notifications-container');
-  const bellDot = document.getElementById('bell-dot');
-  const dropdown = document.getElementById('dropdown');
-  const overlay = document.getElementById('overlay');
-  const loader = document.getElementById('loader');
-  const content = document.getElementById('content');
-
-  function renderNotifications() {
-    container.innerHTML = '';
-    let hasUnread = false;
-
-    notifications.forEach((notif, index) => {
-      const div = document.createElement('div');
-      div.className = `flex items-center gap-3 p-4 cursor-pointer transition notification ${notif.read ? '' : 'bg-blue-50 hover:bg-blue-100'}`;
-      div.onclick = () => markRead(index);
-
-      const icon = document.createElement('span');
-      icon.className = 'text-xl';
-      icon.innerText = notif.icon;
-
-      const text = document.createElement('p');
-      text.className = `flex-1 text-sm ${notif.read ? 'text-gray-700' : 'font-medium text-gray-800'} truncate`;
-      text.innerText = notif.text;
-
-      div.appendChild(icon);
-      div.appendChild(text);
-
-      if (!notif.read) {
-        const dot = document.createElement('span');
-        dot.className = 'w-2 h-2 bg-blue-500 rounded-full unread-dot';
-        div.appendChild(dot);
-        hasUnread = true;
-      }
-
-      container.appendChild(div);
-    });
-
-    bellDot.style.display = hasUnread ? 'block' : 'none';
-  }
-
-  function markRead(index) {
-    notifications[index].read = true;
-    renderNotifications();
-  }
-
-  function markAllRead() {
-    notifications.forEach(n => n.read = true);
-    renderNotifications();
-  }
-
-  function toggleDropdown() {
-    dropdown.classList.toggle('hidden');
-    overlay.classList.toggle('hidden');
-
-    if (!dropdown.classList.contains('hidden')) {
-      loader.classList.remove('hidden');
-      content.classList.add('hidden');
-
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        content.classList.remove('hidden');
-        renderNotifications();
-      }, 500);
-    }
-  }
-
-  function closeDropdown() {
-    dropdown.classList.add('hidden');
-    overlay.classList.add('hidden');
-  }
-
-  function goToNotifications(event) {
-    event.preventDefault();
-    closeDropdown();
-    setTimeout(() => {
-      window.location.href = '/notifications';
-    }, 200);
-  }
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!dropdown.contains(e.target) && !e.target.closest('button[onclick="toggleDropdown()"]')) {
-      closeDropdown();
-    }
-  });
-
-  // Initial render
-  renderNotifications();
-</script>

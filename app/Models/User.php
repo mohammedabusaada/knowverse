@@ -64,15 +64,15 @@ class User extends Authenticatable implements AuthorizableContract
     }
 
     public function parentComments(): HasMany
-{
-    return $this->hasMany(Comment::class)
-                ->whereNull('parent_id'); // count only top-level comments
-}
+    {
+        return $this->hasMany(Comment::class)
+            ->whereNull('parent_id'); // count only top-level comments
+    }
 
-public function allComments(): HasMany
-{
-    return $this->hasMany(Comment::class);
-}
+    public function allComments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 
     public function votes(): HasMany
     {
@@ -151,14 +151,16 @@ public function allComments(): HasMany
     // ============================================
     // Utility
     // ============================================
-   public function notificationEnabled(string $type): bool
-     {
-    $preference = $this->notificationPreferences
-        ->where('type', $type)
-        ->first();
+    public function notificationEnabled($type): bool
+    {
+        // If an Enum is passed, get the string value; otherwise use as is
+        $typeName = $type instanceof \App\Enums\NotificationType ? $type->value : $type;
 
-    return $preference?->enabled ?? true;
-}
+        return $this->notificationPreferences()
+            ->where('type', $typeName)
+            ->value('enabled') ?? true;
+    }
+
 
 
 
@@ -167,11 +169,11 @@ public function allComments(): HasMany
         return optional($this->role)->name === 'admin';
     }
 
-public function addReputation(string $action, ?int $points = null, ?Model $source = null)
-{
-    return app(\App\Services\ReputationService::class)
-        ->award($this, $action, $points, $source);
-}
+    public function addReputation(string $action, ?int $points = null, ?Model $source = null)
+    {
+        return app(\App\Services\ReputationService::class)
+            ->award($this, $action, $points, $source);
+    }
 
     public function totalReputation(): int
     {
@@ -179,17 +181,19 @@ public function addReputation(string $action, ?int $points = null, ?Model $sourc
     }
 
     public function removeReputation(string $action, ?Model $source = null)
-{
-    return app(\App\Services\ReputationService::class)
-        ->remove($this, $action, $source);
-}
+    {
+        return app(\App\Services\ReputationService::class)
+            ->remove($this, $action, $source);
+    }
 
 
-public function getRouteKeyName() { return 'username'; }
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
 
-public function notificationPreferences(): HasMany
-{
-    return $this->hasMany(NotificationPreference::class);
-}
-
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
 }

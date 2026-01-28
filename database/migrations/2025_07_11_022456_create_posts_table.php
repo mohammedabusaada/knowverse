@@ -21,6 +21,7 @@ return new class extends Migration
 
             $table->enum('status', ['draft', 'published', 'archived'])
                 ->default('published')
+                ->index()
                 ->comment('Post visibility status');
 
             $table->unsignedBigInteger('best_comment_id')

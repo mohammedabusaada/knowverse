@@ -27,6 +27,8 @@ return new class extends Migration
 
             // Prevent duplicate preferences
             $table->unique(['user_id', 'type']);
+
+            $table->index(['user_id', 'enabled']);
         });
     }
 
