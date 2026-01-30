@@ -15,6 +15,9 @@ class ActivityVisibility
             'post_created'            => 'public',
             'comment_created'         => 'public',
             'best_answer_selected'    => 'public',
+            'user_followed_user'      => 'public',
+            'user_followed_tag'       => 'public',
+
 
             // Votes (private by default)
             'vote_up'                 => 'private',

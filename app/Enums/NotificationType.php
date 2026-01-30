@@ -17,6 +17,7 @@ enum NotificationType: string
 
         // Social
     case USER_FOLLOWED = 'user_followed';
+    case TAG_FOLLOWED  = 'tag_followed';
 
         // Reputation
     case REPUTATION_CHANGED = 'reputation_changed';
@@ -54,6 +55,7 @@ enum NotificationType: string
             ],
             'social' => [
                 self::USER_FOLLOWED,
+                self::TAG_FOLLOWED,
             ],
             'reputation' => [
                 self::REPUTATION_CHANGED,

@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Tag;
+
 
 class ActivityService
 {
@@ -74,6 +76,30 @@ class ActivityService
             $user,
             'best_answer_selected',
             $comment
+        );
+    }
+
+
+    // --------------------------------------------------
+    // Follow events
+    // --------------------------------------------------
+
+    public static function userFollowedUser(User $actor, User $target): void
+    {
+        self::log(
+            $actor,
+            'user_followed_user',
+            $target
+        );
+    }
+
+    public static function userFollowedTag(User $actor, Tag $tag): void
+    {
+        self::log(
+            $actor,
+            'user_followed_tag',
+            $tag,
+            $tag->name
         );
     }
 

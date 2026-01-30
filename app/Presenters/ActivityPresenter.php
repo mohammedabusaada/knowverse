@@ -17,6 +17,8 @@ class ActivityPresenter
             'vote_removed'           => 'Removed a vote',
             'best_answer_selected'   => 'Selected a best answer',
             'reputation_changed'     => 'Reputation changed',
+            'user_followed_user' => 'Started following a user',
+            'user_followed_tag'  => 'Started following a tag',
             'login'                  => 'Logged in',
             'logout'                 => 'Logged out',
             default                  => Str::headline($activity->action),

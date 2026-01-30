@@ -59,6 +59,9 @@ class NotificationPresenter
             NotificationType::USER_FOLLOWED =>
             "{$actor} started following you",
 
+            NotificationType::TAG_FOLLOWED =>
+            "{$actor} started following your tag",
+
             // -------------------------
             // System / fallback
             // -------------------------
@@ -119,6 +122,8 @@ class NotificationPresenter
 
             // Follow
             NotificationType::USER_FOLLOWED => '👤',
+            NotificationType::TAG_FOLLOWED => '🏷️',
+
 
             // System / fallback
             default => '🔔',
