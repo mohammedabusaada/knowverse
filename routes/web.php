@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 /** * Controllers
  */
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PostController;
@@ -111,14 +112,14 @@ Route::middleware('auth')->group(function () {
         ->name('reports.store');
 
 
-/*
+    /*
 | Notification Preferences
 */
-Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])
-    ->name('settings.notifications');
+    Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])
+        ->name('settings.notifications');
 
-Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])
-    ->name('settings.notifications.update');
+    Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])
+        ->name('settings.notifications.update');
 
     /*
     | Reputation
@@ -127,6 +128,14 @@ Route::post('/settings/notifications', [NotificationPreferenceController::class,
         ->name('reputation.index');
 
     Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
+
+    // User follow
+    Route::post('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'store']);
+    Route::delete('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'destroy']);
+
+    // Tag follow
+    Route::post('/tags/{tag}/follow', [\App\Http\Controllers\TagFollowController::class, 'store']);
+    Route::delete('/tags/{tag}/follow', [\App\Http\Controllers\TagFollowController::class, 'destroy']);
 });
 
 /*
