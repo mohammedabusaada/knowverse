@@ -111,4 +111,10 @@ class Comment extends Model
     ]);
 }
 
+public function increaseSpamScore(int $amount = 1): void
+{
+    $this->increment('spam_score', $amount);
+}
+
+
 }

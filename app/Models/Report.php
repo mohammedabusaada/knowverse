@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{
     BelongsTo,
     MorphTo
 };
+use App\Enums\ReportReason;
 
 class Report extends Model
 {
@@ -22,19 +23,35 @@ class Report extends Model
     public const STATUS_DISMISSED = 'dismissed';
 
     protected $fillable = [
-        'reporter_id',
-        'target_id',
-        'target_type',
-        'reason',
-        'status',
-        'reviewed_by',
-    ];
+    'reporter_id',
+    'target_id',
+    'target_type',
+    'reason_type',
+    'reason',
+    'status',
+    'reviewed_by',
+];
+
+
 
     protected $casts = [
         'deleted_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'status' => \App\Enums\ReportStatus::class,
+        'reason_type' => ReportReason::class,
     ];
+
+    protected $attributes = [
+    'status' => self::STATUS_PENDING,
+];
+
+
+public function scopeDismissed($query)
+{
+    return $query->where('status', self::STATUS_DISMISSED);
+}
+
 
     // ------------------------------------------------------------------
     // Relationships

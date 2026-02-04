@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Rules\CleanContent;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -46,8 +48,8 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'body'  => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255', new CleanContent],
+            'body'  => ['required', 'string', new CleanContent],
             'image' => ['nullable', 'image', 'max:4096'],
             'tag_ids'   => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
@@ -104,14 +106,19 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'body'  => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255', new CleanContent],
+            'body'  => ['required', 'string', new CleanContent],
             'image' => ['nullable', 'image', 'max:4096'],
             'tag_ids'   => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
         ]);
 
         if ($request->hasFile('image')) {
+
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+
             $validated['image'] = $request->file('image')->store('post_images', 'public');
         }
 

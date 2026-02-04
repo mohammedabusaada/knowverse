@@ -57,6 +57,10 @@ Route::middleware(['auth', 'is_admin'])
             Route::patch('/reports/{report}/review', [ReportModerationController::class, 'review'])->name('reports.review');
             Route::patch('/reports/{report}/dismiss', [ReportModerationController::class, 'dismiss'])->name('reports.dismiss');
         });
+
+        // Users management
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+            ->only(['index', 'show', 'destroy']);
     });
 
 /*

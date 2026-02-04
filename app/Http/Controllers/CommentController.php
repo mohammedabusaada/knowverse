@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\NotificationService;
 use App\Services\ActivityService;
 use App\Enums\NotificationType;
+use App\Rules\CleanContent;
+
 
 class CommentController extends Controller
 {
@@ -19,7 +21,7 @@ class CommentController extends Controller
         $validated = $request->validate([
             'post_id'   => ['required', 'exists:posts,id'],
             'parent_id' => ['nullable', 'exists:comments,id'],
-            'body'      => ['required', 'string', 'max:3000'],
+            'body'      => ['required', 'string', 'max:3000', new CleanContent],
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -37,7 +39,7 @@ class CommentController extends Controller
         $this->authorize('update', $comment);
 
         $validated = $request->validate([
-            'body' => ['required', 'string', 'max:2000'],
+            'body' => ['required', 'string', 'max:2000', new CleanContent],
         ]);
 
         $comment->update($validated);
