@@ -7,35 +7,44 @@
 ])
 
 @php
-    $base = "inline-flex items-center justify-center font-medium rounded-lg transition
-             focus:outline-none focus:ring-2 focus:ring-offset-2
-             dark:focus:ring-offset-gray-900";
+    // Monochrome Clean base
+    $base = "inline-flex items-center justify-center font-medium rounded-lg
+             transition-colors duration-150
+             focus:outline-none focus:ring-2 focus:ring-blue-500/40
+             focus:ring-offset-2 focus:ring-offset-white
+             disabled:opacity-50 disabled:cursor-not-allowed
+             dark:focus:ring-offset-gray-950";
 
     $sizes = [
-        'sm' => 'px-3 py-1 text-sm',
-        'md' => 'px-4 py-2 text-base',
-        'lg' => 'px-6 py-3 text-lg',
+        'sm' => 'px-3 py-1.5 text-sm',
+        'md' => 'px-4 py-2 text-sm',   // رسمي/أكاديمي: text-sm أفضل من text-base
+        'lg' => 'px-5 py-2.5 text-base',
     ];
 
+    // ✅ الأزرق Accent واحد (Primary/Links focus)
+    // ✅ باقي الأزرار Monochrome (رماديّات)
+    // ✅ danger أحمر (حالة حذف/تحذير)
     $color = match (true) {
         $primary => "bg-blue-600 text-white hover:bg-blue-700
                      dark:bg-blue-500 dark:hover:bg-blue-600
-                     focus:ring-blue-500",
+                     border border-blue-600 dark:border-blue-500",
 
-        $secondary => "bg-gray-200 text-gray-900 hover:bg-gray-300
-                       dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600
-                       focus:ring-gray-500",
+        $secondary => "bg-gray-900 text-white hover:bg-black
+                       dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100
+                       border border-gray-900 dark:border-white",
 
         $danger => "bg-red-600 text-white hover:bg-red-700
                     dark:bg-red-500 dark:hover:bg-red-600
-                    focus:ring-red-500",
+                    border border-red-600 dark:border-red-500
+                    focus:ring-red-500/40",
 
-        default => "bg-gray-100 text-gray-900 hover:bg-gray-200
-                    dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700
-                    focus:ring-gray-500"
+        default => "bg-white text-gray-900 hover:bg-gray-50
+                    dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800
+                    border border-gray-200 hover:border-gray-300
+                    dark:border-gray-800 dark:hover:border-gray-700"
     };
 
-    $classes = "$base $color {$sizes[$size]}";
+    $classes = trim("$base $color {$sizes[$size]}");
 @endphp
 
 @if ($href)

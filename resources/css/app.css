@@ -4,11 +4,13 @@
 
 @keyframes pulseHighlight {
     0% {
-        background-color: rgba(59, 130, 246, 0.25);
+        background-color: rgba(59, 130, 246, 0.18);
+
     }
 
     50% {
-        background-color: rgba(59, 130, 246, 0.1);
+        background-color: rgba(59, 130, 246, 0.08);
+
     }
 
     100% {

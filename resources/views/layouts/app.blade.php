@@ -3,8 +3,8 @@
     lang="{{ str_replace('_', '-', app()->getLocale()) }}"
     x-data="{ darkMode: localStorage.getItem('theme') === 'dark' }"
     x-init="$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))"
-    :class="{ 'dark': darkMode }">
-
+    :class="{ 'dark': darkMode }"
+>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,62 +31,49 @@
     <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js" defer></script>
 
     <style>
-        .brand-name {
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #000;
-        }
-
-        .dark .brand-name {
-            color: #fff;
-        }
+        .brand-name { font-weight: 700; letter-spacing: -0.02em; color: #000; }
+        .dark .brand-name { color: #fff; }
     </style>
 </head>
 
-<body class="font-sans antialiased
-             bg-gradient-to-br from-gray-100 to-gray-200
-             dark:from-gray-900 dark:to-gray-950
-             text-gray-900 dark:text-gray-100
-             min-h-screen">
+<body class="font-sans antialiased min-h-screen
+             bg-gray-50 dark:bg-gray-950
+             text-gray-900 dark:text-gray-100">
 
     <x-nav-bar />
 
     @if(session('reputation_delta'))
-    <x-toast>
-        +{{ session('reputation_delta') }} reputation
-    </x-toast>
+        <x-toast>
+            +{{ session('reputation_delta') }} reputation
+        </x-toast>
     @endif
 
     @isset($header)
-    <header class="bg-white/80 dark:bg-gray-800/80
-                       backdrop-blur
-                       border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            {{ $header }}
-        </div>
-    </header>
+        <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                {{ $header }}
+            </div>
+        </header>
     @endisset
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        @yield('content')
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+            @yield('content')
+        </div>
     </main>
 
     <script>
-        // Handle Comment Highlighting from Hash
         document.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash;
             if (hash && hash.startsWith('#comment-')) {
                 const el = document.querySelector(hash);
                 if (el) {
                     el.classList.add('pulse-comment');
-                    setTimeout(() => {
-                        el.classList.remove('pulse-comment');
-                    }, 1500);
+                    setTimeout(() => el.classList.remove('pulse-comment'), 1500);
                 }
             }
         });
 
-        // Sync Prism.js Theme with Dark Mode
         document.addEventListener('alpine:init', () => {
             Alpine.effect(() => {
                 const isDark = document.documentElement.classList.contains('dark');
@@ -101,5 +88,4 @@
         });
     </script>
 </body>
-
 </html>
