@@ -32,6 +32,7 @@
                    text-gray-700 dark:text-gray-200
 
                     text-lg
+<<<<<<< Updated upstream
 
                     leading-relaxed
                 "
@@ -105,6 +106,84 @@
                             hover:text-white
                             hover:shadow-md
                             hover:scale-105
+=======
+                    
+                    leading-relaxed
+                "
+            >
+                A platform for structured scientific dialogue and academic knowledge exchange.
+            </p>
+        </section>
+
+        {{-- Primary CTA --}}
+        <section class="text-center">
+            @auth
+                <a
+                    href="{{ route('posts.create') }}"
+                    class="
+                        inline-flex items-center justify-center
+                        px-8 py-3
+                        rounded-xl
+                        bg-gray-900 text-white
+                        font-semibold
+                        shadow-lg shadow-gray-900/20
+                        hover:bg-black hover:shadow-xl
+                        transition
+                    "
+                >
+                    Start a discussion
+                </a>
+            @else
+                <a
+                    href="{{ route('login') }}"
+                    class="
+                        inline-flex items-center justify-center
+                        px-8 py-3
+                        rounded-xl
+                        bg-white text-gray-900
+                        font-semibold
+                        shadow-lg shadow-black/10
+                        hover:bg-gray-50 hover:shadow-xl
+                        transition
+                    "
+                >
+                    Sign in to start a discussion
+                </a>
+            @endauth
+        </section>
+
+        {{-- Popular Topics --}}
+        <section class="mt-6 space-y-4">
+            <h2
+                class="
+                    text-lg
+                    font-semibold
+                    text-gray-800 dark:text-gray-200
+                "
+            >
+                Popular Topics
+            </h2>
+
+            <div class="flex flex-wrap gap-3">
+                @foreach ($popularTags as $tag)
+                    <a
+                        href="{{ route('posts.index', ['tags[]' => $tag->name]) }}"
+                        class="
+                            px-4 py-2
+                            rounded-full
+                            text-sm font-medium
+                            bg-white dark:bg-gray-800
+                            text-gray-700 dark:text-gray-200
+                            border border-gray-200 dark:border-gray-700
+                            shadow-sm
+
+                            hover:bg-gradient-to-r
+                            hover:from-gray-800 hover:to-gray-600
+                            hover:text-white
+                            hover:shadow-md
+                            hover:scale-105
+
+>>>>>>> Stashed changes
                             transition-all duration-200
                         "
                     >

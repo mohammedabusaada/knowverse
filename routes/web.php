@@ -144,6 +144,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+
 Route::get('/{user:username}/activity', [UserActivityController::class, 'index'])
     ->name('activity.index');
 
@@ -164,3 +165,10 @@ if (app()->environment('local')) {
         return view('test-report');
     });
 }
+
+Route::middleware(['auth', 'is_admin'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
+    });
