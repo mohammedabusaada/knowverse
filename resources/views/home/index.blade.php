@@ -19,7 +19,6 @@
                     text-4xl sm:text-5xl
                     font-bold
                     text-gray-900 dark:text-white
-
                 "
             >
                 KnowVerse
@@ -27,87 +26,10 @@
 
             <p
                 class="
-                 px-4 py-2
-                  font-medium
-                   text-gray-700 dark:text-gray-200
-
+                    px-4 py-2
+                    font-medium
+                    text-gray-700 dark:text-gray-200
                     text-lg
-<<<<<<< Updated upstream
-
-                    leading-relaxed
-                "
-            >
-                A platform for structured scientific dialogue and academic knowledge exchange.
-            </p>
-        </section>
-
-        {{-- Primary CTA --}}
-        <section class="text-center">
-            @auth
-                <a
-                    href="{{ route('posts.create') }}"
-                    class="
-                        px-4 py-2 rounded-lg
-                              bg-black text-white
-                            hover:bg-gradient-to-r
-                            hover:from-gray-800 hover:to-gray-600
-                            hover:text-white
-                            hover:shadow-md
-                            hover:scale-105
-                            transition-all duration-200
-                    "
-                >
-                    Start a discussion
-                </a>
-            @else
-                <a
-                    href="{{ route('login') }}"
-                    class="px-4 py-2 rounded-lg
-                              bg-black text-white
-                            hover:bg-gradient-to-r
-                            hover:from-gray-800 hover:to-gray-600
-                            hover:text-white
-                            hover:shadow-md
-                            hover:scale-105
-                            transition-all duration-200
-                    "
-                >
-                    Sign in to start a discussion
-                </a>
-            @endauth
-        </section>
-
-        {{-- Popular Topics --}}
-        <section class="mt-6 space-y-4">
-            <h2
-                class="
-                    text-lg
-                    font-semibold
-                    text-gray-800 dark:text-gray-200
-                "
-            >
-                Popular Topics
-            </h2>
-
-            <div class="flex flex-wrap gap-3">
-                @foreach ($popularTags as $tag)
-                    <a
-                        href="{{ route('posts.index', ['tags[]' => $tag->name]) }}"
-                        class="
-                            px-4 py-2
-                            rounded-full
-                            text-sm font-medium
-                            bg-white dark:bg-gray-800
-                            text-gray-700 dark:text-gray-200
-                            border border-gray-200 dark:border-gray-700
-                            shadow-sm
-                            hover:bg-gradient-to-r
-                            hover:from-gray-800 hover:to-gray-600
-                            hover:text-white
-                            hover:shadow-md
-                            hover:scale-105
-=======
-                    
                     leading-relaxed
                 "
             >
@@ -176,14 +98,11 @@
                             text-gray-700 dark:text-gray-200
                             border border-gray-200 dark:border-gray-700
                             shadow-sm
-
                             hover:bg-gradient-to-r
                             hover:from-gray-800 hover:to-gray-600
                             hover:text-white
                             hover:shadow-md
                             hover:scale-105
-
->>>>>>> Stashed changes
                             transition-all duration-200
                         "
                     >
