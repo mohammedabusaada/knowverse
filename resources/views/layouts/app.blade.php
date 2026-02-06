@@ -12,6 +12,7 @@
 
     <title>{{ config('app.name', 'KnowVerse') }}</title>
 
+
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -20,15 +21,22 @@
         }
     </script>
 
+
+
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+
+
+    <!-- Prism.js -->
+
     <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css" rel="stylesheet" id="prism-light">
     <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark" disabled>
     <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js" defer></script>
+
 
     <style>
         .brand-name { font-weight: 700; letter-spacing: -0.02em; color: #000; }
@@ -40,6 +48,26 @@
              bg-gray-50 dark:bg-gray-950
              text-gray-900 dark:text-gray-100">
 
+    <!-- Brand Styling -->
+    <style>
+        .brand-name {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #000;
+        }
+        .dark .brand-name {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased
+             bg-gradient-to-br from-gray-100 to-gray-200
+             dark:from-gray-900 dark:to-gray-950
+             text-gray-900 dark:text-gray-100
+             min-h-screen">
+
+
     <x-nav-bar />
 
     @if(session('reputation_delta'))
@@ -49,12 +77,19 @@
     @endif
 
     @isset($header)
+
         <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+
+        <header class="bg-white/80 dark:bg-gray-800/80
+                       backdrop-blur
+                       border-b border-gray-200 dark:border-gray-700">
+
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 {{ $header }}
             </div>
         </header>
     @endisset
+
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
@@ -79,6 +114,22 @@
                 const isDark = document.documentElement.classList.contains('dark');
                 const lightPrism = document.getElementById('prism-light');
                 const darkPrism = document.getElementById('prism-dark');
+
+    <!-- Page Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        @yield('content')
+    </main>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.effect(() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                document.getElementById('prism-light').disabled = isDark;
+                document.getElementById('prism-dark').disabled = !isDark;
+            });
+        });
+    </script>
+
 
                 if (lightPrism && darkPrism) {
                     lightPrism.disabled = isDark;
