@@ -6,16 +6,41 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Tag;
 use App\Models\Post;
-
 use Illuminate\Support\Str;
 
 class TagController extends Controller
 {
-
     // GET ALL TAGS
     public function index()
     {
-        return Tag::orderBy('name')->get();
+        $tags = Tag::orderBy('name')->withCount('posts')->paginate(24);
+        
+        // Fetch recommended tags for the sidebar
+        $recommendedTags = $this->getRecommendedTags();
+
+        return view('tags.index', compact('tags', 'recommendedTags'));
+    }
+
+    /**
+     * Display the specified tag's feed.
+     */
+    public function show(Tag $tag)
+    {
+        // Fetch posts associated with this tag, paginated for performance
+        $posts = $tag->posts()
+            ->with(['user', 'tags']) // Eager load for better performance
+            ->latest()
+            ->paginate(15);
+
+        // If user is logged in, we check if they follow this tag
+        $isFollowing = Auth::check() 
+        ? Auth::user()->followedTags()->where('tag_id', $tag->id)->exists() 
+        : false;
+
+        // Fetch recommended tags for the sidebar
+        $recommendedTags = $this->getRecommendedTags();
+
+        return view('tags.show', compact('tag', 'posts', 'isFollowing', 'recommendedTags'));
     }
 
     // CREATE TAG (ADMIN)
@@ -59,11 +84,10 @@ class TagController extends Controller
         return response()->json(['message' => 'Tag deleted']);
     }
 
-    // SEARCH TAGS FOR AUTO COMPLETE
+    // AJAX/API: For search suggestions
     public function search(Request $request)
     {
         $query = $request->query('q', '');
-
         return Tag::where('name', 'LIKE', "%{$query}%")
             ->orderBy('name')
             ->limit(10)
@@ -75,8 +99,8 @@ class TagController extends Controller
     {
         $this->authorize('update', $post);
         $request->validate([
-'tag_ids'   => ['required', 'array', 'max:5'],
-        'tag_ids.*' => 'exists:tags,id'
+            'tag_ids'   => ['required', 'array', 'max:5'],
+            'tag_ids.*' => 'exists:tags,id'
         ]);
 
         $post->tags()->sync($request->tag_ids);
@@ -84,24 +108,45 @@ class TagController extends Controller
         return $post->load('tags');
     }
 
-    // FOLLOW TAG
-    public function follow(Tag $tag)
-    {
-        $tag->followers()->syncWithoutDetaching([Auth::id()]);
-        return response()->json(['message' => 'Tag followed']);
-    }
-
-    // UNFOLLOW TAG
-    public function unfollow(Tag $tag)
-    {
-        $tag->followers()->detach([Auth::id()]);
-        return response()->json(['message' => 'Tag unfollowed']);
-}
-// FOLLOWERS LIST
+    // FOLLOWERS LIST
     // ========================
     public function followers(Tag $tag)
     {
         $followers = $tag->followers()->paginate(20);
         return view('tags.followers', compact('tag', 'followers'));
+    }
+
+    /**
+     * Helper to follow a tag
+     */
+    public function follow(Tag $tag)
+    {
+        Auth::user()->followedTags()->syncWithoutDetaching($tag->id);
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Helper to unfollow a tag
+     */
+    public function unfollow(Tag $tag)
+    {
+        Auth::user()->followedTags()->detach($tag->id);
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Private helper to get tags the user doesn't follow yet
+     */
+    private function getRecommendedTags()
+    {
+        return Tag::withCount('posts')
+            ->when(Auth::check(), function ($query) {
+                $query->whereDoesntHave('followers', function ($q) {
+                    $q->where('user_id', Auth::id());
+                });
+            })
+            ->orderBy('posts_count', 'desc')
+            ->take(5)
+            ->get();
     }
 }

@@ -5,19 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-use App\Http\Requests\FollowUserRequest;
-
 class FollowController extends Controller
 {
-      public function follow(FollowUserRequest $request, User $user)
+    public function toggle(User $user)
     {
-        Auth::user()->following()->syncWithoutDetaching([$user->id]);
-        return back()->with('success', 'The user has been successfully followed');
-    }
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'You cannot follow yourself.');
+        }
 
-    public function unfollow(User $user)
-    {
-        Auth::user()->following()->detach($user->id);
-        return back()->with('success', 'The user has been unfollowed');
+        // Toggle automatically attaches if not present, and detaches if it is.
+        Auth::user()->following()->toggle($user->id);
+
+        return back();
     }
 }

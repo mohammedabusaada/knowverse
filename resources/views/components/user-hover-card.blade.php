@@ -18,7 +18,7 @@
     @mouseleave="hide()"
 >
     <a
-        href="{{ route('profiles.show', $user->username) }}"
+        href="{{ route('profile.show', $user->username) }}"
         class="font-semibold text-blue-600 dark:text-blue-400 hover:underline decoration-2 underline-offset-2 transition"
     >
         {{ $user->display_name }}
@@ -60,7 +60,7 @@
                     </div>
 
                     <a
-                        href="{{ route('profiles.show', $user->username) }}"
+                        href="{{ route('profile.show', $user->username) }}"
                         class="shrink-0 inline-flex items-center justify-center
                                px-3 py-1.5 rounded-lg text-xs font-semibold
                                bg-blue-600 text-white hover:bg-blue-700

@@ -13,7 +13,7 @@
         <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
             {{ $user->bio ?? 'This user hasn\'t shared a bio yet.' }}
         </p>
-        <a href="{{ route('profiles.show', $user->username) }}" class="block text-center py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-800 dark:text-gray-100 transition">
+        <a href="{{ route('profile.show', $user->username) }}" class="block text-center py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-800 dark:text-gray-100 transition">
             View Profile
         </a>
     </div>

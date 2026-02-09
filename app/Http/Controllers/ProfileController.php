@@ -8,50 +8,43 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProfileController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
-     * Display the public profile page: /{username}
+     * Display the user's profile overview.
      */
     public function show(User $user)
     {
-        $user->loadCount(['posts', 'allComments', 'followers']);
-        return view('profiles.show', compact('user'));
+        // Enterprise Eager Loading: load counts in one query
+        $user->loadCount(['posts', 'allComments', 'followers', 'following']);
+        
+        return view('profile.show', compact('user'));
     }
 
     /**
-     * Show the form for editing the profile.
+     * Show the profile edit form.
      */
     public function edit()
     {
-        return view('profiles.edit', [
+        return view('profile.edit', [
             'user' => Auth::user()
         ]);
     }
 
     /**
-     * Update the profile.
+     * Update the user's profile information.
      */
     public function update(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
 
-        $validated = $request->validate([
-            'full_name'       => ['required', 'string', 'max:255'],
-            'academic_title'  => ['nullable', 'string', 'max:255'],
-            'bio'             => ['nullable', 'string', 'max:2000'],
-            'profile_picture' => ['nullable', 'image', 'max:2048'],
-            'username'        => [
-                'sometimes',
-                'string',
-                'max:50',
-                'alpha_dash:ascii',
-                Rule::unique('users')->ignore($user->id),
-                new ReservedUsername(),
-            ],
-        ]);
+        $validated = $request->validated();
 
+        // Handle File Upload via Storage Service logic
         if ($request->hasFile('profile_picture')) {
             if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
                 Storage::disk('public')->delete($user->profile_picture);
@@ -62,25 +55,55 @@ class ProfileController extends Controller
         $user->update($validated);
 
         return redirect()
-            ->route('profiles.show', $user->username)
+            ->route('profile.show', $user->username)
             ->with('status', 'Profile updated successfully.');
     }
 
     /**
-     * List followers of the user.
+     * Display the followers list with privacy handling.
      */
     public function followers(User $user)
     {
-        $followers = $user->followers()->paginate(20);
-        return view('profiles.followers', compact('user', 'followers'));
+        $user->loadCount(['posts', 'allComments', 'followers', 'following']);
+
+        
+        $canView = Auth::check() && (Auth::id() === $user->id || Auth::user()->can('viewLists', $user));
+
+        $followers = $canView 
+            ? $user->followers()->paginate(20) 
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+        return view('profile.followers', [
+            'user' => $user,
+            'followers' => $followers,
+            'isPrivate' => !$canView
+        ]);
     }
 
     /**
-     * List users that this user is following.
+     * Display the following list with privacy handling.
      */
     public function following(User $user)
-    {
-        $following = $user->following()->paginate(20);
-        return view('profiles.following', compact('user', 'following'));
-    }
+{
+    $user->loadCount(['posts', 'allComments', 'followers', 'following']);
+
+    $canView = Auth::check() && (Auth::id() === $user->id || Auth::user()->can('viewLists', $user));
+
+    // Fetch Followed People
+    $followingUsers = $canView 
+        ? $user->following()->paginate(20, ['*'], 'people_page') 
+        : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+    // Fetch Followed Tags
+    $followingTags = $canView 
+        ? $user->followedTags()->withCount('posts')->paginate(20, ['*'], 'tags_page') 
+        : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+
+    return view('profile.following', [
+        'user' => $user,
+        'following' => $followingUsers, // Keep for backward compatibility if needed
+        'followingTags' => $followingTags,
+        'isPrivate' => !$canView
+    ]);
+}
 }

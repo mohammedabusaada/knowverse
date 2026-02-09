@@ -1,55 +1,42 @@
+@props(['activity'])
+
 @php
-$target = $activity->target;
+    $target = $activity->target;
+    // Map actions to our custom icon set
+    $icon = match($activity->action) {
+        'post_created' => 'pencil',
+        'comment_created' => 'chat',
+        'vote_up' => 'arrow-up',
+        'vote_down' => 'arrow-down',
+        'reputation_changed' => 'chart',
+        default => 'user',
+    };
+
+    $color = match($activity->action) {
+        'post_created' => 'text-blue-500 bg-blue-50 dark:bg-blue-900/20',
+        'comment_created' => 'text-green-500 bg-green-50 dark:bg-green-900/20',
+        'vote_up' => 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20',
+        'reputation_changed' => 'text-purple-500 bg-purple-50 dark:bg-purple-900/20',
+        default => 'text-gray-500 bg-gray-50 dark:bg-gray-800',
+    };
 @endphp
 
-<div class="flex gap-4 p-5">
-
+<div class="flex gap-4 p-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0">
     {{-- Icon --}}
-    <div class="flex-shrink-0 mt-1">
-        @switch($activity->action)
-
-        @case('post_created')
-        <span class="text-blue-600">📝</span>
-        @break
-
-        @case('comment_created')
-        <span class="text-green-600">💬</span>
-        @break
-
-        @case('vote_up')
-        <span class="text-emerald-600">⬆️</span>
-        @break
-
-        @case('vote_down')
-        <span class="text-red-600">⬇️</span>
-        @break
-
-        @case('best_answer_selected')
-        <span class="text-yellow-500">⭐</span>
-        @break
-
-        @case('reputation_changed')
-        <span class="text-purple-600">🏆</span>
-        @break
-
-        @default
-        <span class="text-gray-400">•</span>
-        @endswitch
+    <div class="flex-shrink-0">
+        <div class="p-2 rounded-xl {{ $color }}">
+            <x-dynamic-component :component="'icons.' . $icon" class="w-5 h-5" />
+        </div>
     </div>
 
-    {{-- Content --}}
     <div class="flex-1">
-
-        {{-- Description --}}
-        <div class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="text-sm text-gray-900 dark:text-gray-100 leading-relaxed">
             {!! activity_description($activity) !!}
         </div>
 
-        {{-- Timestamp --}}
-        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <div class="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <x-icons.moon class="w-3 h-3 opacity-50" /> {{-- Just an example icon for time --}}
             {{ $activity->created_at->diffForHumans() }}
         </div>
-
     </div>
-
 </div>

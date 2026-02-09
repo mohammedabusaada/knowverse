@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserActivityController extends Controller
 {
@@ -14,37 +15,28 @@ class UserActivityController extends Controller
      */
     public function index(Request $request, User $user)
     {
-        // Profile visibility (already correct)
         $this->authorize('view', $user);
 
         $viewer = Auth::user();
-        $type   = $request->query('type', 'all');
+        $type = $request->query('type', 'all');
 
-        $query = UserActivity::query()
-            ->where('user_id', $user->id)
-            ->with([
-                'target' => function ($morph) {
-                    $morph->morphWith([
-                        \App\Models\Post::class    => ['user', 'tags'],
-                        \App\Models\Comment::class => ['user', 'post'],
-                    ]);
-                }
-            ]);
+        // Start the query using our Model scopes
+        $query = UserActivity::forUser($user)
+            ->withTargets()
+            ->feed();
 
-        // --------------------------------------------------
-        // Filters (semantic grouping)
-        // --------------------------------------------------
+        // Apply semantic filters
         match ($type) {
             'posts' => $query->whereIn('action', [
-                'post_created',
-                'comment_created',
-                'best_answer_selected',
+                'post_created', 
+                'comment_created', 
+                'best_answer_selected'
             ]),
 
             'votes' => $query->whereIn('action', [
-                'vote_up',
-                'vote_down',
-                'vote_removed',
+                'vote_up', 
+                'vote_down', 
+                'vote_removed'
             ]),
 
             'reputation' => $query->where('action', 'reputation_changed'),
@@ -52,33 +44,25 @@ class UserActivityController extends Controller
             default => null,
         };
 
-        // --------------------------------------------------
-        // Fetch & apply visibility rules
-        // --------------------------------------------------
-        $activities = $query
-            ->latest('created_at')
-            ->get()
-            ->filter(fn ($activity) =>
-                $viewer
-                    ? $viewer->can('view', $activity)
-                    : app(\App\Policies\UserActivityPolicy::class)
-                        ->view(null, $activity)
-            );
+        // Fetch and filter by visibility policy
+        $activities = $query->get()->filter(function ($activity) use ($viewer) {
+            return $viewer 
+                ? $viewer->can('view', $activity) 
+                : $activity->isPublic();
+        });
 
-        // --------------------------------------------------
-        // Manual pagination (after filtering)
-        // --------------------------------------------------
-        $perPage = 25;
-        $page    = request()->integer('page', 1);
+        // Setup Manual Pagination
+        $perPage = 20;
+        $page = $request->integer('page', 1);
 
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginated = new LengthAwarePaginator(
             $activities->forPage($page, $perPage),
             $activities->count(),
             $perPage,
             $page,
             [
-                'path'  => request()->url(),
-                'query' => request()->query(),
+                'path'  => $request->url(),
+                'query' => $request->query(),
             ]
         );
 

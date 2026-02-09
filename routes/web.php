@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-/** * Controllers
+/**
+ * Controllers
  */
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PostController;
@@ -18,6 +18,7 @@ use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportModerationController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\TagFollowController;
@@ -29,7 +30,6 @@ use App\Http\Controllers\TagFollowController;
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
 
@@ -44,6 +44,7 @@ require __DIR__ . '/auth.php';
 |--------------------------------------------------------------------------
 | 3. Admin Routes
 |--------------------------------------------------------------------------
+| Protected by auth and custom is_admin middleware.
 */
 
 Route::middleware(['auth', 'is_admin'])
@@ -53,6 +54,7 @@ Route::middleware(['auth', 'is_admin'])
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Moderation Management
         Route::middleware('can:manage-reports')->group(function () {
             Route::get('/reports', [ReportModerationController::class, 'index'])->name('reports.index');
             Route::get('/reports/{report}', [ReportModerationController::class, 'show'])->name('reports.show');
@@ -61,8 +63,7 @@ Route::middleware(['auth', 'is_admin'])
         });
 
         // Users management
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
-            ->only(['index', 'show', 'destroy']);
+        Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
     });
 
 /*
@@ -86,21 +87,25 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [NotificationController::class, 'clear'])->name('clear');
     });
 
-    // Profile Settings
+    // Settings & Profile
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    
+    Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])->name('settings.notifications');
+    Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])->name('settings.notifications.update');
 
     // Content Resources
     Route::resource('posts', PostController::class);
     Route::resource('comments', CommentController::class)->only(['store', 'update', 'destroy']);
+    Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
 
     // Best Answer Logic
     Route::post('/comments/{comment}/best', [CommentController::class, 'markAsBest'])->name('comments.best');
     Route::post('/comments/{comment}/unbest', [CommentController::class, 'unmarkBest'])->name('comments.unbest');
 
-    // Interactions
+    // Interactions (Votes & Reports)
     Route::post('/vote', [VoteController::class, 'vote'])->name('vote');
-
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 
     // Tags Management
     Route::prefix('tags')->name('tags.')->group(function () {
@@ -109,82 +114,28 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [TagController::class, 'store'])->name('store');
         Route::put('/{tag}', [TagController::class, 'update'])->name('update');
         Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
-        Route::post('/{tag}/follow', [TagController::class, 'follow'])->name('follow');
-        Route::post('/{tag}/unfollow', [TagController::class, 'unfollow'])->name('unfollow');
-    });
-
-
-        // Tag follow/unfollow
         Route::post('/{tag}/follow', [TagFollowController::class, 'follow'])->name('follow');
         Route::delete('/{tag}/follow', [TagFollowController::class, 'unfollow'])->name('unfollow');
-
-        // Tag followers list
         Route::get('/{tag}/followers', [TagController::class, 'followers'])->name('followers');
-    });
+    Route::get('/{tag:slug}', [TagController::class, 'show'])->name('show');
+        });
 
+    // Social (Followers)
+    Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('users.follow');
 
-
-    Route::post('/reports', [ReportController::class, 'store'])
-        ->name('reports.store');
-
-
-    /*
-| Notification Preferences
-*/
-    Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])
-        ->name('settings.notifications');
-
-    Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])
-        ->name('settings.notifications.update');
-
-    /*
-    | Reputation
-    */
-    Route::get('/{user:username}/reputation', [ReputationController::class, 'index'])
-        ->name('reputation.index');
-
-    Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
-
-
-    // User follow/unfollow
-    Route::post('/users/{user}/follow', [FollowController::class, 'follow'])->name('users.follow');
-    Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
-
-    // User followers/following lists
-    Route::get('/{user:username}/followers', [ProfileController::class, 'followers'])->name('profiles.followers');
-    Route::get('/{user:username}/following', [ProfileController::class, 'following'])->name('profiles.following');
+    Route::get('/settings/security', function () {
+        return view('settings.security');
+    })->name('settings.security');
+});
 
 /*
 |--------------------------------------------------------------------------
-| 5. Public Profile & Activity Routes (Wildcards last)
+| 5. Public Profile & Activity Routes (Wildcards MUST stay at the bottom)
 |--------------------------------------------------------------------------
 */
 
-
-Route::get('/{user:username}/activity', [UserActivityController::class, 'index'])
-    ->name('activity.index');
-
-Route::get('/{user:username}/reputation', [ReputationController::class, 'index'])
-    ->name('reputation.index');
-
-Route::get('/{user:username}', [ProfileController::class, 'show'])
-    ->name('profiles.show');
-
-/*
-|--------------------------------------------------------------------------
-| 6. Debug / Development
-|--------------------------------------------------------------------------
-*/
-
-if (app()->environment('local')) {
-    Route::get('/test-report', function () {
-        return view('test-report');
-    });
-}
-
-Route::middleware(['auth', 'is_admin'])
-    ->prefix('admin')
-    ->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('admin.dashboard');
-    });
+Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/{user:username}/activity', [UserActivityController::class, 'index'])->name('profile.activity');
+Route::get('/{user:username}/reputation', [ReputationController::class, 'index'])->name('profile.reputation');
+Route::get('/{user:username}/followers', [ProfileController::class, 'followers'])->name('profile.followers');
+Route::get('/{user:username}/following', [ProfileController::class, 'following'])->name('profile.following');

@@ -2,7 +2,7 @@
     'user',
 ])
 
-<a href="{{ route('profiles.show', $user->username) }}"
+<a href="{{ route('profile.show', $user->username) }}"
    class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800
           border border-gray-200 dark:border-gray-700
           rounded-xl hover:shadow-md transition">
