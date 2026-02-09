@@ -3,64 +3,77 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateReportStatusRequest;
 use App\Models\Report;
 use App\Services\ReportModerationService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class ReportModerationController extends Controller
 {
-    protected ReportModerationService $moderationService;
-
-    public function __construct(ReportModerationService $moderationService)
-    {
+    public function __construct(
+        protected ReportModerationService $moderationService
+    ) {
         $this->middleware(['auth', 'can:manage-reports']);
-        $this->moderationService = $moderationService;
     }
 
+    /**
+     * Display the listing of reports.
+     */
     public function index()
     {
-        $reports = Report::with(['reporter', 'reviewer'])
+        // We eager load 'reporter' and 'target' to keep the page fast (prevent N+1)
+        $reports = Report::with(['reporter'])
             ->latest()
             ->paginate(20);
 
         return view('admin.reports.index', compact('reports'));
     }
 
+    /**
+     * Display a specific report.
+     */
     public function show(Report $report)
     {
-        $report->load(['reporter', 'reviewer', 'target']);
+        $report->load(['reporter', 'resolver', 'target']);
 
         return view('admin.reports.show', compact('report'));
     }
 
-    public function review(UpdateReportStatusRequest $request, Report $report)
+    /**
+     * Resolve the report (Hides content + Rewards/Penalizes).
+     */
+    public function resolve(Request $request, Report $report)
     {
-        // 1️⃣ Mark as reviewed
-        $report->markReviewed($request->user());
+        // 1. Update the report record itself
+        $report->markAsResolved($request->user());
 
-        // 2️⃣ Apply moderation logic
+        // 2. Run the logic to hide the Post/Comment and send notifications
         $this->moderationService->handle($report);
 
-        Log::info('Report reviewed & moderation applied.', [
-            'report_id' => $report->id,
-            'reviewed_by' => $request->user()->id,
-        ]);
-
-        return back()->with('success', 'Report reviewed and moderation applied.');
+        return $this->respond($request, 'Report resolved and actions applied.');
     }
 
-    public function dismiss(UpdateReportStatusRequest $request, Report $report)
+    /**
+     * Dismiss the report (No action taken).
+     */
+    public function dismiss(Request $request, Report $report)
     {
-        $report->update([
-            'status' => \App\Enums\ReportStatus::DISMISSED,
-            'reviewed_by' => $request->user()->id,
-        ]);
+        $report->markAsDismissed($request->user());
 
-        Log::info('Report dismissed by admin.', [
-            'report_id' => $report->id,
-        ]);
+        return $this->respond($request, 'Report dismissed without action.');
+    }
 
-        return back()->with('success', 'Report dismissed.');
+    /**
+     * Unified response handler for AJAX and Redirects.
+     */
+    protected function respond(Request $request, string $message)
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => $message,
+                'status' => 'success'
+            ]);
+        }
+        
+        return redirect()->route('admin.reports.index')->with('success', $message);
     }
 }

@@ -26,6 +26,12 @@
                             {{ $comment->created_at->diffForHumans() }}
                         </span>
 
+                        @if($comment->is_hidden)
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-black uppercase tracking-tighter rounded bg-red-50 text-red-600 border border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+            Hidden
+        </span>
+    @endif
+
                         @if ($comment->post->best_comment_id === $comment->id)
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md
                                          bg-gray-100 text-gray-800 border border-blue-600/20
@@ -35,6 +41,15 @@
                             </span>
                         @endif
                     </div>
+                    @if($comment->is_hidden)
+    <div class="mt-2 text-[11px] text-red-500 dark:text-red-400 italic">
+        This comment has been hidden from public view for violating community guidelines.
+    </div>
+@endif
+
+<div x-show="!showEdit" x-transition.opacity class="mt-3 prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+    <x-markdown :text="$comment->body" />
+</div>
                 </div>
 
                 <x-action-dropdown>

@@ -18,34 +18,51 @@
         </div>
 
         <div class="flex-1">
-            <div class="flex items-center gap-2 mb-2 text-xs text-gray-500">
-                <x-user-avatar :src="$post->user->profile_picture_url" size="xs" />
-                <x-user-hover-card :user="$post->user" />
-                <span>•</span>
-                <span>{{ $post->created_at->diffForHumans() }}</span>
+            {{-- UPDATED: Top Row with Dropdown --}}
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                    <x-user-avatar :src="$post->user->profile_picture_url" size="xs" />
+                    <x-user-hover-card :user="$post->user" />
+                    <span>•</span>
+                    <span>{{ $post->created_at->diffForHumans() }}</span>
+
+                    @if($post->is_hidden)
+                        <span class="ml-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-red-200 dark:border-red-800">
+                            Hidden
+                        </span>
+                    @endif
+                </div>
+
+                {{-- The "3 dots" menu --}}
+                <x-action-dropdown>
+                    <x-report-button type="post" :id="$post->id" />
+                    @can('update', $post)
+                        <a href="{{ route('posts.edit', $post) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                            Edit Post
+                        </a>
+                    @endcan
+                </x-action-dropdown>
             </div>
 
             <a href="{{ route('posts.show', $post) }}" class="block group">
                 <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                    {{-- Highlight Title if search query exists --}}
                     @if(request('q'))
-                    @highlight($post->title)
+                        @highlight($post->title)
                     @else
-                    {{ $post->title }}
+                        {{ $post->title }}
                     @endif
                 </h2>
 
                 <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 leading-relaxed mb-4">
-                    {{-- Highlight Body snippet if search query exists --}}
                     @php
-                    $plainText = strip_tags($post->body);
-                    $truncated = Str::limit($plainText, 160);
+                        $plainText = strip_tags($post->body);
+                        $truncated = Str::limit($plainText, 160);
                     @endphp
 
                     @if(request('q'))
-                    @highlight($truncated)
+                        @highlight($truncated)
                     @else
-                    {{ $truncated }}
+                        {{ $truncated }}
                     @endif
                 </p>
             </a>
@@ -53,11 +70,10 @@
             <div class="flex items-center justify-between">
                 <div class="flex flex-wrap gap-2">
                     @foreach($post->tags->take(3) as $tag)
-                    {{-- FIXED LINK: Sends an array with one tag to match the Controller logic --}}
-                    <a href="{{ route('posts.index', ['tags' => [$tag->name]]) }}"
-                        class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
-                        #{{ $tag->name }}
-                    </a>
+                        <a href="{{ route('posts.index', ['tags' => [$tag->name]]) }}"
+                           class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                            #{{ $tag->name }}
+                        </a>
                     @endforeach
                 </div>
 

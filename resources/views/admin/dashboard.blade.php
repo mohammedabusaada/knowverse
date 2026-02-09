@@ -56,11 +56,11 @@
             </p>
         </div>
 
-        {{-- Reviewed Reports --}}
+        {{-- Resolved Reports --}}
         <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-600">
-            <p class="text-sm text-gray-500">Reviewed Reports</p>
+            <p class="text-sm text-gray-500">Resolved Reports</p>
             <p class="mt-2 text-3xl font-bold text-green-600">
-                {{ $reviewedReports }}
+                {{ $resolvedReports }}
             </p>
         </div>
 

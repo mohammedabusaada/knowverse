@@ -38,6 +38,8 @@ class CommentSeeder extends Seeder
                         'post_id' => $post->id,
                         'user_id' => $users->random()->id,
                         'parent_id' => $comment->id, // guaranteed to exist
+                        'is_hidden'  => false,
+                        'spam_score' => 0,
                         'created_at' => now()->format('Y-m-d H:i:s'),
                         'updated_at' => now()->format('Y-m-d H:i:s'),
                     ]);

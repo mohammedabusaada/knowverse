@@ -20,7 +20,11 @@ class PostFactory extends Factory
             'body' => $this->faker->paragraphs(rand(3, 6), true),
             'image' => $this->faker->optional(0.3)->imageUrl(640, 480, 'education', true),
             'status' => $this->faker->randomElement($statuses),
-            'best_comment_id' => null, // handled later if needed
+            
+            // New moderation field: 10% chance to be hidden by default
+            'is_hidden' => $this->faker->boolean(10), 
+            
+            'best_comment_id' => null, // handled later in Seeder if needed
             'view_count' => $this->faker->numberBetween(0, 2000),
             'upvote_count' => $this->faker->numberBetween(0, 300),
             'downvote_count' => $this->faker->numberBetween(0, 50),

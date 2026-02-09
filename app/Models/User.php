@@ -196,4 +196,9 @@ class User extends Authenticatable implements AuthorizableContract
     {
         return $this->hasMany(NotificationPreference::class);
     }
+
+    public function canSeeHiddenContent(): bool
+{
+    return $this->isAdmin();
+}
 }

@@ -56,7 +56,7 @@ Route::middleware(['auth', 'is_admin'])
         Route::middleware('can:manage-reports')->group(function () {
             Route::get('/reports', [ReportModerationController::class, 'index'])->name('reports.index');
             Route::get('/reports/{report}', [ReportModerationController::class, 'show'])->name('reports.show');
-            Route::patch('/reports/{report}/review', [ReportModerationController::class, 'review'])->name('reports.review');
+            Route::patch('/reports/{report}/resolve', [ReportModerationController::class, 'resolve'])->name('reports.resolve');
             Route::patch('/reports/{report}/dismiss', [ReportModerationController::class, 'dismiss'])->name('reports.dismiss');
         });
 

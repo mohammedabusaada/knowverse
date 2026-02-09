@@ -14,28 +14,32 @@ return new class extends Migration
             // Reporter
             $table->foreignId('reporter_id')->constrained('users')->cascadeOnDelete();
 
-            // Polymorphic Target (what is being reported)
-            $table->morphs('target'); // Reported entity (post, comment, or user)
+            // Polymorphic Target (Post, Comment, etc.)
+            $table->morphs('target'); 
 
-            // Report Details
+            // Categorized reason
+            $table->string('reason_type', 50)->index(); 
+            
+            // Optional custom text from user
             $table->text('reason')->nullable();
 
-            $table->enum('status', ['pending', 'reviewed', 'dismissed'])->default('pending');
+            $table->string('status')->default('pending')->index();
 
-            // Reviewer (Admin who handled the report)
-            $table->foreignId('reviewed_by')->nullable()
+            // Admin who handled the report
+            $table->foreignId('resolved_by')->nullable()
                 ->constrained('users')
                 ->nullOnDelete()
-                ->comment('Admin who reviewed the report');
+                ->comment('Admin who handled the report');
 
-            // Timestamps (Using both for auditing the status change)
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            // Audit Timestamps
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamps();
             $table->softDeletes();
 
-
-            // Index: For quickly finding reports by the reporter and status
+            // Combined index for the Admin Dashboard filters
             $table->index(['reporter_id', 'status']);
+
+            $table->unique(['reporter_id', 'target_type', 'target_id'], 'unique_report_per_user');
         });
     }
 
