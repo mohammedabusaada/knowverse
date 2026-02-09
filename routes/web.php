@@ -19,6 +19,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportModerationController;
 use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\TagFollowController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +110,16 @@ Route::middleware('auth')->group(function () {
     });
 
 
+        // Tag follow/unfollow
+        Route::post('/{tag}/follow', [TagFollowController::class, 'follow'])->name('follow');
+        Route::delete('/{tag}/follow', [TagFollowController::class, 'unfollow'])->name('unfollow');
+
+        // Tag followers list
+        Route::get('/{tag}/followers', [TagController::class, 'followers'])->name('followers');
+    });
+
+
+
     Route::post('/reports', [ReportController::class, 'store'])
         ->name('reports.store');
 
@@ -129,14 +141,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
 
-    // User follow
-    Route::post('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'store']);
-    Route::delete('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'destroy']);
 
-    // Tag follow
-    Route::post('/tags/{tag}/follow', [\App\Http\Controllers\TagFollowController::class, 'store']);
-    Route::delete('/tags/{tag}/follow', [\App\Http\Controllers\TagFollowController::class, 'destroy']);
-});
+    // User follow/unfollow
+    Route::post('/users/{user}/follow', [FollowController::class, 'follow'])->name('users.follow');
+    Route::delete('/users/{user}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
+
+    // User followers/following lists
+    Route::get('/{user:username}/followers', [ProfileController::class, 'followers'])->name('profiles.followers');
+    Route::get('/{user:username}/following', [ProfileController::class, 'following'])->name('profiles.following');
 
 /*
 |--------------------------------------------------------------------------

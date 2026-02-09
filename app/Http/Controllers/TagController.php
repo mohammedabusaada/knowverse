@@ -75,7 +75,7 @@ class TagController extends Controller
     {
         $this->authorize('update', $post);
         $request->validate([
-'tag_ids'   => ['required', 'array', 'max:5'], 
+'tag_ids'   => ['required', 'array', 'max:5'],
         'tag_ids.*' => 'exists:tags,id'
         ]);
 
@@ -97,4 +97,11 @@ class TagController extends Controller
         $tag->followers()->detach([Auth::id()]);
         return response()->json(['message' => 'Tag unfollowed']);
 }
+// FOLLOWERS LIST
+    // ========================
+    public function followers(Tag $tag)
+    {
+        $followers = $tag->followers()->paginate(20);
+        return view('tags.followers', compact('tag', 'followers'));
+    }
 }

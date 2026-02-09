@@ -43,10 +43,10 @@ class ProfileController extends Controller
             'bio'             => ['nullable', 'string', 'max:2000'],
             'profile_picture' => ['nullable', 'image', 'max:2048'],
             'username'        => [
-                'sometimes', 
-                'string', 
-                'max:50', 
-                'alpha_dash:ascii', 
+                'sometimes',
+                'string',
+                'max:50',
+                'alpha_dash:ascii',
                 Rule::unique('users')->ignore($user->id),
                 new ReservedUsername(),
             ],
@@ -64,5 +64,23 @@ class ProfileController extends Controller
         return redirect()
             ->route('profiles.show', $user->username)
             ->with('status', 'Profile updated successfully.');
+    }
+
+    /**
+     * List followers of the user.
+     */
+    public function followers(User $user)
+    {
+        $followers = $user->followers()->paginate(20);
+        return view('profiles.followers', compact('user', 'followers'));
+    }
+
+    /**
+     * List users that this user is following.
+     */
+    public function following(User $user)
+    {
+        $following = $user->following()->paginate(20);
+        return view('profiles.following', compact('user', 'following'));
     }
 }

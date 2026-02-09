@@ -18,6 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
             // Composite PK: one follow per pair
             $table->primary(['follower_id', 'followed_id']);
