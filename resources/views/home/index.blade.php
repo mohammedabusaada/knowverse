@@ -19,7 +19,6 @@
                     text-4xl sm:text-5xl
                     font-bold
                     text-gray-900 dark:text-white
-
                 "
             >
                 KnowVerse
@@ -27,12 +26,10 @@
 
             <p
                 class="
-                 px-4 py-2
-                  font-medium
-                   text-gray-700 dark:text-gray-200
-
+                    px-4 py-2
+                    font-medium
+                    text-gray-700 dark:text-gray-200
                     text-lg
-
                     leading-relaxed
                 "
             >
@@ -46,14 +43,14 @@
                 <a
                     href="{{ route('posts.create') }}"
                     class="
-                        px-4 py-2 rounded-lg
-                              bg-black text-white
-                            hover:bg-gradient-to-r
-                            hover:from-gray-800 hover:to-gray-600
-                            hover:text-white
-                            hover:shadow-md
-                            hover:scale-105
-                            transition-all duration-200
+                        inline-flex items-center justify-center
+                        px-8 py-3
+                        rounded-xl
+                        bg-gray-900 text-white
+                        font-semibold
+                        shadow-lg shadow-gray-900/20
+                        hover:bg-black hover:shadow-xl
+                        transition
                     "
                 >
                     Start a discussion
@@ -61,14 +58,15 @@
             @else
                 <a
                     href="{{ route('login') }}"
-                    class="px-4 py-2 rounded-lg
-                              bg-black text-white
-                            hover:bg-gradient-to-r
-                            hover:from-gray-800 hover:to-gray-600
-                            hover:text-white
-                            hover:shadow-md
-                            hover:scale-105
-                            transition-all duration-200
+                    class="
+                        inline-flex items-center justify-center
+                        px-8 py-3
+                        rounded-xl
+                        bg-white text-gray-900
+                        font-semibold
+                        shadow-lg shadow-black/10
+                        hover:bg-gray-50 hover:shadow-xl
+                        transition
                     "
                 >
                     Sign in to start a discussion
