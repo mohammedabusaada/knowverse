@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Relations\{
     BelongsTo,
     HasMany,
@@ -22,6 +24,8 @@ class Comment extends Model
         'user_id',
         'parent_id',
         'body',
+        'is_hidden',
+        'spam_score',
         'upvote_count',
         'downvote_count',
     ];
@@ -109,6 +113,45 @@ class Comment extends Model
         'upvote_count'   => $up,
         'downvote_count' => $down,
     ]);
+}
+
+public function increaseSpamScore(int $amount = 1): void
+{
+    $this->increment('spam_score', $amount);
+}
+public function scopeVisible($query)
+{
+    return $query->where('is_hidden', false);
+}
+
+protected static function booted()
+{
+    static::addGlobalScope('visibility', function ($builder) {
+        // 1. If we are in the admin area, show everything
+        if (Request::is('admin/*')) {
+            return;
+        }
+
+        // 2. Handle authenticated users
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Admins see everything everywhere
+            if ($user->isAdmin()) {
+                return;
+            }
+
+            // Users see public content OR their own hidden content 
+            // (so they can see why it was hidden)
+            $builder->where(function ($query) use ($user) {
+                $query->where('is_hidden', false)
+                      ->orWhere('user_id', $user->id);
+            });
+        } else {
+            // 3. Guests only see non-hidden content
+            $builder->where('is_hidden', false);
+        }
+    });
 }
 
 }

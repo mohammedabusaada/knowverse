@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             ReputationSeeder::class,
             NotificationsSeeder::class,
             UserActivitySeeder::class,
-             NotificationPreferenceSeeder::class,
+            NotificationPreferenceSeeder::class,
+            ReportSeeder::class,
         ]);
     }
 }

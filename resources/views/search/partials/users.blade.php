@@ -3,7 +3,7 @@
 @else
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach($users as $user)
-            <a href="{{ route('profiles.show', $user->username) }}"
+            <a href="{{ route('profile.show', $user->username) }}"
                class="group p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-blue-500/50 transition-all">
                 <div class="flex items-center gap-3">
                     {{-- Avatar with group-hover effect --}}

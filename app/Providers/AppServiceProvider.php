@@ -14,6 +14,7 @@ use App\Observers\PostObserver;
 use App\Observers\UserObserver;
 use App\Observers\CommentObserver;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        //This tells Laravel that target_type "post" = App\Models\Post
+        Relation::morphMap([
+        'post' => \App\Models\Post::class,
+        'comment' => \App\Models\Comment::class,
+        'user' => \App\Models\User::class,
+    ]);
 
         User::observe(UserObserver::class);
         Vote::observe(VoteObserver::class);

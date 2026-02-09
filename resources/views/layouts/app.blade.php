@@ -1,136 +1,68 @@
 <!DOCTYPE html>
-<html
-    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
     x-data="{ darkMode: localStorage.getItem('theme') === 'dark' }"
     x-init="$watch('darkMode', val => localStorage.setItem('theme', val ? 'dark' : 'light'))"
-    :class="{ 'dark': darkMode }"
->
+    :class="{ 'dark': darkMode }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'KnowVerse') }}</title>
 
-
+    {{-- Dark Mode Head Script --}}
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
         }
     </script>
 
-
-
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
-
-    <!-- Prism.js -->
-
+    {{-- PrismJS for Code Highlighting --}}
     <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css" rel="stylesheet" id="prism-light">
     <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark" disabled>
     <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js" defer></script>
-
-
-    <style>
-        .brand-name { font-weight: 700; letter-spacing: -0.02em; color: #000; }
-        .dark .brand-name { color: #fff; }
-    </style>
 </head>
 
-<body class="font-sans antialiased min-h-screen
-             bg-gray-50 dark:bg-gray-950
-             text-gray-900 dark:text-gray-100">
-
-    <!-- Brand Styling -->
-    <style>
-        .brand-name {
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #000;
-        }
-        .dark .brand-name {
-            color: #fff;
-        }
-    </style>
-</head>
-
-<body class="font-sans antialiased
-             bg-gradient-to-br from-gray-100 to-gray-200
-             dark:from-gray-900 dark:to-gray-950
-             text-gray-900 dark:text-gray-100
-             min-h-screen">
-
-
+<body class="font-sans antialiased min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    
+    {{-- Navigation Bar Component --}}
     <x-nav-bar />
 
+    {{-- Reputation Toast Notification --}}
     @if(session('reputation_delta'))
-        <x-toast>
-            +{{ session('reputation_delta') }} reputation
-        </x-toast>
+        <x-toast>+{{ session('reputation_delta') }} reputation</x-toast>
     @endif
 
-    @isset($header)
+    {{-- Layout Wrapper --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10 py-10">
+            
+            {{-- Left Sidebar Column --}}
+            {{-- Hidden on very small screens, or you can adjust it to be a bottom-nav on mobile later --}}
+            <aside class="w-full lg:w-64 flex-shrink-0">
+                @include('layouts.includes.sidebar')
+            </aside>
 
-        <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+            {{-- Main Content Column --}}
+            <main class="flex-1 min-w-0">
+                @yield('content')
+            </main>
 
-        <header class="bg-white/80 dark:bg-gray-800/80
-                       backdrop-blur
-                       border-b border-gray-200 dark:border-gray-700">
-
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {{ $header }}
-            </div>
-        </header>
-    @endisset
-
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
-            @yield('content')
         </div>
-    </main>
+    </div>
 
+    {{-- Scripts --}}
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#comment-')) {
-                const el = document.querySelector(hash);
-                if (el) {
-                    el.classList.add('pulse-comment');
-                    setTimeout(() => el.classList.remove('pulse-comment'), 1500);
-                }
-            }
-        });
-
         document.addEventListener('alpine:init', () => {
+            // Prism Dark Mode Switcher
             Alpine.effect(() => {
                 const isDark = document.documentElement.classList.contains('dark');
                 const lightPrism = document.getElementById('prism-light');
                 const darkPrism = document.getElementById('prism-dark');
-
-    <!-- Page Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        @yield('content')
-    </main>
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.effect(() => {
-                const isDark = document.documentElement.classList.contains('dark');
-                document.getElementById('prism-light').disabled = isDark;
-                document.getElementById('prism-dark').disabled = !isDark;
-            });
-        });
-    </script>
-
-
                 if (lightPrism && darkPrism) {
                     lightPrism.disabled = isDark;
                     darkPrism.disabled = !isDark;

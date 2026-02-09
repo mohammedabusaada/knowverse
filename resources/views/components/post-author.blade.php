@@ -1,12 +1,12 @@
 @props(['user', 'date'])
 
 <div class="flex items-center gap-3">
-    <a href="{{ route('profiles.show', $user->username) }}">
+    <a href="{{ route('profile.show', $user->username) }}">
         <x-user-avatar :src="$user->profile_picture_url" size="md" class="ring-2 ring-gray-100 dark:ring-gray-700" />
     </a>
     <div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('profiles.show', $user->username) }}" class="font-bold text-gray-900 dark:text-white hover:text-blue-500">
+            <a href="{{ route('profile.show', $user->username) }}" class="font-bold text-gray-900 dark:text-white hover:text-blue-500">
                 {{ $user->display_name }}
             </a>
             @if($user->academic_title)

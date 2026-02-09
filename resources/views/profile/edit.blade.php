@@ -14,7 +14,7 @@
             Edit Profile
         </h1>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Update your personal information and profile details
+            Update your personal information and privacy preferences
         </p>
     </div>
 
@@ -77,11 +77,17 @@
 
         {{-- Personal Information --}}
         <div>
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
                 Personal Information
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <x-input
+                    label="Username"
+                    name="username"
+                    value="{{ old('username', $user->username) }}"
+                    required />
+
                 <x-input
                     label="Full name"
                     name="full_name"
@@ -101,7 +107,7 @@
                 Bio
             </h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Markdown is supported
+                Markdown is supported. Tell the community about your expertise.
             </p>
 
             <x-textarea
@@ -111,15 +117,40 @@
             >{{ old('bio', $user->bio) }}</x-textarea>
         </div>
 
+        {{-- Privacy Settings --}}
+        <div class="bg-gray-50 dark:bg-gray-800/40 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Privacy & Visibility
+            </h2>
+            
+            <div class="flex items-center justify-between">
+                <div class="pr-4">
+                    <label for="public_follow_lists" class="font-medium text-gray-900 dark:text-white">Public Follow Lists</label>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Allow other users to see who you are following and who follows you. If disabled, these tabs will be hidden from your profile for others.
+                    </p>
+                </div>
+                
+                {{-- Toggle Switch --}}
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="public_follow_lists" value="0">
+                    <input type="checkbox" name="public_follow_lists" id="public_follow_lists" value="1" class="sr-only peer" {{ old('public_follow_lists', $user->public_follow_lists) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+
         {{-- Actions --}}
-        <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
-            <x-button primary>
-                Save changes
+        <div class="flex justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <x-button href="{{ route('profile.show', $user->username) }}" secondary>
+                Cancel
+            </x-button>
+            <x-button type="submit" primary>
+                Save Changes
             </x-button>
         </div>
 
     </form>
-
 </div>
 
 @endsection
@@ -128,18 +159,16 @@
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        new EasyMDE({
+        const easyMDE = new EasyMDE({
             element: document.getElementById("bio-editor"),
             spellChecker: false,
-            autosave: {
-                enabled: true,
-                uniqueId: "profile_bio_{{ auth()->id() }}",
-                delay: 500,
-            },
+            status: false,
+            maxHeight: "300px",
             toolbar: [
                 "bold", "italic", "heading", "|",
                 "unordered-list", "ordered-list", "|",
-                "link", "preview"
+                "link", "quote", "|",
+                "preview", "side-by-side", "fullscreen"
             ],
         });
     });

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id')->nullable()->comment('Self-reference for replies');
 
             $table->text('body');
+            $table->boolean('is_hidden')->default(false)->index();
+            $table->integer('spam_score')->default(0);
             $table->integer('upvote_count')->default(0);
             $table->integer('downvote_count')->default(0);
 

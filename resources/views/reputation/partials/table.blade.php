@@ -1,55 +1,24 @@
-<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-            rounded-2xl shadow-sm p-6">
-
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="text-left border-b border-gray-300 dark:border-gray-700">
-                <th class="py-2">Date</th>
-                <th class="py-2">Action</th>
-                <th class="py-2">Change</th>
-                <th class="py-2">Source</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach ($history as $entry)
-                <tr class="border-b border-gray-200 dark:border-gray-700">
-                    <td class="py-2 text-gray-600 dark:text-gray-400">
-                        {{ $entry->created_at->diffForHumans() }}
-                    </td>
-
-                    <td class="py-2 capitalize">
-                        {{ str_replace('_', ' ', $entry->action) }}
-                    </td>
-
-                    <td class="py-2 font-bold 
-                        {{ $entry->delta > 0 ? 'text-green-600' : 'text-red-600' }}">
-                        {{ $entry->delta > 0 ? '+' : '' }}{{ $entry->delta }}
-                    </td>
-
-                    <td class="py-2">
-                        @if ($entry->source)
-                            @if ($entry->source_type === \App\Models\Post::class)
-                                <a href="{{ route('posts.show', $entry->source) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:underline">
-                                    View Post
-                                </a>
-                            @elseif ($entry->source_type === \App\Models\Comment::class)
-                                <a href="{{ route('posts.show', $entry->source->post_id) }}#comment-{{ $entry->source_id }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:underline">
-                                    View Comment
-                                </a>
-                            @endif
-                        @else
-                            —
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <div class="mt-6">
-        {{ $history->links() }}
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
+    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        @forelse ($history as $entry)
+            <x-reputation-item 
+                :type="$entry->action" 
+                :points="$entry->delta" 
+                :date="$entry->created_at->diffForHumans()"
+                :source="$entry->source"
+                :sourceType="$entry->source_type"
+            />
+        @empty
+            <div class="p-12 text-center">
+                <x-icons.chart class="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p class="text-gray-500 dark:text-gray-400 font-medium">No reputation history found.</p>
+            </div>
+        @endforelse
     </div>
+
+    @if($history->hasPages())
+        <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+            {{ $history->links() }}
+        </div>
+    @endif
 </div>

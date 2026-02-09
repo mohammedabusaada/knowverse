@@ -23,6 +23,8 @@ return new class extends Migration
                 ->default('published')
                 ->index()
                 ->comment('Post visibility status');
+            
+            $table->boolean('is_hidden')->default(false)->index();
 
             $table->unsignedBigInteger('best_comment_id')
                 ->nullable()

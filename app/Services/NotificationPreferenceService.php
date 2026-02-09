@@ -7,9 +7,17 @@ use App\Enums\NotificationType;
 
 class NotificationPreferenceService
 {
+    /**
+     * Core logic to check if a user should receive a specific notification.
+     */
     public function shouldNotify(User $user, NotificationType $type): bool
     {
-        // Pass the ->value (string) to the user model helper
-        return $user->notificationEnabled($type->value);
+        // 1. Mandatory notifications always bypass user preferences
+        if ($type->isMandatory()) {
+            return true;
+        }
+
+        // 2. Check user's specific setting in the database
+        return $user->notificationEnabled($type);
     }
 }

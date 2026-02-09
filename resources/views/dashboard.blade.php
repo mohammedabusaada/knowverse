@@ -26,7 +26,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Share knowledge with others.</p>
         </a>
 
-        <a href="{{ route('profiles.show', auth()->user()->username) }}"
+        <a href="{{ route('profile.show', auth()->user()->username) }}"
             class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700
                   hover:shadow-md transition flex flex-col items-center text-center">
 

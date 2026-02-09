@@ -3,32 +3,30 @@
 use App\Models\UserActivity;
 use Illuminate\Support\Str;
 
-function activity_description(UserActivity $activity): string
+function activity_description(App\Models\UserActivity $activity): string
 {
-    $user = e($activity->user->display_name);
     $target = $activity->target;
 
     return match ($activity->action) {
+        'post_created' => 
+            "Created a post: " . ($target ? "<a href='".route('posts.show', $target)."' class='font-bold hover:text-blue-600 transition'>".e($target->title)."</a>" : "<strong>a deleted post</strong>"),
 
-        'post_created' =>
-        "Created a post: <strong>{$target->title}</strong>",
+        'comment_created' => 
+            "Commented on " . ($target?->post ? "<a href='".route('posts.show', $target->post)."' class='font-bold hover:text-blue-600 transition'>".e($target->post->title)."</a>" : "<strong>a post</strong>"),
 
-        'comment_created' =>
-        "Commented on <strong>" . e($target->post?->title ?? 'a post') . "</strong>",
+        'vote_up' => 
+            "Upvoted a " . class_basename($target),
 
-        'vote_up' =>
-        "Upvoted a " . class_basename($target),
+        'vote_down' => 
+            "Downvoted a " . class_basename($target),
 
-        'vote_down' =>
-        "Downvoted a " . class_basename($target),
+        'best_answer_selected' => 
+            "Selected a best answer",
 
-        'best_answer_selected' =>
-        "Selected a best answer",
+        'reputation_changed' => 
+            "Reputation changed " . e($activity->details),
 
-        'reputation_changed' =>
-        "Reputation changed {$activity->details}",
-
-        default =>
-        Str::headline($activity->action),
+        default => 
+            Illuminate\Support\Str::headline($activity->action),
     };
 }

@@ -4,10 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    MorphTo
-};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
 
 class UserActivity extends Model
 {
@@ -27,6 +24,16 @@ class UserActivity extends Model
         'created_at' => 'datetime',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Automatically set created_at on creation since $timestamps is false
+        static::creating(function ($activity) {
+            $activity->created_at = $activity->created_at ?? now();
+        });
+    }
+
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
@@ -45,42 +52,27 @@ class UserActivity extends Model
     // Scopes
     // ------------------------------------------------------------------
 
-    public function scopeRecent($query, int $limit = 10)
+    public function scopeForUser($query, User $user)
     {
-        return $query->orderByDesc('created_at')->limit($limit);
+        return $query->where('user_id', $user->id);
     }
 
-    public function scopeByAction($query, string $action)
+    public function scopeFeed($query)
     {
-        return $query->where('action', $action);
+        return $query->orderByDesc('created_at');
     }
 
-    // ------------------------------------------------------------------
-// Feed Scopes
-// ------------------------------------------------------------------
-
-public function scopeForUser($query, User $user)
-{
-    return $query->where('user_id', $user->id);
-}
-
-public function scopeFeed($query)
-{
-    return $query->orderByDesc('created_at');
-}
-
-public function scopeWithTargets($query)
-{
-    return $query->with([
-        'target' => function ($morph) {
-            $morph->morphWith([
-                \App\Models\Post::class => ['user', 'tags'],
-                \App\Models\Comment::class => ['user', 'post'],
-            ]);
-        }
-    ]);
-}
-
+    public function scopeWithTargets($query)
+    {
+        return $query->with([
+            'target' => function ($morph) {
+                $morph->morphWith([
+                    \App\Models\Post::class => ['user', 'tags'],
+                    \App\Models\Comment::class => ['user', 'post'],
+                ]);
+            }
+        ]);
+    }
 
     // ------------------------------------------------------------------
     // Utility
@@ -98,7 +90,7 @@ public function scopeWithTargets($query)
     }
 
     public function isPublic(): bool
-{
-    return \App\Support\ActivityVisibility::for($this->action) === 'public';
-}
+    {
+        return \App\Support\ActivityVisibility::for($this->action) === 'public';
+    }
 }

@@ -6,35 +6,41 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
 
+            // Authentication & Identity
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('full_name')->nullable();
             $table->string('academic_title')->nullable();
-
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
 
+            // Authorization
             $table->foreignId('role_id')
                 ->constrained('roles')
                 ->cascadeOnDelete()
                 ->comment('References roles table');
 
+            // Profile & Preferences
             $table->text('bio')->nullable()->comment('Short user biography or description');
             $table->string('profile_picture')->nullable();
+            $table->boolean('public_follow_lists')->default(true); // Added this row
 
-            // Cached cumulative reputation value
+            // Reputation & Metrics
             $table->integer('reputation_points')
                 ->default(0)
                 ->comment('Cumulative sum of user reputation (synced with reputations table)');
 
+            // Analytics & Tracking
             $table->timestamp('last_login_at')->nullable()->comment('Date and time of last login');
-
             $table->timestamps();
             $table->softDeletes()->comment('Soft delete support');
         });
@@ -56,6 +62,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('sessions');

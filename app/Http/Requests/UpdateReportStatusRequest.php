@@ -3,20 +3,23 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateReportStatusRequest extends FormRequest
 {
-     public function authorize(): bool
+    /**
+     * Verify that the user is an admin before processing the request
+     */
+    public function authorize(): bool
     {
-    return $this->user()?->role?->name === 'admin';
-    
+        // Use the permission defined in the Policy or ensure the user is an admin
+        return $this->user() && $this->user()->isAdmin();
     }
 
+    /**
+     * No validation rules are required because the action is defined by the PATCH route
+     */
     public function rules(): array
     {
-        return [
-            'status' => 'required|string|in:pending,reviewed,dismissed',
-        ];
+        return [];
     }
 }

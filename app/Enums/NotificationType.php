@@ -8,6 +8,8 @@ enum NotificationType: string
     case POST_COMMENTED = 'post_commented';
     case COMMENT_REPLIED = 'comment_replied';
     case BEST_ANSWER_RECEIVED = 'best_answer_received';
+    case REPORT_RESOLVED = 'report_resolved'; // For the reporter
+    case CONTENT_REMOVED = 'content_removed'; // For the author
 
         // Votes
     case POST_UPVOTED = 'post_upvoted';
@@ -31,8 +33,10 @@ enum NotificationType: string
     public function isMandatory(): bool
     {
         return match ($this) {
-            self::SYSTEM => true,
-            default => false,
+        self::SYSTEM, 
+        self::REPORT_RESOLVED, 
+        self::CONTENT_REMOVED => true, // Moderation is always mandatory
+        default => false,
         };
     }
 
