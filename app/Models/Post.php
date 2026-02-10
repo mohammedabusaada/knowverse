@@ -126,6 +126,12 @@ class Post extends Model
         return $this->morphMany(UserActivity::class, 'target');
     }
 
+    public function savedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'saved_posts')
+                    ->withTimestamps();
+    }
+
     // ------------------------------------------------------------------
     // Scopes
     // ------------------------------------------------------------------
@@ -208,5 +214,19 @@ class Post extends Model
         'downvote_count' => $down,
     ]);
 }
+
+public function isSavedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        // Check loaded relationship first to avoid extra query if already eager loaded
+        if ($this->relationLoaded('savedByUsers')) {
+            return $this->savedByUsers->contains($user);
+        }
+
+        return $this->savedByUsers()->where('user_id', $user->id)->exists();
+    }
 
 }

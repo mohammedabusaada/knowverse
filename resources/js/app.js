@@ -2,6 +2,7 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import EasyMDE from "easymde";
 import './vote.js';
+import './save-post.js';
 
 window.Alpine = Alpine;
 window.EasyMDE = EasyMDE;
