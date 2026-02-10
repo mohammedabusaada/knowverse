@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('posts')
                 ->cascadeOnDelete();
 
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->primary(['user_id', 'post_id']);
         });

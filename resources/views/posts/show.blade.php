@@ -24,7 +24,7 @@
                 {{-- Left Side: Voting --}}
                 <div class="flex flex-col items-center">
                     <x-post-vote :post="$post" />
-                    <x-post.bookmark-button />
+                    <x-post.save-post-button :post="$post" />
                 </div>
 
                 <div class="flex-1">

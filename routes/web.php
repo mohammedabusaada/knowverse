@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\TagFollowController;
+use App\Http\Controllers\SavedPostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,7 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/{tag}/follow', [TagFollowController::class, 'follow'])->name('follow');
         Route::delete('/{tag}/follow', [TagFollowController::class, 'unfollow'])->name('unfollow');
         Route::get('/{tag}/followers', [TagController::class, 'followers'])->name('followers');
-    Route::get('/{tag:slug}', [TagController::class, 'show'])->name('show');
+        Route::get('/{tag:slug}', [TagController::class, 'show'])->name('show');
         });
 
     // Social (Followers)
@@ -126,6 +127,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/security', function () {
         return view('settings.security');
     })->name('settings.security');
+
+    Route::post('/posts/{post}/save', [SavedPostController::class, 'toggle'])->name('posts.save.toggle');
 });
 
 /*
