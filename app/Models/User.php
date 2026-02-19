@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\NotificationPreference;
 
 use Illuminate\Database\Eloquent\Relations\{
@@ -19,7 +20,8 @@ use Illuminate\Database\Eloquent\Relations\{
     BelongsToMany
 };
 
-class User extends Authenticatable implements AuthorizableContract
+// <--- 2. Add 'MustVerifyEmail' to implements
+class User extends Authenticatable implements AuthorizableContract, MustVerifyEmail
 {
     use Authorizable, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
@@ -161,9 +163,6 @@ class User extends Authenticatable implements AuthorizableContract
             ->value('enabled') ?? true;
     }
 
-
-
-
     public function isAdmin(): bool
     {
         return optional($this->role)->name === 'admin';
@@ -186,7 +185,6 @@ class User extends Authenticatable implements AuthorizableContract
             ->remove($this, $action, $source);
     }
 
-
     public function getRouteKeyName()
     {
         return 'username';
@@ -198,12 +196,12 @@ class User extends Authenticatable implements AuthorizableContract
     }
 
     public function canSeeHiddenContent(): bool
-{
-    return $this->isAdmin();
-}
+    {
+        return $this->isAdmin();
+    }
 
-public function isFollowedBy(User $user): bool
-{
-    return $this->followers()->where('follower_id', $user->id)->exists();
-}
+    public function isFollowedBy(User $user): bool
+    {
+        return $this->followers()->where('follower_id', $user->id)->exists();
+    }
 }
