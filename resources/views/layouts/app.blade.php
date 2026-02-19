@@ -9,6 +9,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'KnowVerse') }}</title>
 
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
+    
     {{-- Dark Mode Head Script --}}
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
