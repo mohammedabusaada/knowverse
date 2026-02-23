@@ -32,4 +32,14 @@ class SavedPostController extends Controller
             'message' => $message,
         ]);
     }
+    public function index(){
+    $user = Auth::user();
+
+    $savedPosts = $user->savedPosts()
+        ->with(['user', 'tags', 'bestComment'])
+        ->latest()
+        ->paginate(10);
+
+    return view('saved-posts.index', compact('savedPosts'));
+}
 }
