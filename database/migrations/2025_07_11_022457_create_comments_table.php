@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->unsignedBigInteger('parent_id')->nullable()->comment('Self-reference for replies');
 

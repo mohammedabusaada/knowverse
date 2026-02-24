@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -23,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\{
 // <--- 2. Add 'MustVerifyEmail' to implements
 class User extends Authenticatable implements AuthorizableContract, MustVerifyEmail
 {
-    use Authorizable, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use Authorizable, HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'username',
@@ -48,7 +47,6 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         'last_login_at'     => 'datetime',
         'password'          => 'hashed',
         'reputation_points' => 'integer',
-        'deleted_at'        => 'datetime',
     ];
 
     // ============================================
@@ -165,7 +163,22 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
     public function isAdmin(): bool
     {
-        return optional($this->role)->name === 'admin';
+        return $this->role_id === 2;
+    }
+
+    public function isModerator(): bool
+    {
+        return $this->role_id === 3;
+    }
+
+    public function canModerate(): bool
+    {
+        return $this->isAdmin() || $this->isModerator();
+    }
+
+    public function canSeeHiddenContent(): bool
+    {
+        return $this->canModerate(); // Bothe moderator and admin can see hidden content
     }
 
     public function addReputation(string $action, ?int $points = null, ?Model $source = null)
@@ -193,11 +206,6 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
     public function notificationPreferences(): HasMany
     {
         return $this->hasMany(NotificationPreference::class);
-    }
-
-    public function canSeeHiddenContent(): bool
-    {
-        return $this->isAdmin();
     }
 
     public function isFollowedBy(User $user): bool

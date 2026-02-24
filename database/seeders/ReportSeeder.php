@@ -8,17 +8,14 @@ use App\Enums\{ReportReason, ReportStatus};
 
 class ReportSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $reporters = User::take(10)->get(); 
-        $admins = User::whereHas('role', function($query) {
-    $query->where('name', 'admin');
-})->get();
+        $moderators = User::whereIn('role_id', [2, 3])->get();
         $posts = Post::take(10)->get();
         $comments = Comment::take(10)->get();
+        // Get normal users to be reported
+        $reportedUsers = User::where('role_id', 1)->inRandomOrder()->take(3)->get();
 
         // 1. Create "pending" reports on posts
         foreach ($posts->random(3) as $post) {
@@ -27,7 +24,7 @@ class ReportSeeder extends Seeder
                 'target_id'   => $post->id,
                 'target_type' => Post::class,
                 'reason'      => 'This post contains misleading information.',
-                'reason_type' => ReportReason::SPAM,
+                'reason_type' => ReportReason::MISINFORMATION,
                 'status'      => ReportStatus::PENDING,
             ]);
         }
@@ -41,8 +38,20 @@ class ReportSeeder extends Seeder
                 'reason'      => 'Hate speech in comments.',
                 'reason_type' => ReportReason::HATE_SPEECH,
                 'status'      => ReportStatus::RESOLVED,
-                'resolved_by' => $admins->random()->id ?? null,
+                'resolved_by' => $moderators->random()->id ?? null,
                 'resolved_at' => now(),
+            ]);
+        }
+
+        // 3. Create "pending" reports on Users (For banning tests)
+        foreach ($reportedUsers as $reportedUser) {
+            Report::create([
+                'reporter_id' => $reporters->random()->id,
+                'target_id'   => $reportedUser->id,
+                'target_type' => User::class,
+                'reason'      => 'This user is spamming the forum and harassing others.',
+                'reason_type' => ReportReason::HARASSMENT,
+                'status'      => ReportStatus::PENDING,
             ]);
         }
     }

@@ -32,12 +32,17 @@
         </div>
 
         {{-- Actions --}}
-        <div class="self-start sm:self-center mt-4 sm:mt-0">
+        <div class="self-start sm:self-center mt-4 sm:mt-0 flex items-center gap-3">
             @auth
                 @if(auth()->id() === $user->id)
                     <x-button href="{{ route('profile.edit') }}" secondary>Edit Profile</x-button>
                 @else
                     <x-follow-button :user="$user" />
+                    
+                    {{-- Report user button (Dropdown) --}}
+                    <x-action-dropdown>
+                        <x-report-button type="user" :id="$user->id" />
+                    </x-action-dropdown>
                 @endif
             @else
                 <x-follow-button :user="$user" />

@@ -19,27 +19,28 @@ class ReportModerationService
     {
         DB::transaction(function () use ($report) {
             $target = $report->target_type::withoutGlobalScopes()
-                ->when(in_array(SoftDeletes::class, class_uses($report->target_type)), function ($query) {
+                ->when(in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($report->target_type)), function ($query) {
                     return $query->withTrashed();
                 })
                 ->find($report->target_id);
 
             if (!$target) return;
 
-            // Resolve 'wasHidden' status based on target type
-            $wasHidden = false;
+            $wasActionTaken = false;
 
+            // If the target is user, we permanently delete it (Hard Delete).
             if ($target instanceof User) {
-                // If the target IS a user, we don't hide them, we just mark the action as successful
-                $wasHidden = true; 
+                $target->delete(); // This will delete the user and set user_id = null in their posts.
+                $wasActionTaken = true; 
             } else {
-                $wasHidden = match ($report->reason_type) {
+                // For posts and comments
+                $wasActionTaken = match ($report->reason_type) {
                     ReportReason::SPAM => $this->handleSpam($target),
                     default => $this->hideContent($target),
                 };
             }
 
-            if ($wasHidden) {
+            if ($wasActionTaken) {
                 $this->applyReputationChanges($report, $target);
             }
         });

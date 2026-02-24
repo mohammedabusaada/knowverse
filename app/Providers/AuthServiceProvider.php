@@ -22,7 +22,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('manage-reports', function (User $user) {
-            return $user->role->name === 'admin';
+            return $user->canModerate();
         });
     }
 }
