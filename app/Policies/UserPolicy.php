@@ -32,18 +32,16 @@ class UserPolicy
     }
 
     /**
-     * Only admins can delete users (optional).
+     * Only admins can delete users.
      */
     public function delete(User $auth, User $model): bool
     {
         return $auth->role_id === 2;
     }
-        /**
-     * تعطي صلاحية manage-reports للمستخدم الذي role_id = 2
-     */
+
     public function manageReports(User $auth): bool
     {
-        return $auth->role_id === 2;
+        return $auth->canModerate();
     }
 }
 

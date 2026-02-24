@@ -13,12 +13,12 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        // Fetch role IDs dynamically (in case of future expansion)
-        $userRoleId = Role::where('name', 'user')->value('id') ?? 1;
-        $adminRoleId = Role::where('name', 'admin')->value('id') ?? 2;
-
-        // Weighted random role assignment: 90% user, 10% admin
-        $roleId = $this->faker->boolean(10) ? $adminRoleId : $userRoleId;
+        // 80% User, 10% Admin, 10% Moderator
+        $roleId = $this->faker->randomElement([
+            1, 1, 1, 1, 1, 1, 1, 1, // User
+            2,                      // Admin
+            3                       // Moderator
+        ]);
 
         return [
             'username' => $this->faker->unique()->userName(),

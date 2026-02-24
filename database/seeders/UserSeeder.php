@@ -15,16 +15,25 @@ class UserSeeder extends Seeder
             $this->call(RoleSeeder::class);
         }
 
-        // Create a few fixed admin accounts for testing (not random)
+        // 1. Create a fixed Admin account
         User::factory()->create([
             'username' => 'admin',
             'email' => 'admin@knowverse.test',
             'full_name' => 'System Administrator',
-            'role_id' => Role::where('name', 'admin')->value('id'),
-            'password' => 'admin1234', // will be hashed automatically
+            'role_id' => 2, // Admin
+            'password' => 'admin1234',
         ]);
 
-        // Generate multiple random users (mix of user/admin by weight)
+        // 2. Create a fixed Moderator account
+        User::factory()->create([
+            'username' => 'moderator',
+            'email' => 'moderator@knowverse.test',
+            'full_name' => 'Community Moderator',
+            'role_id' => 3, // Moderator
+            'password' => 'moderator1234',
+        ]);
+
+        // Generate multiple random users (mix of user/admin/mod by weight)
         User::factory(20)->create();
     }
 }

@@ -83,7 +83,12 @@ class Post extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'username' => 'deleted_user',
+            'full_name' => 'Deleted User',
+            'profile_picture' => null,
+            'role_id' => 1,
+        ]);
     }
 
     public function comments(): HasMany

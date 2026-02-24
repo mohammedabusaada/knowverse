@@ -34,6 +34,13 @@ class RoleSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'id' => 3,
+                'name' => 'moderator',
+                'description' => 'Community moderator who handles reports and content.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

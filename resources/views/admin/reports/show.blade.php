@@ -96,19 +96,24 @@
             <div x-data="{ 
                 processing: false,
                 async handleAction(url) {
-                    if (!confirm('Are you sure?')) return;
+                    if (!confirm('Are you sure? This action cannot be undone.')) return;
                     this.processing = true;
                     try {
-                        await fetch(url, {
+                        const response = await fetch(url, {
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json'
                             }
                         });
-                        window.location.href = '{{ route('admin.reports.index') }}';
+                        if (response.ok) {
+                            window.location.href = '{{ route('admin.reports.index') }}';
+                        } else {
+                            alert('Action failed. Please try again.');
+                            this.processing = false;
+                        }
                     } catch (e) {
-                        alert('Error.');
+                        alert('Error connecting to the server.');
                         this.processing = false;
                     }
                 }
@@ -116,13 +121,14 @@
 
                 <button @click="handleAction('{{ route('admin.reports.resolve', $report) }}')"
                         :disabled="processing"
-                        class="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-semibold disabled:opacity-50">
-                    <span x-text="processing ? 'Processing...' : 'Resolve & Apply Action'"></span>
+                        class="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-semibold disabled:opacity-50 shadow-md">
+                    {{-- 💡 تغيير النص بناءً على نوع الهدف --}}
+                    <span x-text="processing ? 'Processing...' : '{{ $report->target_type === App\Models\User::class ? 'Resolve & Ban User' : 'Resolve & Hide Content' }}'"></span>
                 </button>
 
                 <button @click="handleAction('{{ route('admin.reports.dismiss', $report) }}')"
                         :disabled="processing"
-                        class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition font-semibold disabled:opacity-50">
+                        class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition font-semibold disabled:opacity-50 border border-gray-300">
                     <span x-text="processing ? 'Wait...' : 'Dismiss Report'"></span>
                 </button>
             </div>

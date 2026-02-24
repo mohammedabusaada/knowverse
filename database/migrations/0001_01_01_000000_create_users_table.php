@@ -42,7 +42,6 @@ return new class extends Migration
             // Analytics & Tracking
             $table->timestamp('last_login_at')->nullable()->comment('Date and time of last login');
             $table->timestamps();
-            $table->softDeletes()->comment('Soft delete support');
         });
 
         // Laravel default authentication support tables
