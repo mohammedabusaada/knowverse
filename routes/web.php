@@ -36,7 +36,7 @@ Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 
 Route::get('/posts/{post}', [PostController::class, 'show'])
     ->name('posts.show')
-    ->whereNumber('post'); 
+    ->whereNumber('post');
 
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 
@@ -79,6 +79,10 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/saved-posts', [SavedPostController::class, 'index'])
+        ->name('saved-posts.index');
+
+
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::post('/read-all', [NotificationController::class, 'readAll'])->name('readAll');
@@ -89,10 +93,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
+
     Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])->name('settings.notifications');
     Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])->name('settings.notifications.update');
-    
+
     Route::get('/settings/security', function () { return view('settings.security'); })->name('settings.security');
 
     /*
@@ -101,7 +105,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('verified')->group(function () {
-        
+
         Route::resource('posts', PostController::class)->except(['show', 'index']);
         Route::resource('comments', CommentController::class)->only(['store', 'update', 'destroy']);
         Route::post('/posts/{post}/tags', [TagController::class, 'attachTags'])->name('posts.tags.attach');
@@ -116,7 +120,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('users.follow');
         Route::post('/tags/{tag}/follow', [TagFollowController::class, 'follow'])->name('tags.follow');
         Route::delete('/tags/{tag}/follow', [TagFollowController::class, 'unfollow'])->name('tags.unfollow');
-        
+
         Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
         Route::put('/tags/{tag}', [TagController::class, 'update'])->name('tags.update');
         Route::delete('/tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
