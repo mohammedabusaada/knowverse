@@ -35,6 +35,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         'profile_picture',
         'reputation_points',
         'last_login_at',
+        'banned_at',
     ];
 
     protected $hidden = [
@@ -45,6 +46,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_login_at'     => 'datetime',
+        'banned_at'         => 'datetime',
         'password'          => 'hashed',
         'reputation_points' => 'integer',
     ];
@@ -211,5 +213,10 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
     public function isFollowedBy(User $user): bool
     {
         return $this->followers()->where('follower_id', $user->id)->exists();
+    }
+
+    public function isBanned(): bool
+    {
+        return !is_null($this->banned_at);
     }
 }

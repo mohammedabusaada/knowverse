@@ -41,6 +41,10 @@ return new class extends Migration
 
             // Analytics & Tracking
             $table->timestamp('last_login_at')->nullable()->comment('Date and time of last login');
+
+            // Banned status
+            $table->timestamp('banned_at')->nullable();
+
             $table->timestamps();
         });
 

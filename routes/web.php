@@ -52,20 +52,28 @@ require __DIR__ . '/auth.php';
 | 3. Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'is_admin'])
+Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // ADMIN ONLY ROUTES (Middleware logic can be handled in controllers or explicitly here)
+        Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
+        
+        // TAGS MANAGEMENT
+        Route::get('/tags', [\App\Http\Controllers\Admin\TagController::class, 'index'])->name('tags.index');
+        Route::post('/tags', [\App\Http\Controllers\Admin\TagController::class, 'store'])->name('tags.store');
+        Route::put('/tags/{tag}', [\App\Http\Controllers\Admin\TagController::class, 'update'])->name('tags.update');
+        Route::delete('/tags/{tag}', [\App\Http\Controllers\Admin\TagController::class, 'destroy'])->name('tags.destroy');
+
+        // MODERATOR & ADMIN ROUTES
         Route::middleware('can:manage-reports')->group(function () {
             Route::get('/reports', [ReportModerationController::class, 'index'])->name('reports.index');
             Route::get('/reports/{report}', [ReportModerationController::class, 'show'])->name('reports.show');
             Route::patch('/reports/{report}/resolve', [ReportModerationController::class, 'resolve'])->name('reports.resolve');
             Route::patch('/reports/{report}/dismiss', [ReportModerationController::class, 'dismiss'])->name('reports.dismiss');
         });
-
-        Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
     });
 
 /*
@@ -93,6 +101,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/settings/notifications', [NotificationPreferenceController::class, 'edit'])->name('settings.notifications');
     Route::post('/settings/notifications', [NotificationPreferenceController::class, 'update'])->name('settings.notifications.update');

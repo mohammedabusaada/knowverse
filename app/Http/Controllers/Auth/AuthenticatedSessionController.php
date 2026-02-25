@@ -26,8 +26,25 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Check if the user is banned before proceeding
+        if ($request->user()->isBanned()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'login' => 'Your account has been suspended due to community guidelines violations.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
+        // Smart Redirect: If the user has moderation permissions, direct them to the admin panel
+        if ($request->user()->canModerate()) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
+        // For regular users: Redirect to the personal dashboard
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

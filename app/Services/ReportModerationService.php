@@ -19,7 +19,7 @@ class ReportModerationService
     {
         DB::transaction(function () use ($report) {
             $target = $report->target_type::withoutGlobalScopes()
-                ->when(in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($report->target_type)), function ($query) {
+                ->when(in_array(SoftDeletes::class, class_uses($report->target_type)), function ($query) {
                     return $query->withTrashed();
                 })
                 ->find($report->target_id);
@@ -28,9 +28,10 @@ class ReportModerationService
 
             $wasActionTaken = false;
 
-            // If the target is user, we permanently delete it (Hard Delete).
+            // Instead of Hard Deleting the user (which breaks FK constraints like notifications),
+            // we "Ban" them by setting the banned_at timestamp.
             if ($target instanceof User) {
-                $target->delete(); // This will delete the user and set user_id = null in their posts.
+                $target->update(['banned_at' => now()]); 
                 $wasActionTaken = true; 
             } else {
                 // For posts and comments
@@ -56,11 +57,16 @@ class ReportModerationService
             $penalty = 10;
             $author->decrement('reputation_points', $penalty);
             
+            // Customize the notification message based on the target type
+            $message = ($target instanceof User) 
+                ? "Your account has been suspended and you lost {$penalty} reputation points due to community guidelines violations."
+                : "A report against your content was resolved. You lost {$penalty} reputation points.";
+
             $this->notificationService->notify(
                 recipient: $author,
                 type: NotificationType::CONTENT_REMOVED,
                 target: $target,
-                message: "A report against your content was resolved. You lost {$penalty} reputation points."
+                message: $message
             );
         }
 
