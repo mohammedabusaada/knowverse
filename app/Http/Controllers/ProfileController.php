@@ -106,4 +106,27 @@ class ProfileController extends Controller
         'isPrivate' => !$canView
     ]);
 }
+
+
+/**
+     * Delete the user's account.
+     */
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        // Hard delete the user
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')->with('status', 'Your account has been deleted.');
+    }
 }

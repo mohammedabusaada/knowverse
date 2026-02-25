@@ -1,124 +1,150 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
+
+@section('header', 'Reports Moderation')
 
 @section('content')
-{{-- Success Toast --}}
-@if(session('success'))
-<div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" 
-     x-transition:enter="transition ease-out duration-300"
-     x-transition:enter-start="opacity-0 transform translate-y-2"
-     x-transition:enter-end="opacity-100 transform translate-y-0"
-     class="fixed bottom-5 right-5 z-50">
-    <div class="bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span class="font-semibold">{{ session('success') }}</span>
-    </div>
-</div>
-@endif
+<div class="max-w-7xl mx-auto space-y-6">
 
-{{-- Pass data into the function to keep the script block clean --}}
-<div x-data="reportsModeration({{ \Illuminate\Support\Js::from($reports->mapWithKeys(fn($r) => [$r->id => $r->status])) }})" 
-     class="w-full px-4 py-6">
-    
-    <div class="mb-8 text-center sm:text-left">
-        <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Reports Moderation</h1>
-        <p class="mt-1 text-gray-500">Protect the community by taking action on flagged content.</p>
-    </div>
-
-    <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-        <table class="min-w-full">
-            <thead class="bg-gray-50/80 border-b border-gray-100">
-                <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Reporter</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Target Content</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-                @foreach ($reports as $report)
-                    <tr class="hover:bg-blue-50/40 transition-colors cursor-pointer group" 
-                        @click="open({{ $report->id }}, statuses[{{ $report->id }}])">
-                        
-                        <td class="px-6 py-5 text-sm font-semibold text-gray-700">
-                            {{ $report->reporter->username ?? 'Unknown' }}
-                        </td>
-
-                        <td class="px-6 py-5 text-sm">
-                            <div class="flex flex-col">
-                                <span class="text-[10px] font-black text-blue-500 uppercase tracking-tighter mb-0.5">
-                                    {{ class_basename($report->target_type) }}
-                                </span>
-                                <span class="text-gray-600 font-medium line-clamp-1">
-                                    @if($report->target)
-                                        {{ $report->target->title ?? $report->target->body ?? $report->target->username }}
-                                    @else
-                                        <span class="text-red-400 italic">Content Deleted</span>
-                                    @endif
-                                </span>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border"
-                                  :class="badgeClass({{ $report->id }})"
-                                  x-text="statuses[{{ $report->id }}]">
-                            </span>
-                        </td>
-
-                        <td class="px-6 py-5 text-center">
-                            <div class="inline-flex items-center gap-1 text-sm font-bold transition group-hover:translate-x-1"
-                                 :class="statuses[{{ $report->id }}] === 'pending' ? 'text-blue-600' : 'text-gray-400'">
-                                <span x-text="statuses[{{ $report->id }}] === 'pending' ? 'Review' : 'View'"></span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Modal Template (Efficient rendering inside the loop) --}}
-                    <template x-if="openReportId === {{ $report->id }}">
-                        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden" x-cloak>
-                            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="close()"></div>
-                            
-                            <div class="relative bg-white rounded-3xl w-full max-w-lg p-8 shadow-2xl overflow-hidden"
-                                 x-transition:enter="ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100">
-                                
-                                <div class="mb-6">
-                                    <h2 class="text-2xl font-black text-gray-900 leading-tight">Review Report</h2>
-                                    <p class="text-gray-500 text-sm font-medium">Flagged for: <span class="text-red-500 capitalize">{{ $report->reason_type->value ?? 'General' }}</span></p>
-                                </div>
-
-                                <div class="bg-gray-50 rounded-2xl p-5 mb-6 border border-gray-100 italic text-gray-600 text-sm leading-relaxed">
-                                    "{{ $report->reason }}"
-                                </div>
-
-                                <div class="grid grid-cols-1 gap-3">
-                                    <button @click="resolve({{ $report->id }})" 
-                                            class="w-full py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 font-bold shadow-lg shadow-green-100 transition-all">
-                                        Resolve & Hide Content
-                                    </button>
-                                    <button @click="dismiss({{ $report->id }})" 
-                                            class="w-full py-4 bg-white border-2 border-gray-100 text-gray-500 rounded-2xl hover:border-red-100 hover:text-red-500 font-bold transition-all">
-                                        Dismiss Report
-                                    </button>
-                                </div>
-
-                                <button @click="close()" class="mt-6 w-full text-center text-xs font-bold text-gray-300 hover:text-gray-400 uppercase tracking-widest transition">
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                @endforeach
-            </tbody>
-        </table>
-        
-        <div class="p-6 bg-gray-50/50 border-t border-gray-100">
-            {{ $reports->links() }}
+    {{-- Alert Messages --}}
+    @if(session('success'))
+        <div class="p-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 rounded-xl font-medium">
+            {{ session('success') }}
         </div>
+    @endif
+    @if(session('error'))
+        <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl font-medium">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- Header Intro --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Protect the community by taking action on flagged content and users.
+            </p>
+        </div>
+        <div class="text-sm text-gray-500 font-medium">
+            Total: {{ number_format($reports->total()) }} reports
+        </div>
+    </div>
+
+    {{-- Pass data into the Alpine component --}}
+    <div x-data="reportsModeration({{ \Illuminate\Support\Js::from($reports->mapWithKeys(fn($r) => [$r->id => $r->status])) }})" 
+         class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-950/50">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Reporter</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Target Content</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                    @forelse ($reports as $report)
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer group" 
+                            @click="open({{ $report->id }}, statuses[{{ $report->id }}])">
+                            
+                            {{-- Reporter Column --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">
+                                {{ $report->reporter->username ?? 'Unknown' }}
+                            </td>
+
+                            {{-- Target Content Column --}}
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">
+                                        {{ class_basename($report->target_type) }}
+                                    </span>
+                                    <span class="text-gray-600 dark:text-gray-300 text-sm font-medium line-clamp-1">
+                                        @if($report->target)
+                                            {{ $report->target->title ?? $report->target->body ?? $report->target->username }}
+                                        @else
+                                            <span class="text-red-500 dark:text-red-400 italic">Content Deleted</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </td>
+
+                            {{-- Status Column --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border"
+                                      :class="badgeClass({{ $report->id }})"
+                                      x-text="statuses[{{ $report->id }}]">
+                                </span>
+                            </td>
+
+                            {{-- Action Column --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="inline-flex items-center gap-1 text-sm font-bold transition group-hover:translate-x-1"
+                                     :class="statuses[{{ $report->id }}] === 'pending' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'">
+                                    <span x-text="statuses[{{ $report->id }}] === 'pending' ? 'Review' : 'View'"></span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {{-- Modal Template --}}
+                        <template x-if="openReportId === {{ $report->id }}">
+                            <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden" x-cloak>
+                                <div class="absolute inset-0 bg-gray-900/60 dark:bg-black/80 backdrop-blur-sm" @click.stop="close()"></div>
+                                
+                                <div class="relative bg-white dark:bg-gray-900 rounded-3xl w-full max-w-lg p-8 shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+                                     @click.stop
+                                     x-transition:enter="ease-out duration-300"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100">
+                                    
+                                    <div class="mb-6">
+                                        <h2 class="text-2xl font-black text-gray-900 dark:text-white leading-tight">Review Report</h2>
+                                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">
+                                            Flagged for: <span class="text-red-600 dark:text-red-400 capitalize">{{ $report->reason_type->value ?? 'General' }}</span>
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-2xl p-5 mb-6 border border-gray-200 dark:border-gray-800 italic text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                        "{{ $report->reason }}"
+                                    </div>
+
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <button @click="resolve({{ $report->id }})" 
+                                                class="w-full py-4 bg-red-600 text-white rounded-2xl hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 font-bold shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                                            {{ $report->target_type === App\Models\User::class ? 'Resolve & Ban User' : 'Resolve & Hide Content' }}
+                                        </button>
+                                        <button @click="dismiss({{ $report->id }})" 
+                                                class="w-full py-4 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-2xl hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white font-bold transition-all focus:outline-none">
+                                            Dismiss Report
+                                        </button>
+                                    </div>
+
+                                    <button @click="close()" class="mt-6 w-full text-center text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 uppercase tracking-widest transition">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    
+                    {{-- Empty case --}}
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                No reports found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        {{-- Pagination --}}
+        @if($reports->hasPages())
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950/50">
+                {{ $reports->links() }}
+            </div>
+        @endif
     </div>
 </div>
 
@@ -136,12 +162,16 @@ function reportsModeration(initialStatuses) {
             const status = String(currentStatus).toLowerCase();
             if (status === 'pending') {
                 this.openReportId = id;
+                document.body.classList.add('overflow-hidden'); // Prevent background scroll
             } else {
                 window.location.href = `/admin/reports/${id}`;
             }
         },
 
-        close() { this.openReportId = null; },
+        close() { 
+            this.openReportId = null; 
+            document.body.classList.remove('overflow-hidden');
+        },
 
         async performAction(id, action) {
             try {
@@ -161,7 +191,7 @@ function reportsModeration(initialStatuses) {
                     alert(error.message || 'Moderation action failed.');
                 }
             } catch (e) {
-                alert('Connection error. Please check your internet.');
+                alert('Connection error. Please check your network.');
             }
         },
 
@@ -170,9 +200,9 @@ function reportsModeration(initialStatuses) {
 
         badgeClass(id) {
             const s = String(this.statuses[id]).toLowerCase();
-            if (s === 'pending') return 'bg-amber-50 text-amber-600 border-amber-100';
-            if (s === 'resolved') return 'bg-green-50 text-green-600 border-green-100';
-            return 'bg-gray-50 text-gray-500 border-gray-100';
+            if (s === 'pending') return 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800';
+            if (s === 'resolved') return 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800';
+            return 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700';
         }
     }
 }

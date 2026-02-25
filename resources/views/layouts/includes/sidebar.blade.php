@@ -40,11 +40,23 @@
                                 icon="bell">
                         Notifications
                     </x-nav-link>
+
+                    {{-- Special button visible only to Admins and Moderators --}}
+                    @if(auth()->user()->canModerate())
+                        <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+                            <x-nav-link :href="route('admin.dashboard')" 
+                                        :active="request()->routeIs('admin.*')" 
+                                        icon="lock" 
+                                        class="bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">
+                                Admin Panel
+                            </x-nav-link>
+                        </div>
+                    @endif
                 </nav>
             </div>
         @endauth
 
-        {{-- Recommended Tags Widget (NEW) --}}
+        {{-- Recommended Tags Widget --}}
         @if(isset($recommendedTags) && $recommendedTags->count() > 0)
         <div class="bg-white dark:bg-gray-800/40 rounded-2xl p-5 border border-gray-100 dark:border-gray-700/50 shadow-sm">
             <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
