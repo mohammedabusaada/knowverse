@@ -3,45 +3,23 @@
     'primary' => false,
     'secondary' => false,
     'danger' => false,
-    'size' => 'md', // sm, md, lg
+    'size' => 'md',
 ])
 
 @php
-    // Monochrome Clean base
-    $base = "inline-flex items-center justify-center font-medium rounded-lg
-             transition-colors duration-150
-             focus:outline-none focus:ring-2 focus:ring-blue-500/40
-             focus:ring-offset-2 focus:ring-offset-white
-             disabled:opacity-50 disabled:cursor-not-allowed
-             dark:focus:ring-offset-gray-950";
+    $base = "inline-flex items-center justify-center font-serif font-bold transition-all focus:outline-none rounded-sm border border-transparent";
 
     $sizes = [
-        'sm' => 'px-3 py-1.5 text-sm',
-        'md' => 'px-4 py-2 text-sm',   // رسمي/أكاديمي: text-sm أفضل من text-base
-        'lg' => 'px-5 py-2.5 text-base',
+        'sm' => 'px-4 py-1.5 text-xs',
+        'md' => 'px-6 py-2 text-sm tracking-wide',
+        'lg' => 'px-8 py-2.5 text-base tracking-wide',
     ];
 
-    // ✅ الأزرق Accent واحد (Primary/Links focus)
-    // ✅ باقي الأزرار Monochrome (رماديّات)
-    // ✅ danger أحمر (حالة حذف/تحذير)
     $color = match (true) {
-        $primary => "bg-blue-600 text-white hover:bg-blue-700
-                     dark:bg-blue-500 dark:hover:bg-blue-600
-                     border border-blue-600 dark:border-blue-500",
-
-        $secondary => "bg-gray-900 text-white hover:bg-black
-                       dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100
-                       border border-gray-900 dark:border-white",
-
-        $danger => "bg-red-600 text-white hover:bg-red-700
-                    dark:bg-red-500 dark:hover:bg-red-600
-                    border border-red-600 dark:border-red-500
-                    focus:ring-red-500/40",
-
-        default => "bg-white text-gray-900 hover:bg-gray-50
-                    dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800
-                    border border-gray-200 hover:border-gray-300
-                    dark:border-gray-800 dark:hover:border-gray-700"
+        $primary => "bg-ink text-paper border-ink hover:bg-transparent hover:text-ink",
+        $secondary => "bg-transparent text-ink border-rule hover:border-ink hover:bg-aged/50",
+        $danger => "bg-transparent text-[#a65a38] border-[#a65a38] hover:bg-[#a65a38] hover:text-paper",
+        default => "bg-transparent text-ink hover:bg-aged/50"
     };
 
     $classes = trim("$base $color {$sizes[$size]}");

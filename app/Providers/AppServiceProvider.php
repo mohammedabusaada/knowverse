@@ -73,12 +73,12 @@ class AppServiceProvider extends ServiceProvider
                 ->salutation("Regards,\n" . config('app.name') . ' Academic Community');
         });
 
-        // Register custom Blade directives
+        // Register custom Blade directives (Monochrome Update)
         Blade::directive('highlight', function ($expression) {
             return "<?php
                 echo preg_replace(
                     '/(' . preg_quote(request('q'), '/') . ')/i',
-                    '<mark class=\"bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded px-0.5\">$1</mark>',
+                    '<mark class=\"bg-black text-white dark:bg-white dark:text-black px-1 rounded-sm font-bold\">$1</mark>',
                     $expression
                 );
             ?>";

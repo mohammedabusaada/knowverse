@@ -83,12 +83,8 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
 */
 Route::middleware('auth')->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
     Route::get('/saved-posts', [SavedPostController::class, 'index'])
-        ->name('saved-posts.index');
+        ->name('posts.saved');
 
 
     Route::prefix('notifications')->name('notifications.')->group(function () {

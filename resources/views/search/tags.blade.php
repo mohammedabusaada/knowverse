@@ -1,34 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-10">
+<div class="max-w-4xl mx-auto px-4 py-10 animate-[fadeUp_0.8s_ease_both]">
 
-    <h1 class="text-2xl font-bold dark:text-white mb-2">
-        Tags matching “{{ $q }}”
-    </h1>
+    <div class="mb-10 text-center">
+        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink mb-4">Disciplines Query</h1>
+        <p class="font-serif text-lg text-muted italic">
+            Matching <span class="text-ink font-bold">"{{ $q }}"</span>
+        </p>
+    </div>
 
-    <div class="mb-6">
+    <div class="mb-12 max-w-2xl mx-auto">
         <x-search-bar :value="$q" />
     </div>
 
     @if($tags->isEmpty())
-        <p class="text-gray-600 dark:text-gray-300">
-            No tags found.
-        </p>
+        <div class="py-16 text-center border border-dashed border-rule bg-aged/10">
+            <p class="font-serif text-lg text-muted italic">No disciplines found.</p>
+        </div>
     @else
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-3 justify-center">
             @foreach($tags as $tag)
                 <a href="{{ route('posts.index') }}?tags[]={{ urlencode($tag->name) }}"
-                   class="px-4 py-2 rounded-lg
-                          bg-gray-100 dark:bg-gray-700
-                          text-gray-800 dark:text-gray-200
-                          hover:bg-gray-200 dark:hover:bg-gray-600">
-                    #{{ $tag->name }}
+                   class="font-mono text-xs tracking-[0.1em] text-ink bg-aged border border-rule px-4 py-1.5 hover:bg-ink hover:text-paper transition-colors">
+                    <span class="opacity-40 font-serif mr-1">§</span>{{ strtolower($tag->name) }}
                 </a>
             @endforeach
         </div>
 
-        <div class="mt-6">
+        <div class="mt-12">
             {{ $tags->links() }}
         </div>
     @endif

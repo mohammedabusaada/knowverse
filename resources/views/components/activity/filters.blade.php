@@ -5,24 +5,22 @@
 
 @php
     $filters = [
-        'all'        => 'All',
-        'posts'      => 'Posts',
-        'votes'      => 'Votes',
-        'reputation' => 'Reputation',
+        'all'        => 'Overview',
+        'posts'      => 'Discussions',
+        'votes'      => 'Endorsements',
+        'reputation' => 'Standing',
     ];
 @endphp
 
-<div class="mb-6 flex gap-2 text-sm">
-
+<div class="mb-8 border-b border-rule flex flex-wrap gap-6 text-sm">
     @foreach ($filters as $key => $label)
         <a href="{{ route('profile.activity', ['user' => $user->username, 'type' => $key]) }}"
-   class="px-4 py-2 rounded-full border transition
-   {{ $type === $key
-       ? 'bg-blue-600 text-white border-blue-600'
-       : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-   }}">
-    {{ $label }}
-</a>
+           class="pb-2 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors border-b-2 
+           {{ $type === $key
+               ? 'border-ink text-ink font-bold'
+               : 'border-transparent text-muted hover:text-ink hover:border-rule'
+           }}">
+            {{ $label }}
+        </a>
     @endforeach
-
 </div>

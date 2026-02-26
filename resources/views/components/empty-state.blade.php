@@ -3,13 +3,13 @@
     'description' => null,
 ])
 
-<div class="text-center py-16">
-    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ $title }}
+<div class="text-center py-20 border border-dashed border-rule rounded-sm bg-aged/10">
+    <h3 class="font-heading text-xl font-bold text-ink mb-3">
+        ✦ &nbsp; {{ $title }} &nbsp; ✦
     </h3>
 
     @if ($description)
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p class="font-serif text-[15px] text-muted italic">
             {{ $description }}
         </p>
     @endif

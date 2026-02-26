@@ -1,119 +1,66 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-[fadeUp_0.8s_ease_both]">
 
     {{-- Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div class="min-w-0">
-            <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-                All Discussions
-            </h1>
-
-            @if(!empty($selectedTags))
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Showing posts with specific tags
-                </p>
-            @endif
-        </div>
-
-        <div class="shrink-0">
-            @auth
-                <x-button tag="a" href="{{ route('posts.create') }}" primary>
-                    + Start a Discussion
-                </x-button>
-            @else
-                <x-button tag="a" href="{{ route('login') }}" secondary>
-                    Sign in to contribute
-                </x-button>
-            @endauth
-        </div>
+    <div class="flex items-center gap-4 mb-10">
+        <h1 class="font-mono text-xs tracking-[0.2em] uppercase text-muted m-0">The Archive</h1>
+        <div class="flex-1 h-px bg-rule"></div>
     </div>
 
-    {{-- Active Filters Banner (Monochrome + Blue accent) --}}
+    {{-- Active Filters Banner --}}
     @if(!empty($selectedTags))
-        <div class="mb-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
-                    Filtered by
+        <div class="mb-8 p-4 bg-aged/30 border border-rule flex flex-wrap items-center gap-3">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-muted">Filtered by:</span>
+            
+            @foreach($selectedTags as $tag)
+                <span class="font-mono text-[11px] tracking-wider text-ink bg-aged border border-rule px-2 py-0.5">
+                    {{ strtolower($tag) }}
                 </span>
+            @endforeach
 
-                @foreach($selectedTags as $tag)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full
-                                 text-xs font-semibold
-                                 bg-gray-100 text-gray-800 border border-gray-200
-                                 dark:bg-gray-950 dark:text-gray-200 dark:border-gray-800">
-                        <span class="text-blue-600 dark:text-blue-400">#</span>{{ $tag }}
-                    </span>
-                @endforeach
-
-                <a href="{{ route('posts.index') }}"
-                   class="ml-auto text-xs font-semibold
-                          text-gray-500 hover:text-blue-600
-                          dark:text-gray-400 dark:hover:text-blue-400 transition">
-                    Clear all filters
-                </a>
-            </div>
+            <a href="{{ route('posts.index') }}" class="ml-auto font-mono text-[10px] uppercase tracking-widest text-accent hover:text-ink transition-colors">
+                [ Clear Filters ]
+            </a>
         </div>
     @endif
 
-    {{-- Empty State --}}
-    @if ($posts->isEmpty())
-        <div class="text-center py-16 sm:py-20
-                    bg-white dark:bg-gray-900
-                    border border-gray-200 dark:border-gray-800
-                    rounded-2xl">
-            <p class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
-                No discussions found
-            </p>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Try adjusting your filters or start a new discussion.
-            </p>
-
-            <div class="mt-6">
-                <a href="{{ route('posts.index') }}"
-                   class="text-sm font-semibold text-blue-600 hover:text-blue-700
-                          dark:text-blue-400 dark:hover:text-blue-300 transition">
-                    View all posts
-                </a>
-            </div>
-        </div>
-    @else
-
-        {{-- Content Grid --}}
-        <div class="lg:grid lg:grid-cols-4 lg:gap-8">
-
-            {{-- Desktop Sidebar --}}
-            <aside class="hidden lg:block lg:col-span-1">
-                <div class="sticky top-24">
-                    @include('posts.partials.filters')
+    <div class="flex flex-col md:flex-row gap-12">
+        
+        {{-- Main Feed --}}
+        <div class="flex-1 min-w-0">
+            @if ($posts->isEmpty())
+                <div class="text-center py-20 text-muted italic border border-dashed border-rule">
+                    The archive yielded no results.
                 </div>
-            </aside>
-
-            {{-- Main Content --}}
-            <div class="lg:col-span-3">
-
-                {{-- Mobile Filters --}}
-                <div class="lg:hidden mb-6">
-                    @include('posts.partials.filters')
-                </div>
-
-                {{-- Posts List --}}
-                <div class="space-y-2">
+            @else
+                <div class="flex flex-col">
                     @foreach ($posts as $post)
                         <x-post-card :post="$post" />
                     @endforeach
                 </div>
 
-                {{-- Pagination --}}
-                <div class="mt-8">
+                <div class="mt-12">
                     {{ $posts->links() }}
                 </div>
-
-            </div>
+            @endif
         </div>
-    @endif
+
+        {{-- Sidebar Filters (Desktop) --}}
+        <aside class="hidden md:block w-64 shrink-0">
+            <div class="sticky top-24">
+                @include('posts.partials.filters')
+            </div>
+        </aside>
+    </div>
 
 </div>
-@endsection
 
+<style>
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+@endsection

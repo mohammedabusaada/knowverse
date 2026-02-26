@@ -1,5 +1,5 @@
-<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
-    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+<div class="border border-rule rounded-sm bg-paper shadow-sm">
+    <div class="divide-y divide-rule">
         @forelse ($history as $entry)
             <x-reputation-item 
                 :type="$entry->action" 
@@ -9,15 +9,15 @@
                 :sourceType="$entry->source_type"
             />
         @empty
-            <div class="p-12 text-center">
-                <x-icons.chart class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p class="text-gray-500 dark:text-gray-400 font-medium">No reputation history found.</p>
+            <div class="p-16 text-center bg-aged/10">
+                <span class="block text-2xl mb-2 opacity-50">✦</span>
+                <p class="font-serif text-muted italic text-[15px]">No standing history recorded yet.</p>
             </div>
         @endforelse
     </div>
 
     @if($history->hasPages())
-        <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+        <div class="p-5 border-t border-rule bg-aged/30">
             {{ $history->links() }}
         </div>
     @endif

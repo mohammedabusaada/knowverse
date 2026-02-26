@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
+/* 1. Setting up dynamic color variables based on theme (Dark/Light) */
+@layer base {
+    :root {
+        --color-paper: #f7f4ef;
+        --color-aged: #ede8df;
+        --color-ink: #1a1714;
+        --color-muted: #8c8070;
+        --color-accent: #2b4a7a;
+        --color-accent-warm: #7a3b1e;
+        --color-rule: rgba(26, 23, 20, 0.15);
+    }
+
+    .dark {
+        --color-paper: #141210;
+        --color-aged: #1f1c18;
+        --color-ink: #ede8df;
+        --color-muted: #7a7060;
+        --color-accent: #6a8ac0;
+        --color-accent-warm: #a65a38;
+        --color-rule: rgba(237, 232, 223, 0.12);
+    }
+
+    /* Basic Body settings */
+    body {
+        background-color: var(--color-paper);
+        color: var(--color-ink);
+        font-family: 'EB Garamond', Georgia, serif;
+        /* Vintage paper texture for light mode */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    .dark body {
+        /* Removing texture in dark mode for a cleaner look */
+        background-image: none; 
+    }
+}
+
+/* 2. Injecting these variables into Tailwind to use them as standard classes */
+@theme {
+    --color-paper: var(--color-paper);
+    --color-aged: var(--color-aged);
+    --color-ink: var(--color-ink);
+    --color-muted: var(--color-muted);
+    --color-accent: var(--color-accent);
+    --color-accent-warm: var(--color-accent-warm);
+    --color-rule: var(--color-rule);
+
+    --font-serif: 'EB Garamond', Georgia, serif;
+    --font-heading: 'Libre Baskerville', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+}
+
+/* 3. Other legacy settings (such as Custom Variant and Animations) */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @keyframes pulseHighlight {
-    0% {
-        background-color: rgba(59, 130, 246, 0.18);
-
-    }
-
-    50% {
-        background-color: rgba(59, 130, 246, 0.08);
-
-    }
-
-    100% {
-        background-color: transparent;
-    }
+    0% { background-color: var(--color-accent); opacity: 0.2; }
+    50% { background-color: var(--color-accent); opacity: 0.1; }
+    100% { background-color: transparent; }
 }
 
 .pulse-comment {
     animation: pulseHighlight 1.2s ease-out 1;
-    border-radius: 0.375rem;
+    border-radius: 0.125rem;
 }
 
 html {

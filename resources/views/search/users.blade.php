@@ -1,44 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-10">
+<div class="max-w-4xl mx-auto px-4 py-10 animate-[fadeUp_0.8s_ease_both]">
 
-    <h1 class="text-2xl font-bold dark:text-white mb-2">
-        Users matching “{{ $q }}”
-    </h1>
+    <div class="mb-10 text-center">
+        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink mb-4">Scholars Query</h1>
+        <p class="font-serif text-lg text-muted italic">
+            Matching <span class="text-ink font-bold">"{{ $q }}"</span>
+        </p>
+    </div>
 
-    <div class="mb-6">
+    <div class="mb-12 max-w-2xl mx-auto">
         <x-search-bar :value="$q" />
     </div>
 
     @if($users->isEmpty())
-        <p class="text-gray-600 dark:text-gray-300">
-            No users found.
-        </p>
+        <div class="py-16 text-center border border-dashed border-rule bg-aged/10">
+            <p class="font-serif text-lg text-muted italic">No scholars found matching your criteria.</p>
+        </div>
     @else
-        <div class="space-y-4">
+        <div class="flex flex-col border-t border-rule">
             @foreach($users as $user)
                 <a href="{{ route('profile.show', $user->username) }}"
-                   class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800
-                          border border-gray-200 dark:border-gray-700
-                          rounded-lg hover:shadow transition">
+                   class="flex items-center gap-4 py-5 border-b border-rule hover:bg-aged/20 transition-colors px-2 group">
 
-                    <img src="{{ $user->profile_picture_url }}"
-                         class="w-12 h-12 rounded-full object-cover">
+                    <x-user-avatar :src="$user->profile_picture_url" size="lg" class="border border-rule grayscale opacity-90 group-hover:grayscale-0 transition-all" />
 
-                    <div>
-                        <p class="font-semibold dark:text-white">
+                    <div class="min-w-0">
+                        <p class="font-heading text-lg font-bold text-ink group-hover:text-accent transition-colors truncate">
                             {{ $user->display_name }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="font-mono text-xs text-muted mt-1 truncate">
                             {{ '@' . $user->username }}
                         </p>
+                    </div>
+
+                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[9px] uppercase tracking-widest text-ink pr-4 hidden sm:block">
+                        View Dossier &rarr;
                     </div>
                 </a>
             @endforeach
         </div>
 
-        <div class="mt-6">
+        <div class="mt-12">
             {{ $users->links() }}
         </div>
     @endif

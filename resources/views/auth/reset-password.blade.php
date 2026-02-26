@@ -2,100 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KnowVerse - Reset Password</title>
-    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen flex bg-gray-50">
+<body class="min-h-screen flex bg-paper text-ink font-serif antialiased">
 
-    {{-- Left Side: Bold Black --}}
-    <div class="hidden md:flex w-1/2 bg-black text-white flex-col justify-center items-center px-10 py-16">
-        <x-application-logo class="w-auto h-16 mb-8 hover:scale-105 transform transition duration-300" />
-
-        <h1 class="text-4xl font-extrabold mb-4 tracking-tight">Set a new password</h1>
-        <p class="text-lg text-gray-400 text-center max-w-sm leading-relaxed">
-            Choose a strong password to keep your account secure.
+    <div class="hidden md:flex w-1/2 bg-ink text-paper flex-col justify-center items-center px-10 relative">
+        <x-application-logo class="w-auto h-16 mb-8" />
+        <h1 class="text-4xl font-heading font-bold mb-4">New Credentials</h1>
+        <p class="text-lg text-aged italic text-center max-w-sm">
+            Update your access key to return to your research.
         </p>
     </div>
 
-    {{-- Right Side: Form --}}
-    <div class="flex w-full md:w-1/2 justify-center items-center bg-white px-8 py-12 shadow-2xl md:shadow-none z-10 md:rounded-l-3xl">
+    <div class="flex w-full md:w-1/2 justify-center items-center bg-paper px-8 py-12">
         <div class="max-w-md w-full">
+            <h2 class="font-heading text-4xl font-bold text-ink mb-10">Reset Password</h2>
 
-            <h2 class="text-3xl font-bold text-black mb-8">Reset Password</h2>
-
-            @if (session('status'))
-                <div class="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('password.store') }}" class="space-y-5" novalidate>
+            <form method="POST" action="{{ route('password.store') }}" class="space-y-6">
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
                 <div>
-                    <label for="email" class="block text-gray-700 font-semibold mb-1.5 text-sm">Email Address</label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value="{{ old('email', $request->email) }}"
-                        required
-                        autofocus
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
+                    <label for="email" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                 </div>
 
                 <div>
-                    <label for="password" class="block text-gray-700 font-semibold mb-1.5 text-sm">New Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
+                    <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">New Password</label>
+                    <input id="password" type="password" name="password" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-gray-700 font-semibold mb-1.5 text-sm">Confirm Password</label>
-                    <input
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
+                    <label for="password_confirmation" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Confirm New Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                 </div>
 
-                <button type="submit" class="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg focus:ring-4 focus:ring-gray-300 transition-all mt-2">
-                    Reset Password
+                <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-widest text-xs py-4 hover:bg-transparent hover:text-ink border border-ink transition-all mt-4">
+                    Update Password
                 </button>
             </form>
-
-            <p class="mt-8 text-center text-gray-500 text-sm">
-                Back to
-                <a href="{{ route('login') }}" class="text-black font-bold hover:underline transition-colors">
-                    Sign In
-                </a>
-            </p>
-
         </div>
     </div>
 </body>

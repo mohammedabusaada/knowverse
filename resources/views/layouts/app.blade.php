@@ -18,8 +18,9 @@
         }
     </script>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -29,7 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js" defer></script>
 </head>
 
-<body class="font-sans antialiased min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+<body class="antialiased min-h-screen selection:bg-accent selection:text-paper">
     
     {{-- Navigation Bar Component --}}
     <x-nav-bar />
@@ -40,12 +41,11 @@
     @endif
 
     {{-- Layout Wrapper --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row gap-10 py-10">
             
             {{-- Left Sidebar Column --}}
-            {{-- Hidden on very small screens, or you can adjust it to be a bottom-nav on mobile later --}}
-            <aside class="w-full lg:w-64 flex-shrink-0">
+            <aside class="w-full lg:w-56 flex-shrink-0">
                 @include('layouts.includes.sidebar')
             </aside>
 
