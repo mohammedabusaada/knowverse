@@ -1,30 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'Saved Posts')
-
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6">Saved Posts</h1>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-[fadeUp_0.8s_ease_both]">
+    <div class="mb-10 border-b border-rule pb-4">
+        <h1 class="font-heading text-4xl font-bold text-ink mb-2">Saved Entries</h1>
+        <p class="font-serif text-lg text-muted italic">Your personal collection of bookmarked discussions.</p>
+    </div>
 
     @if($savedPosts->isEmpty())
-        {{-- Empty state when no saved posts --}}
-        <x-empty-state message="You haven't saved any posts yet" />
+        <x-search-empty message="You haven't saved any entries yet." />
     @else
-        {{-- Grid layout for saved posts --}}
-        <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div class="flex flex-col border-t border-rule">
             @foreach($savedPosts as $post)
                 <x-post-card :post="$post" />
             @endforeach
         </div>
-    @endif
 
-    {{-- Skeleton loader example (optional) --}}
-    {{--
-    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 animate-pulse">
-        @for ($i = 0; $i < 6; $i++)
-            <div class="bg-gray-200 h-64 rounded-lg"></div>
-        @endfor
-    </div>
-    --}}
+        <div class="mt-12">
+            {{ $savedPosts->links() }}
+        </div>
+    @endif
 </div>
 @endsection

@@ -3,9 +3,9 @@
     'rows' => 5,
 ])
 
-<div class="mb-5">
+<div class="mb-5 space-y-1.5">
     @if($label)
-        <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label class="block text-sm font-serif font-bold text-ink">
             {{ $label }}
         </label>
     @endif
@@ -14,15 +14,11 @@
         rows="{{ $rows }}"
         {{ $attributes->merge([
             'class' => '
-                w-full rounded-lg
-                bg-white dark:bg-gray-900
-                border border-gray-300 dark:border-gray-700
-                text-gray-900 dark:text-gray-100
-                placeholder-gray-400 dark:placeholder-gray-500
-                focus:outline-none
-                focus:ring-2 focus:ring-blue-500/40
-                focus:border-blue-500
-                transition
+                w-full rounded-sm bg-transparent
+                border border-rule text-ink font-serif text-sm px-4 py-3
+                placeholder:text-muted placeholder:italic
+                focus:outline-none focus:ring-0 focus:border-ink
+                transition-colors resize-y
             '
         ]) }}
     >{{ $slot }}</textarea>

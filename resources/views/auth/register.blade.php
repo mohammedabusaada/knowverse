@@ -5,34 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KnowVerse - Register</title>
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen flex bg-gray-50">
 
-    {{-- Left Side: Bold Black --}}
-    <div class="hidden md:flex w-1/2 bg-black text-white flex-col justify-center items-center px-10 py-16">
-        <x-application-logo class="w-auto h-16 mb-8 hover:scale-105 transform transition duration-300" />
+<body class="min-h-screen flex bg-paper text-ink font-serif antialiased selection:bg-accent selection:text-paper">
 
-        <h1 class="text-4xl font-extrabold mb-4 tracking-tight">
-            Join KnowVerse
-        </h1>
-        <p class="text-lg text-gray-400 text-center max-w-sm leading-relaxed">
-            Create an account and start exploring knowledge together.
+    {{-- Left Side: Ink Background --}}
+    <div class="hidden md:flex w-1/2 bg-ink text-paper flex-col justify-center items-center px-10 py-16 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3C/filter%3E%3Crect width=\'400\' height=\'400\' filter=\'url(%23n)\' opacity=\'0.04\'/%3E%3C/svg%3E');"></div>
+        
+        <x-application-logo class="w-auto h-16 mb-8 hover:opacity-80 transition-opacity" />
+        <h1 class="text-4xl md:text-5xl font-heading font-bold mb-4 tracking-tight text-center">Join the Guild</h1>
+        <p class="text-lg text-aged italic text-center max-w-md leading-relaxed border-l-2 border-paper/20 pl-4">
+            Begin your contribution to the collective wisdom of KnowVerse.
         </p>
     </div>
 
     {{-- Right Side: Register Form --}}
-    <div class="flex w-full md:w-1/2 justify-center items-center bg-white px-8 py-12 shadow-2xl md:shadow-none z-10 md:rounded-l-3xl">
+    <div class="flex w-full md:w-1/2 justify-center items-center bg-paper px-8 py-12 z-10">
         <div class="max-w-md w-full">
-
-            <h2 class="text-3xl font-bold text-black mb-8">Create Account</h2>
+            <h2 class="font-heading text-4xl font-bold text-ink mb-10 text-center md:text-left">Create Account</h2>
 
             @if ($errors->any())
-                <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
+                <div class="mb-6 p-4 border border-[#a65a38] bg-[#a65a38]/5 text-[#a65a38] text-sm italic font-medium">
                     <ul class="list-disc list-inside space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -41,80 +39,46 @@
                 </div>
             @endif
 
-            <form action="{{ route('register') }}" method="POST" class="space-y-5" novalidate>
+            <form action="{{ route('register') }}" method="POST" class="space-y-6" novalidate>
                 @csrf
-
                 <div>
-                    <label for="username" class="block text-gray-700 font-semibold mb-1.5 text-sm">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value="{{ old('username') }}"
-                        required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
+                    <label for="username" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Username</label>
+                    <input type="text" id="username" name="username" value="{{ old('username') }}" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:text-muted/30 placeholder:italic"
+                           placeholder="Choose your moniker..." />
                 </div>
 
                 <div>
-                    <label for="full_name" class="block text-gray-700 font-semibold mb-1.5 text-sm">Full Name</label>
-                    <input
-                        type="text"
-                        id="full_name"
-                        name="full_name"
-                        value="{{ old('full_name') }}"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
+                    <label for="email" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:text-muted/30 placeholder:italic"
+                           placeholder="address@archive.edu" />
                 </div>
 
-                <div>
-                    <label for="email" class="block text-gray-700 font-semibold mb-1.5 text-sm">Email Address</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                    />
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label for="password" class="block text-gray-700 font-semibold mb-1.5 text-sm">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                        />
+                        <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Password</label>
+                        <input type="password" id="password" name="password" required
+                               class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                     </div>
-
                     <div>
-                        <label for="password_confirmation" class="block text-gray-700 font-semibold mb-1.5 text-sm">Confirm</label>
-                        <input
-                            type="password"
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all bg-gray-50 focus:bg-white"
-                        />
+                        <label for="password_confirmation" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Confirm</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required
+                               class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg focus:ring-4 focus:ring-gray-300 transition-all mt-2">
-                    Sign Up
+                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-xs py-4 transition-colors mt-6">
+                    Create Account
                 </button>
             </form>
 
-            <p class="mt-8 text-center text-gray-500 text-sm">
-                Already have an account?
-                <a href="{{ route('login') }}" class="text-black font-bold hover:underline transition-colors">
-                    Sign in
+            <p class="mt-10 text-center text-muted font-serif italic text-[15px]">
+                Already registered?
+                <a href="{{ route('login') }}" class="text-ink font-bold border-b border-ink hover:text-accent transition-colors ml-1">
+                    Sign In
                 </a>
             </p>
-
         </div>
     </div>
 </body>

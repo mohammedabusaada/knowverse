@@ -18,33 +18,32 @@
         }
     "
     @endif
-    class="relative flex items-start gap-4 p-4 transition-all duration-300 border-b border-gray-100 dark:border-gray-700/50 
-           {{ $isUnread ? 'bg-blue-50/30 dark:bg-blue-900/10 border-l-4 border-blue-500' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50' }}">
+    class="relative flex items-start gap-4 p-5 transition-all duration-300 
+           {{ $isUnread ? 'bg-accent/5' : 'hover:bg-aged/30' }}">
 
-    <div class="flex-shrink-0 mt-1">
-        <div class="flex items-center justify-center w-10 h-10 rounded-full {{ $isUnread ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-500' }}">
-            <span class="text-xl">{!! $notification->presenter()->icon() !!}</span>
+    {{-- Unread Indicator --}}
+    @if($isUnread)
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>
+    @endif
+
+    <div class="flex-shrink-0 pt-0.5">
+        <div class="flex items-center justify-center w-8 h-8 rounded-sm border border-rule {{ $isUnread ? 'bg-paper text-accent' : 'bg-aged text-muted' }}">
+            <span class="text-sm font-serif">{!! $notification->presenter()->icon() !!}</span>
         </div>
     </div>
 
     <div class="flex-1 min-w-0">
         <div class="flex flex-col">
             <a href="{{ route('notifications.visit', $notification) }}"
-                class="text-sm leading-relaxed {{ $isUnread ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400' }} hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                class="font-serif text-[15px] leading-relaxed {{ $isUnread ? 'font-bold text-ink' : 'text-muted' }} hover:text-accent transition-colors">
                 {!! $notification->presenter()->message() !!}
             </a>
 
-            <div class="flex items-center mt-1.5 space-x-2 text-xs text-gray-400 dark:text-gray-500">
-                <span class="font-medium capitalize">{{ str_replace('_', ' ', $notification->type->value) }}</span>
-                <span>•</span>
+            <div class="flex flex-wrap items-center mt-2 space-x-3 font-mono text-[9px] uppercase tracking-widest text-muted">
+                <span>{{ str_replace('_', ' ', $notification->type->value) }}</span>
+                <span>&bull;</span>
                 <span>{{ $notification->created_at->diffForHumans() }}</span>
             </div>
         </div>
     </div>
-
-    @if($isUnread)
-    <div class="flex-shrink-0 ml-2">
-        <span class="block w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm shadow-blue-200 dark:shadow-none"></span>
-    </div>
-    @endif
 </div>

@@ -2,17 +2,6 @@
 
 @php
     $isPositive = $points > 0;
-    
-    // Map database 'action' strings to UI styles
-    $styles = match($type) {
-        'post_upvote', 'upvote' => ['icon' => 'arrow-up', 'color' => 'text-green-600', 'bg' => 'bg-green-50 dark:bg-green-900/20'],
-        'post_downvote', 'downvote' => ['icon' => 'arrow-down', 'color' => 'text-red-600', 'bg' => 'bg-red-50 dark:bg-red-900/20'],
-        'comment_upvote' => ['icon' => 'chat', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50 dark:bg-blue-900/20'],
-        'award' => ['icon' => 'chart', 'color' => 'text-yellow-600', 'bg' => 'bg-yellow-50 dark:bg-yellow-900/20'],
-        default => ['icon' => 'user', 'color' => 'text-gray-600', 'bg' => 'bg-gray-50 dark:bg-gray-800'],
-    };
-
-    // Determine the link based on the source
     $url = null;
     if ($source) {
         if ($sourceType === \App\Models\Post::class) {
@@ -23,27 +12,24 @@
     }
 @endphp
 
-<div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-    <div class="flex items-center gap-4">
-        <div class="p-2.5 {{ $styles['bg'] }} {{ $styles['color'] }} rounded-xl">
-            <x-dynamic-component :component="'icons.' . $styles['icon']" class="w-5 h-5" />
-        </div>
+<div class="flex items-center justify-between py-5 border-b border-rule hover:bg-aged/20 transition-colors px-3">
+    <div class="flex items-start gap-4">
         <div>
-            <p class="text-sm font-bold text-gray-900 dark:text-white">
-                {{ str_replace('_', ' ', ucwords($type, '_')) }}
+            <p class="font-serif text-base text-ink font-bold">
+                <span class="capitalize">{{ str_replace('_', ' ', $type) }}</span>
                 @if($url)
-                    <a href="{{ $url }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium ml-1">
-                        View source
+                    <a href="{{ $url }}" class="text-muted hover:text-ink font-normal italic ml-2 border-b border-transparent hover:border-ink transition-colors">
+                        Ref &rarr;
                     </a>
                 @endif
             </p>
-            <p class="text-xs text-gray-500 font-medium">
+            <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-muted mt-1.5">
                 {{ $date }}
             </p>
         </div>
     </div>
     
-    <div class="text-sm font-black {{ $isPositive ? 'text-green-600' : 'text-red-600' }}">
+    <div class="font-mono text-xl {{ $isPositive ? 'text-ink font-bold' : 'text-[#a65a38]' }}">
         {{ $isPositive ? '+' : '' }}{{ $points }}
     </div>
 </div>

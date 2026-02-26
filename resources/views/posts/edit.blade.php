@@ -2,96 +2,119 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<style>
+    .editor-toolbar { border: none !important; border-bottom: 1px solid #e5e7eb !important; opacity: 0.7; transition: opacity 0.2s; }
+    .dark .editor-toolbar { border-bottom-color: #374151 !important; }
+    .editor-toolbar:hover { opacity: 1; }
+    .CodeMirror { border: none !important; padding: 0 !important; font-size: 1.1rem; line-height: 1.7; }
+    .CodeMirror-scroll { min-height: 400px; }
+    .dark .CodeMirror { color: #f3f4f6; background: transparent; }
+    .dark .editor-toolbar a { color: #9ca3af !important; }
+    .dark .editor-toolbar a:hover, .dark .editor-toolbar a.active { color: #fff !important; background: #374151 !important; border-color: #374151 !important; }
+</style>
 @endpush
 
 @section('content')
+<div class="max-w-4xl mx-auto px-4 py-8">
 
-<div class="max-w-3xl mx-auto">
-
-    <h1 class="text-3xl font-bold mb-6 dark:text-white">Edit Post</h1>
-
-    <form action="{{ route('posts.update', $post) }}"
-        method="POST"
-        enctype="multipart/form-data"
-        class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-700"
-        x-data="{
-              imagePreview: null,
-              currentImage: '{{ $post->image ? asset("storage/" . $post->image) : "" }}'
-          }">
-
+    <form action="{{ route('posts.update', $post) }}" method="POST" enctype="multipart/form-data" 
+          x-data="{ imagePreview: null, currentImage: '{{ $post->image ? asset("storage/" . $post->image) : "" }}' }">
+        
         @csrf
         @method('PUT')
 
-        <!-- Title -->
-        <x-input
-            label="Title"
-            name="title"
-            value="{{ old('title', $post->title) }}"
-            required />
-
-        <!-- Body (Markdown enabled) -->
-        <x-textarea
-            label="Body (Markdown supported)"
-            name="body"
-            id="markdown-editor"
-            rows="12"
-            required>{{ old('body', $post->body) }}</x-textarea>
-
-        <!-- Current Image Preview -->
-        @if ($post->image)
-        <div class="mt-6">
-            <p class="text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                Current Image
-            </p>
-            <img :src="currentImage"
-                class="w-48 rounded-lg shadow border border-gray-300 dark:border-gray-700">
+        {{-- Top Actions --}}
+        <div class="flex items-center justify-between mb-12">
+            <a href="{{ route('posts.show', $post) }}" class="text-sm font-bold text-gray-500 hover:text-black dark:hover:text-white transition">
+                &larr; Cancel
+            </a>
+            
+            <div class="flex items-center gap-3">
+                <x-button primary type="submit" size="md" class="px-6">
+                    Save Changes
+                </x-button>
+            </div>
         </div>
-        @endif
 
-        <!-- Replace Image -->
-        <div class="mt-6">
-            <x-input-file
-                label="Replace Image (optional)"
-                name="image"
-                accept="image/*"
-                @change="imagePreview = URL.createObjectURL($event.target.files[0])" />
-
-            <template x-if="imagePreview">
-                <img :src="imagePreview" class="mt-4 w-48 rounded-lg shadow">
-            </template>
-
-            @error('image')
-            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+        {{-- Title Input --}}
+        <div class="mb-8">
+            <input 
+                type="text" 
+                name="title" 
+                value="{{ old('title', $post->title) }}" 
+                placeholder="Title" 
+                required 
+                class="w-full bg-transparent border-none text-4xl sm:text-5xl font-black text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-700 focus:ring-0 p-0"
+            />
+            @error('title')
+                <p class="text-red-500 text-sm mt-2 font-bold">{{ $message }}</p>
             @enderror
         </div>
 
-        <!-- Buttons -->
-        <div class="flex justify-between items-center mt-8">
-
-            <!-- Update Button -->
-            <x-button primary type="submit">Update Post</x-button>
-
+        {{-- Tags Selection --}}
+        <div class="mb-10 border-b border-gray-200 dark:border-gray-800 pb-8">
+            <x-tag-multiselect
+                :options="$tags"
+                :selected="old('tag_ids', $post->tags->pluck('id')->toArray())"
+                max="5" 
+            />
         </div>
 
-    </form> <!-- CLOSE UPDATE FORM HERE -->
+        {{-- Markdown Body --}}
+        <div class="mb-10">
+            <textarea name="body" id="markdown-editor" required>{{ old('body', $post->body) }}</textarea>
+            @error('body')
+                <p class="text-red-500 text-sm mt-2 font-bold">{{ $message }}</p>
+            @enderror
+        </div>
 
-    @can('delete', $post)
-    <!-- Delete Form OUTSIDE the update form -->
-    <form action="{{ route('posts.destroy', $post) }}"
-        method="POST"
-        class="mt-4"
-        onsubmit="return confirm('Are you sure you want to delete this post?');">
-        @csrf
-        @method('DELETE')
+        {{-- Cover Image --}}
+        <div class="mb-12 border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col sm:flex-row items-start sm:items-center gap-8">
+            <div>
+                <label class="block text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                    Cover Image
+                </label>
+                <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl hover:border-black dark:hover:border-white transition group">
+                    <span class="text-sm font-bold text-gray-500 group-hover:text-black dark:group-hover:text-white">Replace Image</span>
+                    <input type="file" name="image" accept="image/*" class="hidden" @change="imagePreview = URL.createObjectURL($event.target.files[0])" />
+                </label>
+                @error('image')
+                    <p class="text-red-500 text-sm mt-2 font-bold">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <x-button danger>Delete</x-button>
+            <div class="flex items-center gap-4">
+                <template x-if="currentImage && !imagePreview">
+                    <img :src="currentImage" class="h-24 w-auto rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 opacity-50">
+                </template>
+                
+                <template x-if="imagePreview">
+                    <div class="flex items-center gap-4">
+                        <span class="text-gray-400">&rarr;</span>
+                        <img :src="imagePreview" class="h-24 w-auto rounded-lg shadow-md border-2 border-black dark:border-white">
+                    </div>
+                </template>
+            </div>
+        </div>
     </form>
+
+    {{-- Danger Zone (Delete) --}}
+    @can('delete', $post)
+        <div class="border-t-2 border-red-100 dark:border-red-900/30 pt-8 mt-12">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-red-600 dark:text-red-500">Danger Zone</h3>
+                    <p class="text-sm text-gray-500 mt-1">Permanently delete this post and all its comments.</p>
+                </div>
+                <form action="{{ route('posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                    @csrf @method('DELETE')
+                    <x-button danger type="submit">Delete Post</x-button>
+                </form>
+            </div>
+        </div>
     @endcan
 
-    </form>
-
 </div>
-
 @endsection
 
 @push('scripts')
@@ -101,12 +124,7 @@
         new EasyMDE({
             element: document.getElementById("markdown-editor"),
             spellChecker: false,
-            autofocus: true,
-            autosave: {
-                enabled: true,
-                uniqueId: "post_edit_{{ $post->id }}",
-                delay: 800,
-            },
+            status: false,
         });
     });
 </script>

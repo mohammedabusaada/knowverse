@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-[fadeUp_0.8s_ease_both]">
+    
     {{-- Tag Header Component --}}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm"
+    <div class="mb-16 border-b-4 border-double border-rule pb-10"
          x-data="{ 
             isFollowing: {{ $isFollowing ? 'true' : 'false' }}, 
             count: {{ $tag->followers_count ?? 0 }},
@@ -29,68 +30,64 @@
             }
          }">
         
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
-                {{-- Fixed Icon Container --}}
-                <div class="w-14 h-14 flex-none bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center border border-indigo-100 dark:border-indigo-800">
-                    <x-icons.tag class="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+            
+            <div class="min-w-0 flex-1">
+                <div class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-4 flex items-center gap-2">
+                    <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Disciplines</a>
+                    <span class="opacity-50">/</span>
+                    <span class="text-ink font-bold">Archive</span>
                 </div>
 
-                <div class="min-w-0">
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white truncate">#{{ $tag->name }}</h1>
-                        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-full border border-gray-200 dark:border-gray-600">
-                            {{-- Fallback values inside spans for better SEO/Initial Load --}}
-                            <span x-text="count">{{ $tag->followers_count ?? 0 }}</span> 
-                            <span x-text="count === 1 ? 'Follower' : 'Followers'">{{ Str::plural('Follower', $tag->followers_count ?? 0) }}</span>
-                        </span>
-                    </div>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1">
-                        Browsing {{ number_format($posts->total()) }} posts tagged with this topic.
-                    </p>
+                <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink truncate mb-4">
+                    {{ strtolower($tag->name) }}
+                </h1>
+                
+                <p class="font-serif text-lg text-muted italic mb-6">
+                    Browsing {{ number_format($posts->total()) }} entries tagged with this topic.
+                </p>
+
+                <div class="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-ink">
+                    <span x-text="count">{{ $tag->followers_count ?? 0 }}</span>
+                    <span x-text="count === 1 ? 'Scholar following' : 'Scholars following'"></span>
                 </div>
             </div>
             
             @auth
-                <button @click="toggleFollow()" 
-                        :class="isFollowing 
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' 
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200 dark:shadow-none'"
-                        class="px-8 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                        :disabled="loading">
-                    
-                    {{-- Loading Spinner SVG --}}
-                    <svg x-show="loading" class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                <div class="shrink-0 pt-2">
+                    <button @click="toggleFollow()" 
+                            :class="isFollowing 
+                                ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' 
+                                : 'text-paper bg-ink border-ink hover:bg-transparent hover:text-ink'"
+                            class="font-mono text-xs uppercase tracking-[0.15em] px-6 py-2 border transition-all flex items-center justify-center gap-2"
+                            :disabled="loading">
+                        
+                        <svg x-show="loading" class="animate-spin h-3 w-3 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" x-cloak>
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
 
-                    <span x-text="isFollowing ? 'Unfollow' : 'Follow Tag'"></span>
-                </button>
+                        <span x-text="isFollowing ? 'Unfollow' : 'Follow Discipline'"></span>
+                    </button>
+                </div>
             @endauth
         </div>
     </div>
 
     {{-- Posts Feed --}}
-    <div class="space-y-4">
+    <div class="flex flex-col">
         @forelse($posts as $post)
             <x-post-card :post="$post" />
         @empty
-            <div class="bg-white dark:bg-gray-800 rounded-3xl p-16 text-center border border-gray-200 dark:border-gray-700 shadow-sm">
-                <div class="inline-flex p-4 bg-gray-50 dark:bg-gray-900 rounded-full mb-4">
-                    <x-icons.tag class="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">No posts yet</h3>
-                <p class="text-gray-500 max-w-xs mx-auto mt-2">Be the first to share something about #{{ $tag->name }}!</p>
-                <div class="mt-6">
-                    <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="text-indigo-600 font-semibold hover:underline">
-                        Create a Post &rarr;
-                    </a>
-                </div>
+            <div class="py-20 text-center border border-dashed border-rule bg-aged/10">
+                <p class="font-serif text-muted italic text-lg mb-4">The archive is currently empty for this discipline.</p>
+                <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="font-mono text-xs uppercase tracking-[0.15em] text-ink border-b border-ink hover:text-accent hover:border-accent transition-colors">
+                    Contribute an Entry &rarr;
+                </a>
             </div>
         @endforelse
 
-        <div class="py-6">
+        <div class="mt-12">
             {{ $posts->links() }}
         </div>
     </div>

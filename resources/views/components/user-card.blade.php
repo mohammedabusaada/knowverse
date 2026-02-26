@@ -11,32 +11,31 @@
     }
 @endphp
 
-<div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:border-indigo-500/50 transition-colors">
-    <div class="flex items-center gap-3">
-        {{-- Avatar with fallback check --}}
-        <img src="{{ $user->profile_picture_url }}" 
-             alt="{{ $user->display_name }}"
-             class="w-12 h-12 rounded-full object-cover border border-gray-100 dark:border-gray-700">
+<div class="flex items-center justify-between py-4 border-b border-rule hover:bg-aged/30 transition-colors px-3 group">
+    <div class="flex items-center gap-4">
+        <x-user-avatar :user="$user" size="md" class="border border-rule grayscale opacity-90 group-hover:grayscale-0 transition-all" />
         
-        <div>
+        <div class="min-w-0">
             <div class="flex items-center gap-2">
-                <a href="{{ route('profile.show', $user->username) }}" class="font-bold text-gray-900 dark:text-white hover:text-indigo-600 transition-colors">
+                <a href="{{ route('profile.show', $user->username) }}" class="font-heading font-bold text-ink hover:text-accent transition-colors text-lg truncate">
                     {{ $user->display_name }}
                 </a>
                 
                 @if($badge)
-                    <span class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                    <span class="font-mono text-[9px] tracking-[0.15em] uppercase text-muted bg-aged px-2 py-0.5 rounded-sm border border-rule">
                         {{ $badge }}
                     </span>
                 @endif
             </div>
-            <p class="text-xs text-gray-500">{{ '@' . $user->username }}</p>
+            <p class="font-mono text-[11px] text-muted truncate mt-0.5">{{ '@' . $user->username }}</p>
         </div>
     </div>
     
-    <div class="flex items-center gap-2">
+    <div class="shrink-0 pl-4">
         @if(auth()->check() && auth()->id() !== $user->id)
-            <x-follow-button :user="$user" />
+            <div class="scale-90 origin-right">
+                <x-follow-button :user="$user" />
+            </div>
         @endif
     </div>
 </div>

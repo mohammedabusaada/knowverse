@@ -1,36 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto" x-data="{ search: '' }">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-[fadeUp_0.8s_ease_both]" x-data="{ search: '' }">
+    
     {{-- Header & Search --}}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div class="max-w-xl">
-            <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">Explore Tags</h1>
-            <p class="text-lg text-gray-500 dark:text-gray-400 mt-2">
-                Follow your favorite topics to personalize your feed.
-            </p>
-        </div>
+    <div class="mb-12">
+        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink tracking-tight mb-4">Explore Disciplines</h1>
+        <p class="font-serif text-lg text-muted italic mb-8">
+            Follow your favorite academic topics to curate your personal archive.
+        </p>
 
-        {{-- Client-side Search Filter --}}
-        <div class="relative w-full md:w-80">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        {{-- Search Filter --}}
+        <div class="relative w-full max-w-lg border-b border-rule pb-2">
+            <div class="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none pb-2">
+                <span class="font-serif text-lg text-muted opacity-50">§</span>
             </div>
             <input 
                 x-model="search"
                 type="text" 
-                placeholder="Filter tags..." 
-                class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+                placeholder="Filter disciplines..." 
+                class="block w-full pl-6 pr-3 py-2 bg-transparent border-none text-ink font-serif text-lg placeholder:text-muted focus:ring-0 transition-colors"
             >
         </div>
     </div>
 
-    {{-- Tags Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {{-- Tags List (Replaced Grid with Classic List) --}}
+    <div class="flex flex-col border-t border-rule">
         @foreach($tags as $tag)
-            {{-- Check if logged in user follows this tag --}}
             @php
                 $isFollowing = auth()->check() && auth()->user()->followedTags->contains($tag->id);
             @endphp
@@ -47,45 +43,38 @@
                         }).catch(() => this.following = !this.following);
                     }
                 }"
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:shadow-xl hover:border-indigo-500/50 transition-all group relative overflow-hidden"
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-b border-rule hover:bg-aged/20 transition-colors group px-2"
             >
-                {{-- Decorative Background Glow --}}
-                <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all"></div>
+                <div class="min-w-0 flex-1">
+                    <h2 class="font-heading text-xl font-bold text-ink mb-1">
+                        <a href="{{ route('tags.show', $tag->slug) }}" class="hover:text-accent transition-colors">
+                            {{ strtolower($tag->name) }}
+                        </a>
+                    </h2>
+                    
+                    <p class="font-serif text-[15px] text-muted line-clamp-2 leading-relaxed italic mb-2">
+                        {{ $tag->description ?? 'Academic discussions and research related to ' . strtolower($tag->name) . '.' }}
+                    </p>
 
-                <div class="flex items-start justify-between mb-4">
-                    <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
-                        <x-icons.tag class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                    <div class="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-muted">
+                        <span>{{ number_format($tag->posts_count) }} entries</span>
+                        <span>&bull;</span>
+                        <a href="{{ route('tags.show', $tag->slug) }}" class="text-ink hover:text-accent transition-colors">
+                            Explore &rarr;
+                        </a>
                     </div>
+                </div>
 
+                <div class="shrink-0 sm:self-start mt-2 sm:mt-0">
                     @auth
                         <button 
                             @click="toggle()"
-                            :class="following ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' : 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'"
-                            class="text-xs font-bold px-4 py-2 rounded-lg transition-all active:scale-95"
+                            :class="following ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' : 'text-ink border-ink hover:bg-ink hover:text-paper'"
+                            class="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-1.5 border transition-all"
                         >
-                            <span x-text="following ? 'Following' : 'Follow'"></span>
+                            <span x-text="following ? 'Unfollow' : 'Follow'"></span>
                         </button>
                     @endauth
-                </div>
-
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-                    <a href="{{ route('tags.show', $tag->slug) }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                        #{{ $tag->name }}
-                    </a>
-                </h2>
-                
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2 leading-relaxed">
-                    {{ $tag->description ?? 'Join the community discussing ' . $tag->name . '. Share knowledge and solve problems together.' }}
-                </p>
-
-                <div class="mt-6 flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-700/50">
-                    <span class="text-sm font-medium text-gray-400">
-                        {{ number_format($tag->posts_count) }} posts
-                    </span>
-                    <a href="{{ route('tags.show', $tag->slug) }}" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group/link">
-                        Explore 
-                        <span class="transform group-hover/link:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
                 </div>
             </div>
         @endforeach
@@ -96,4 +85,11 @@
         {{ $tags->links() }}
     </div>
 </div>
+
+<style>
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
 @endsection

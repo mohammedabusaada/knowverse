@@ -11,18 +11,15 @@ $sizes = [
 
 $sizeClass = $sizes[$size] ?? $sizes['md'];
 
-// Determine image source
 $finalSrc = $src ?? ($user ? $user->profile_picture_url : null);
-
-// Determine fallback initial
 $initial = $user ? substr($user->username, 0, 1) : '?';
 @endphp
 
-<div {{ $attributes->merge(['class' => "$sizeClass rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center"]) }}>
+<div {{ $attributes->merge(['class' => "$sizeClass rounded-full overflow-hidden shrink-0 bg-aged flex items-center justify-center"]) }}>
     @if($finalSrc)
         <img src="{{ $finalSrc }}" alt="{{ $user->username ?? 'User' }}" class="w-full h-full object-cover">
     @else
-        <span class="font-bold text-gray-500 uppercase">
+        <span class="font-heading font-bold text-ink uppercase">
             {{ $initial }}
         </span>
     @endif

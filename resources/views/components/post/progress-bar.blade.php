@@ -10,6 +10,6 @@
         }"
         x-init="updateProgress(); window.addEventListener('scroll', () => updateProgress())"
         :style="'width: ' + percent + '%'"
-        class="h-full bg-blue-600/80 dark:bg-blue-500/80 transition-all duration-150"
+        class="h-full bg-black dark:bg-white transition-all duration-150"
     ></div>
 </div>

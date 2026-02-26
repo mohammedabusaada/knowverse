@@ -1,47 +1,22 @@
 @props(['activity'])
 
-@php
-use App\Presenters\ActivityPresenter;
-
-$title = ActivityPresenter::title($activity);
-$color = ActivityPresenter::color($activity);
-$link = ActivityPresenter::link($activity);
-$linkText = ActivityPresenter::linkText($activity);
-@endphp
-
-<div class="flex gap-4 py-4 border-b dark:border-gray-700">
-
+<div class="flex gap-5 py-6 border-b border-rule last:border-0 group hover:bg-aged/10 transition-colors px-2">
     {{-- Timeline dot --}}
-    <div class="flex flex-col items-center">
-        <span class="w-3 h-3 rounded-full bg-blue-600 mt-1"></span>
-        <span class="flex-1 w-px bg-gray-300 dark:bg-gray-700"></span>
+    <div class="flex flex-col items-center pt-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-rule group-hover:bg-ink transition-colors"></span>
     </div>
 
     {{-- Content --}}
-    <div class="flex-1">
-
-        <div class="text-sm {{ $color }}">
-            <span class="font-medium">{{ $title }}</span>
-
-            @if ($link && $linkText)
-            —
-            <a href="{{ $link }}"
-                class="text-blue-600 dark:text-blue-400 hover:underline">
-                {{ $linkText }}
-            </a>
-            @endif
-
+    <div class="flex-1 min-w-0">
+        <div class="font-serif text-[15px] text-ink leading-relaxed">
+            {!! activity_description($activity) !!}
             @if ($activity->details)
-            <span class="text-gray-500">
-                {{ $activity->details }}
-            </span>
+                <span class="text-muted italic ml-1">"{{ $activity->details }}"</span>
             @endif
         </div>
 
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-muted mt-2">
             {{ $activity->created_at->diffForHumans() }}
         </div>
-
     </div>
-
 </div>
