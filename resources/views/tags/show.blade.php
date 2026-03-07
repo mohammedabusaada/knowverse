@@ -34,9 +34,9 @@
             
             <div class="min-w-0 flex-1">
                 <div class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-4 flex items-center gap-2">
-                    <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Disciplines</a>
+                    <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Tags</a>
                     <span class="opacity-50">/</span>
-                    <span class="text-ink font-bold">Archive</span>
+                    <span class="text-ink font-bold">Discussions</span>
                 </div>
 
                 <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink truncate mb-4">
@@ -44,7 +44,7 @@
                 </h1>
                 
                 <p class="font-serif text-lg text-muted italic mb-6">
-                    Browsing {{ number_format($posts->total()) }} entries tagged with this topic.
+                    Browsing {{ number_format($posts->total()) }} discussions tagged with this topic.
                 </p>
 
                 <div class="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-ink">
@@ -67,7 +67,7 @@
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
 
-                        <span x-text="isFollowing ? 'Unfollow' : 'Follow Discipline'"></span>
+                        <span x-text="isFollowing ? 'Unfollow' : 'Follow Tag'"></span>
                     </button>
                 </div>
             @endauth
@@ -80,9 +80,9 @@
             <x-post-card :post="$post" />
         @empty
             <div class="py-20 text-center border border-dashed border-rule bg-aged/10">
-                <p class="font-serif text-muted italic text-lg mb-4">The archive is currently empty for this discipline.</p>
+                <p class="font-serif text-muted italic text-lg mb-4">There are no discussions for this tag yet.</p>
                 <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="font-mono text-xs uppercase tracking-[0.15em] text-ink border-b border-ink hover:text-accent hover:border-accent transition-colors">
-                    Contribute an Entry &rarr;
+                    Start a Discussion &rarr;
                 </a>
             </div>
         @endforelse

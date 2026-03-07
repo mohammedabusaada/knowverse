@@ -24,8 +24,8 @@ return [
             'label'   => 'Upvotes on my posts',
             'default' => true,
         ],
-        'best_answer_received' => [
-            'label'   => 'My comment marked as best answer',
+        'authors_pick_received' => [
+            'label'   => 'My response is selected as Author\'s Pick',
             'default' => true,
         ],
         'report_resolved' => [

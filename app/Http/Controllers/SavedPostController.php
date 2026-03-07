@@ -40,6 +40,6 @@ class SavedPostController extends Controller
         ->latest()
         ->paginate(10);
 
-    return view('saved-posts.index', compact('savedPosts'));
+    return view('posts.saved', compact('savedPosts'));
 }
 }

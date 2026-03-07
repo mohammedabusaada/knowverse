@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
 
+            // Establish ownership with a nullable foreign key to support 'Deleted Scholar' content retention
             $table->foreignId('user_id')
                 ->nullable()
                 ->constrained('users')
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->text('body')->comment('Main content');
             $table->string('image')->nullable()->comment('Optional image path or URL');
 
+            // Categorical state management for content lifecycle
             $table->enum('status', ['draft', 'published', 'archived'])
                 ->default('published')
                 ->index()
@@ -29,8 +31,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('best_comment_id')
                 ->nullable()
-                ->comment('Optional: best comment chosen by post author');
+                ->comment('Reference to the comment accepted as the Author\'s Pick');
 
+            // Engagement and popularity metrics for ranking algorithms
             $table->integer('view_count')->default(0);
             $table->integer('upvote_count')->default(0);
             $table->integer('downvote_count')->default(0);
@@ -38,7 +41,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes()->comment('Soft delete');
 
-            // Index for efficient filtering by user or title searches
+            // Compound index to optimize author-specific feeds and title searches
             $table->index(['user_id', 'title']);
         });
     }

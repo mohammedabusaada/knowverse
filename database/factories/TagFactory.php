@@ -12,9 +12,12 @@ class TagFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->word(); // e.g., "AI", "Physics"
+        // Generate distinct academic taxonomy terms
+        $name = $this->faker->unique()->word(); 
+        
         return [
             'name' => ucfirst($name),
+            // Auto-generate URL-friendly routing identifiers
             'slug' => Str::slug($name),
             'created_at' => now(),
             'updated_at' => now(),

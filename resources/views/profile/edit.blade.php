@@ -1,176 +1,129 @@
-@extends('layouts.app')
+@extends('settings._layout')
 
-@push('styles')
-<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
-<style>
-    /* Clean up the Markdown editor for Settings */
-    .editor-toolbar { border: 2px solid #e5e7eb !important; border-bottom: 1px solid #e5e7eb !important; border-radius: 0.5rem 0.5rem 0 0 !important; opacity: 0.8; transition: opacity 0.2s; }
-    .dark .editor-toolbar { border-color: #374151 !important; }
-    .editor-toolbar:hover { opacity: 1; }
-    .CodeMirror { border: 2px solid #e5e7eb !important; border-top: none !important; border-radius: 0 0 0.5rem 0.5rem !important; font-size: 0.875rem; line-height: 1.6; }
-    .dark .CodeMirror { border-color: #374151 !important; color: #f3f4f6; background: #000; }
-    .dark .editor-toolbar a { color: #9ca3af !important; }
-    .dark .editor-toolbar a:hover, .dark .editor-toolbar a.active { color: #fff !important; background: #374151 !important; border-color: #374151 !important; }
-</style>
-@endpush
-
-@section('content')
-
-<div class="max-w-4xl mx-auto px-4 py-10">
-
-    {{-- Page Header --}}
-    <div class="mb-10">
-        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-black dark:text-white">
-            Edit Profile
+@section('settings-content')
+<div>
+    <div class="mb-10 border-b border-rule pb-4">
+        <h1 class="font-heading text-3xl md:text-4xl font-bold tracking-tight text-ink">
+            Public Identity
         </h1>
-        <p class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-            Update your personal information and privacy preferences.
+        <p class="mt-2 font-serif text-[15px] italic text-muted">
+            Manage your scholarly credentials and visual presence within the Community.
         </p>
     </div>
 
-    {{-- Form Card --}}
+    {{-- Comprehensive Identity Configuration Form --}}
     <form
         action="{{ route('profile.update') }}"
         method="POST"
         enctype="multipart/form-data"
         x-data="{
-            avatarPreview: '{{ $user->profile_picture_url }}',
+            avatarPreview: '{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : '' }}',
             newAvatar: null
         }"
-        class="bg-white dark:bg-black
-               border-2 border-black dark:border-white
-               rounded-2xl shadow-sm
-               p-6 md:p-10 space-y-10"
+        class="space-y-12"
     >
-
         @csrf
         @method('PUT')
 
-        {{-- Profile Picture --}}
+        {{-- Visual Identity Section --}}
         <div>
-            <h2 class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6 border-b-2 border-gray-100 dark:border-gray-800 pb-2">
-                Profile Picture
+            <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+                Scholar Portrait
             </h2>
 
             <div class="flex items-center gap-8">
                 <div class="relative group shrink-0">
                     <img
+                        x-show="newAvatar || avatarPreview"
                         :src="newAvatar ? URL.createObjectURL(newAvatar) : avatarPreview"
-                        class="w-24 h-24 rounded-full object-cover
-                               border-4 border-gray-100 dark:border-gray-900
-                               group-hover:border-black dark:group-hover:border-white
-                               transition-all duration-300"
+                        class="w-24 h-24 rounded-full object-cover border-2 border-rule group-hover:border-ink transition-all duration-300"
                     />
+                    <div x-show="!newAvatar && !avatarPreview" class="w-24 h-24 rounded-full border-2 border-rule bg-aged flex items-center justify-center group-hover:border-ink transition-colors">
+                         <span class="font-heading text-3xl text-muted uppercase">{{ mb_substr($user->display_name ?? $user->username, 0, 1) }}</span>
+                    </div>
                 </div>
 
                 <div class="flex-1">
-                    <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl hover:border-black dark:hover:border-white transition group mb-1">
-                        <span class="text-sm font-bold text-gray-500 group-hover:text-black dark:group-hover:text-white">Choose New Image</span>
+                    <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2 border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper font-mono text-[10px] uppercase tracking-widest transition-colors mb-2 shadow-sm">
+                        <span>Upload New Portrait</span>
                         <input type="file" name="profile_picture" accept="image/*" class="hidden" @change="newAvatar = $event.target.files[0]" />
                     </label>
-                    <p class="text-xs text-gray-400 mt-1">JPG, JPEG, PNG, or WEBP (Max: 2MB)</p>
+                    <p class="font-serif text-xs italic text-muted">High-resolution square portraits recommended (Max 2MB).</p>
 
                     @error('profile_picture')
-                        <p class="text-red-500 font-bold text-xs mt-2">{{ $message }}</p>
+                        <p class="text-accent-warm font-mono text-[10px] font-bold tracking-widest mt-2">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
         </div>
 
-        {{-- Personal Information --}}
+        {{-- Core Credentials --}}
         <div>
-            <h2 class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6 border-b-2 border-gray-100 dark:border-gray-800 pb-2">
-                Personal Information
+            <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+                Scholarly Metadata
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <x-input
-                    label="Username"
-                    name="username"
-                    value="{{ old('username', $user->username) }}"
-                    required />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {{-- Username Field --}}
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Pseudonym / Username</label>
+                    <input type="text" name="username" value="{{ old('username', $user->username) }}" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
+                    @error('username') <span class="text-xs font-mono text-accent-warm block mt-1">{{ $message }}</span> @enderror
+                </div>
 
-                <x-input
-                    label="Full name"
-                    name="full_name"
-                    value="{{ old('full_name', $user->full_name) }}"
-                    required />
+                {{-- Full Name Field --}}
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Formal Name</label>
+                    <input type="text" name="full_name" value="{{ old('full_name', $user->full_name) }}" required
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
+                    @error('full_name') <span class="text-xs font-mono text-accent-warm block mt-1">{{ $message }}</span> @enderror
+                </div>
 
-                <x-input
-                    label="Academic title (optional)"
-                    name="academic_title"
-                    value="{{ old('academic_title', $user->academic_title) }}" />
-            </div>
-        </div>
-
-        {{-- Bio --}}
-        <div>
-            <h2 class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6 border-b-2 border-gray-100 dark:border-gray-800 pb-2">
-                Bio
-            </h2>
-
-            <textarea
-                name="bio"
-                id="bio-editor"
-                rows="6"
-            >{{ old('bio', $user->bio) }}</textarea>
-        </div>
-
-        {{-- Privacy Settings --}}
-        <div class="bg-gray-50 dark:bg-black border-2 border-gray-200 dark:border-gray-800 rounded-xl p-6">
-            <div class="flex items-center justify-between">
-                <div class="pr-6">
-                    <label for="public_follow_lists" class="text-sm font-bold text-black dark:text-white block mb-1">Public Follow Lists</label>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-relaxed">
-                        Allow other users to see who you are following and who follows you. If disabled, these tabs will be hidden from your profile for others.
+                {{-- Locked Email Field --}}
+                <div class="opacity-80">
+                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Email Identifier (Verified)</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" 
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-aged/20 text-muted font-serif text-lg cursor-not-allowed" 
+                           readonly 
+                           title="Email cannot be modified to maintain identity persistence." />
+                    <p class="mt-2 text-[10px] font-serif italic text-muted leading-relaxed">
+                        Registration email is permanent and serves as your primary academic key.
                     </p>
                 </div>
-                
-                {{-- Toggle Switch (Monochrome) --}}
-                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                    <input type="hidden" name="public_follow_lists" value="0">
-                    <input type="checkbox" name="public_follow_lists" id="public_follow_lists" value="1" class="sr-only peer" {{ old('public_follow_lists', $user->public_follow_lists) ? 'checked' : '' }}>
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-800 
-                                peer-checked:after:translate-x-full peer-checked:after:border-white 
-                                after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-                                after:bg-white after:border-gray-300 after:border after:rounded-full 
-                                after:h-5 after:w-5 after:transition-all dark:border-gray-600 
-                                peer-checked:bg-black dark:peer-checked:bg-white"></div>
-                </label>
+
+                {{-- Optional Credentials --}}
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Titles & Designations</label>
+                    <input type="text" name="academic_title" value="{{ old('academic_title', $user->academic_title) }}" placeholder="e.g. Researcher, PhD, MSc"
+                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:italic placeholder:opacity-50" />
+                    @error('academic_title') <span class="text-xs font-mono text-accent-warm block mt-1">{{ $message }}</span> @enderror
+                </div>
             </div>
         </div>
 
-        {{-- Actions --}}
-        <div class="flex justify-end gap-4 pt-8 border-t-2 border-gray-100 dark:border-gray-800">
-            <x-button href="{{ route('profile.show', $user->username) }}" secondary>
-                Cancel
-            </x-button>
-            <x-button type="submit" primary>
-                Save Changes
-            </x-button>
+        {{-- Academic Biography --}}
+        <div>
+            <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+                Biography
+            </h2>
+            <x-markdown-editor 
+                name="bio" 
+                id="bio-editor"
+                :value="old('bio', $user->bio)" 
+            />
+            @error('bio') <span class="text-xs font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
         </div>
 
+        {{-- Footer Actions --}}
+        <div class="flex justify-end gap-4 pt-6 border-t border-rule">
+            <a href="{{ route('profile.show', $user->username) }}" class="px-6 py-3 text-muted hover:text-ink font-mono text-[10px] uppercase tracking-widest transition-colors">
+                Cancel Edit
+            </a>
+            <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
+                Commit Updates
+            </button>
+        </div>
     </form>
 </div>
-
 @endsection
-
-@push('scripts')
-<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const easyMDE = new EasyMDE({
-            element: document.getElementById("bio-editor"),
-            spellChecker: false,
-            status: false,
-            maxHeight: "250px",
-            toolbar: [
-                "bold", "italic", "heading", "|",
-                "unordered-list", "ordered-list", "|",
-                "link", "quote", "|",
-                "preview"
-            ],
-        });
-    });
-</script>
-@endpush

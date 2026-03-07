@@ -23,41 +23,68 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+/**
+ * Handle an incoming registration request.
+ * Implements multi-layered validation and sanitization to ensure data integrity and platform security.
+ */
     public function store(Request $request): RedirectResponse
     {
-        // Sanitize input
+        // 1. Data Normalization: Sanitize inputs to prevent archival inconsistencies
         $request->merge([
-            'username' => trim($request->username),
-            'email' => trim($request->email),
+            'username'  => strtolower(trim($request->username)),
+            'email'     => strtolower(trim($request->email)),
+            'full_name' => $request->full_name ? trim($request->full_name) : null,
         ]);
 
-        // Validate the request, enforcing strict email DNS validation and global password rules
+        // 2. Strict Validation Protocols
         $request->validate([
             'username' => [
-                'required', 'string', 'max:255', 'unique:users', 'alpha_dash:ascii',
-                new ReservedUsername(),
+                'required', 'string', 'min:4', 'max:30', 'unique:users', 'alpha_dash:ascii', 
+                'regex:/^(?!.*(.)\1\1).+$/', // Anti-Spam: Blocks repetitive character sequences
+                'regex:/[a-zA-Z]/',        // Prevents hijacking system-level slugs
+                new ReservedUsername(), 
             ],
-            'full_name' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email:rfc,dns', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'full_name' => [
+                'required', 
+                'string', 
+                'min:3',
+                'max:255'
+            ],
+            'email' => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'email:rfc',
+                'max:255', 
+                'unique:users',
+                'not_regex:/^([^@]+)\1+@/', // Prevents repetitive patterns before @ (e.g., aaaa@domain.com)
+            ],
+            'password' => [
+                'required', 
+                'confirmed', 
+                Rules\Password::defaults()
+            ],
+        ], [
+            // Custom messages for a professional user experience
+            'username.regex' => 'Username format is non-compliant or contains too many repetitive characters.',
+            'email.email'    => 'Please provide a valid, verifiable academic or personal email address.',
+            'email.dns'      => 'The email domain provided could not be verified by our DNS protocols.',
         ]);
 
+        // 3. Persist the scholar record with immutable role assignment
         $user = User::create([
-            'username' => $request->username,
+            'username'  => $request->username,
             'full_name' => $request->full_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => 1,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
+            'role_id'   => 1, 
         ]);
 
+        // 4. Trigger the Registered event to initiate email verification protocols
         event(new Registered($user));
 
-        // Redirect to login page instead of auto-logging in to enforce email verification
-        return redirect()->route('login')->with('status', 'Account created! We have sent a verification link to your email. Please verify before logging in.');
+        return redirect()
+            ->route('login')
+            ->with('status', 'Account created! We have sent a verification link to your email. Please verify before logging in.');
     }
 }

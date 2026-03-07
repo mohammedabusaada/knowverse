@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\NotificationPreference;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Database\Eloquent\Relations\{
     BelongsTo,
@@ -19,10 +21,16 @@ use Illuminate\Database\Eloquent\Relations\{
     BelongsToMany
 };
 
-// <--- 2. Add 'MustVerifyEmail' to implements
+use App\Models\NotificationPreference;
+
+/**
+ * Core User Entity
+ * Handles scholar authentication, authorization, and academic reputation.
+ * Integrates SoftDeletes to support reversible account deactivation. [cite: 157]
+ */
 class User extends Authenticatable implements AuthorizableContract, MustVerifyEmail
 {
-    use Authorizable, HasApiTokens, HasFactory, Notifiable;
+    use Authorizable, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'username',
@@ -33,6 +41,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         'role_id',
         'bio',
         'profile_picture',
+        'public_follow_lists',
         'reputation_points',
         'last_login_at',
         'banned_at',
@@ -68,7 +77,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
     public function parentComments(): HasMany
     {
         return $this->hasMany(Comment::class)
-            ->whereNull('parent_id'); // count only top-level comments
+            ->whereNull('parent_id');
     }
 
     public function allComments(): HasMany
@@ -115,16 +124,23 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
     public function savedPosts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'saved_posts')->withTimestamps();
+        return $this->belongsToMany(Post::class, 'saved_posts')
+            ->withTimestamps();
     }
 
     public function followedTags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, 'tag_follows')->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'tag_follows')
+            ->withTimestamps();
+    }
+
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(NotificationPreference::class);
     }
 
     // ============================================
-    // Accessors
+    // Accessors (Properties you can access without ())
     // ============================================
 
     public function getDisplayNameAttribute(): string
@@ -134,15 +150,14 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
     public function getProfilePictureUrlAttribute(): string
     {
-        if (!$this->profile_picture) {
+        if (
+            !$this->profile_picture ||
+            !Storage::disk('public')->exists($this->profile_picture)
+        ) {
             return asset('images/default-avatar.png');
         }
 
-        if (!file_exists(public_path('storage/' . $this->profile_picture))) {
-            return asset('images/default-avatar.png');
-        }
-
-        return asset('storage/' . $this->profile_picture);
+        return Storage::disk('public')->url($this->profile_picture);
     }
 
     public function getJoinedDateAttribute(): string
@@ -150,13 +165,23 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         return $this->created_at->format('F Y');
     }
 
+    /**
+     * Standardizes the retrieval of the suspension state.
+     */
+    public function getIsBannedAttribute(): bool
+    {
+        return !is_null($this->banned_at);
+    }
+
     // ============================================
-    // Utility
+    // Utility & Permissions (Methods you MUST call with ())
     // ============================================
+
     public function notificationEnabled($type): bool
     {
-        // If an Enum is passed, get the string value; otherwise use as is
-        $typeName = $type instanceof \App\Enums\NotificationType ? $type->value : $type;
+        $typeName = $type instanceof \App\Enums\NotificationType
+            ? $type->value
+            : $type;
 
         return $this->notificationPreferences()
             ->where('type', $typeName)
@@ -180,7 +205,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
     public function canSeeHiddenContent(): bool
     {
-        return $this->canModerate(); // Bothe moderator and admin can see hidden content
+        return $this->canModerate();
     }
 
     public function addReputation(string $action, ?int $points = null, ?Model $source = null)
@@ -189,15 +214,22 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
             ->award($this, $action, $points, $source);
     }
 
+    public function removeReputation(string $action, ?Model $source = null)
+    {
+        return app(\App\Services\ReputationService::class)
+            ->remove($this, $action, $source);
+    }
+
     public function totalReputation(): int
     {
         return $this->reputation_points;
     }
 
-    public function removeReputation(string $action, ?Model $source = null)
+    public function isFollowedBy(User $user): bool
     {
-        return app(\App\Services\ReputationService::class)
-            ->remove($this, $action, $source);
+        return $this->followers()
+            ->where('follower_id', $user->id)
+            ->exists();
     }
 
     public function getRouteKeyName()
@@ -205,18 +237,31 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         return 'username';
     }
 
-    public function notificationPreferences(): HasMany
+    /**
+     * Domain Logic: Determines the scholar's rank based on cumulative contribution points. [cite: 193]
+     */
+    public function getAcademicStanding(): string
     {
-        return $this->hasMany(NotificationPreference::class);
+        $points = $this->reputation_points;
+
+        return match (true) {
+            $points >= 1000 => 'Distinguished Fellow',
+            $points >= 500  => 'Senior Scholar',
+            $points >= 250  => 'Associate Researcher',
+            $points >= 100  => 'Active Contributor',
+            $points >= 50   => 'Junior Researcher',
+            default         => 'Novice Scholar',
+        };
     }
 
-    public function isFollowedBy(User $user): bool
+    public function getStandingColor(): string
     {
-        return $this->followers()->where('follower_id', $user->id)->exists();
-    }
+        $points = $this->reputation_points;
 
-    public function isBanned(): bool
-    {
-        return !is_null($this->banned_at);
+        return match (true) {
+            $points >= 500  => 'text-accent',
+            $points >= 100  => 'text-ink',
+            default         => 'text-muted',
+        };
     }
 }

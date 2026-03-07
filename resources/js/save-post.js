@@ -26,8 +26,6 @@ document.addEventListener("alpine:init", () => {
                 // 2. Sync with Server Truth
                 this.isSaved = data.saved;
                 
-                // Optional: Dispatch event for Toast notification
-                // window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.message } }));
 
             } catch (error) {
                 console.error(error);

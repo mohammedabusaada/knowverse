@@ -1,22 +1,19 @@
 @extends('layouts.app')
 
 @section('profile-content')
-    <div class="max-w-4xl">
-        {{-- Filters --}}
+    <div class="max-w-4xl py-6 animate-[fadeUp_0.4s_ease_both]">
+        
         <x-activity.filters :user="$user" :type="request('type', 'all')" />
 
-        {{-- Feed Card --}}
-        <div class="bg-white dark:bg-black border-2 border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+        <div class="flex flex-col border-t border-rule mt-2">
             @forelse ($activities as $activity)
-                @include('activity._item', ['activity' => $activity])
+                <x-activity.item :activity="$activity" />
             @empty
-                <div class="p-16 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-900 mb-5 border border-gray-200 dark:border-gray-800">
-                        <x-icons.chat class="w-8 h-8 text-black dark:text-white" />
-                    </div>
-                    <h3 class="text-xl font-black text-black dark:text-white">No activity yet</h3>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-xs mx-auto mt-2 font-medium">
-                        This user hasn't performed any actions in the Verse yet.
+                <div class="py-16 text-center border border-dashed border-rule bg-aged/10 rounded-sm mt-4">
+                    <span class="block text-2xl mb-2 opacity-50 text-muted">✦</span>
+                    <h3 class="font-heading text-xl font-bold text-ink mb-1">No activity yet</h3>
+                    <p class="font-serif text-muted italic text-[15px]">
+                        This scholar hasn't performed any public actions in this category yet.
                     </p>
                 </div>
             @endforelse
@@ -25,6 +22,7 @@
         <div class="mt-8">
             {{ $activities->links() }}
         </div>
+        
     </div>
 @endsection
 

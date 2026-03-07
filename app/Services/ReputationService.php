@@ -8,10 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Services\ActivityService;
 
+/**
+ * Gamification and Reputation Economy Manager.
+ * Implements a rigid ledger system to trace every point awarded or retracted,
+ * ensuring absolute integrity of user standing.
+ */
 class ReputationService
 {
     /**
-     * Award reputation to a user for a specific action.
+     * Issues an economic reward or penalty.
+     * Wrapped in a DB transaction to guarantee atomicity (All operations succeed simultaneously, or none do).
      */
     public function award(
         User $user,
@@ -20,97 +26,81 @@ class ReputationService
         ?Model $source = null,
         ?string $note = null
     ): Reputation {
-        return DB::transaction(function () use (
-            $user,
-            $action,
-            $customDelta,
-            $source,
-            $note
-        ) {
+        return DB::transaction(function () use ($user, $action, $customDelta, $source, $note) {
+            
+            // Resolve dynamic point configurations from the central settings file
+            $delta = $customDelta ?? config("reputation.points.$action", 0);
 
-            $delta = $customDelta
-                ?? config("reputation.points.$action", 0);
-
-            // Create reputation log entry
+            // 1. Immutable Audit: Append entry to the append-only ledger
             $record = Reputation::create([
                 'user_id'     => $user->id,
                 'action'      => $action,
                 'delta'       => $delta,
-                'source_id'   => $source?->id,
-                'source_type' => $source ? get_class($source) : null,
+                'source_id'   => $source?->getKey(),
+                'source_type' => $source ? $source->getMorphClass() : null,
                 'note'        => $note,
             ]);
 
-            // Update cached reputation
+            // 2. Cache Synchronization: Update the aggregated column on the User entity for fast querying
             if ($delta !== 0) {
                 $user->increment('reputation_points', $delta);
             }
 
-            // Log activity (single source of truth)
-            ActivityService::reputationChanged(
-                $user,
-                $delta,
-                $source,
-                $action
-            );
+            // 3. Propagate to the Public Activity Stream
+            ActivityService::reputationChanged($user, $delta, $source, $action);
 
             return $record;
         });
     }
 
-    /**
-     * Remove reputation for a specific action (+ optional source).
+/**
+     * Retracts reputation points previously distributed.
+     * Crucial for restoring economic equilibrium when content is soft-deleted or downvoted.
      */
-    public function remove(
-        User $user,
-        string $action,
-        ?Model $source = null
-    ): void {
+    public function remove(User $user, string $action, ?Model $source = null): void 
+    {
         DB::transaction(function () use ($user, $action, $source) {
 
             $query = Reputation::where('user_id', $user->id)
                 ->where('action', $action);
 
+            // Scope the removal specifically to a polymorphic entity if contextualized
             if ($source) {
-                $query->where('source_id', $source->id)
-                    ->where('source_type', get_class($source));
+                $query->where('source_id', $source->getKey())
+                      ->where('source_type', $source->getMorphClass());
             }
 
-            $sum = (int) $query->sum('delta');
+            // Retrieve only the LATEST single ledger entry for this action/source combination.
+            // Deleting all matching rows would destroy the points earned from OTHER users' votes.
+            $record = $query->latest('id')->first();
 
-            if ($sum === 0) {
+            if (!$record) {
                 return;
             }
 
-            // Delete reputation logs
+            $sum = (int) $record->delta;
+
+            // 1. Ledger Cleanup: Purge the targeted transactional entries
             $query->delete();
 
-            // Update cached reputation
+            // 2. Cache Reconcile: Adjust the user's aggregate standing
             $user->decrement('reputation_points', $sum);
 
-            // Log reversal as activity
-            ActivityService::reputationChanged(
-                $user,
-                -$sum,
-                $source,
-                "{$action}_reverted"
-            );
+            // 3. Transparency Audit: Log the reversal action
+            ActivityService::reputationChanged($user, -$sum, $source, "{$action}_reverted");
         });
     }
 
-    /**
-     * Recalculate user's reputation from logs (admin/debug tool).
+/**
+     * Diagnostic and Recovery Tool.
+     * Rehydrates (recalculates) the user's aggregate reputation score from the ground up 
+     * by summarizing all historical ledger transactions.
      */
     public function recalc(User $user): void
     {
         DB::transaction(function () use ($user) {
-
-            $total = Reputation::where('user_id', $user->id)
-                ->sum('delta');
-
-            $user->update([
-                'reputation_points' => $total,
-            ]);
+            $total = (int) Reputation::where('user_id', $user->id)->sum('delta');
+            $user->update(['reputation_points' => $total]);
         });
     }
 }

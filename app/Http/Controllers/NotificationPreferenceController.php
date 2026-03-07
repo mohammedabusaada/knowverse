@@ -9,37 +9,46 @@ use App\Enums\NotificationType;
 
 class NotificationPreferenceController extends Controller
 {
+    /**
+     * Renders the settings interface for fine-grained notification control.
+     */
     public function edit()
     {
         return view('settings.notifications', [
             'user' => Auth::user(),
-            // Grouped cases from Enum: [ 'posts' => [CASE, CASE], 'votes' => [...] ]
+            // Pass the logical grouping mapping defined in the Enum for UI organization
             'categories' => NotificationType::grouped(),
             'preferences' => Auth::user()->notificationPreferences->keyBy('type'),
         ]);
     }
 
+    /**
+     * Synchronizes user toggle states with the database.
+     * Employs updateOrCreate to handle both existing preferences and first-time toggles seamlessly.
+     */
     public function update(Request $request)
     {
         $user = Auth::user();
         $inputPreferences = $request->input('preferences', []);
 
-        // Iterate through all cases in the Enum to ensure we handle all types
+        // Iterate strictly through defined Enum cases to prevent invalid type injection
         foreach (NotificationType::cases() as $typeCase) {
-            // Skip mandatory types; users shouldn't be able to toggle them
+            
+            // Architectural constraint: Mandatory system alerts cannot be opted-out of
             if ($typeCase->isMandatory()) {
                 continue;
             }
 
             $typeValue = $typeCase->value;
 
+            // Upsert mechanism: Updates if exists, creates if missing
             NotificationPreference::updateOrCreate(
                 [
                     'user_id' => $user->id,
                     'type'    => $typeValue,
                 ],
                 [
-                    // If the key exists in input, it's enabled (true), otherwise false
+                    // Boolean casting based on HTML checkbox payload presence
                     'enabled' => isset($inputPreferences[$typeValue]) && $inputPreferences[$typeValue] == '1',
                 ]
             );

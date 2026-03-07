@@ -5,10 +5,13 @@ namespace App\Policies;
 use App\Models\Post;
 use App\Models\User;
 
+/**
+ * Enforces authorization logic for core scholarly discussions.
+ */
 class PostPolicy
 {
     /**
-     * Allow viewing by anyone (even guests).
+     * Allows public viewing of the discussion.
      */
     public function view(?User $user, Post $post): bool
     {
@@ -16,7 +19,7 @@ class PostPolicy
     }
 
     /**
-     * Only authenticated users can create.
+     * Write Access: Restricts creation to registered and authenticated scholars only.
      */
     public function create(User $user): bool
     {
@@ -24,18 +27,18 @@ class PostPolicy
     }
 
     /**
-     * Users can update their own posts or admins can update all.
+     * Modification Access: Restricts modifications to the original author or the moderation team
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->isAdmin();
+        return $user->id === $post->user_id || $user->canModerate();
     }
 
     /**
-     * Users can delete their own posts or admins can delete all.
+     * Deletion Access: Restricts deletion to the original author or the moderation team.
      */
     public function delete(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->isAdmin();
+        return $user->id === $post->user_id || $user->canModerate();
     }
 }

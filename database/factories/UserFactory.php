@@ -13,7 +13,8 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        // 80% User, 10% Admin, 10% Moderator
+        // Weighted Role Distribution: Simulate a realistic hierarchy
+        // (80% Standard Scholars, 10% System Admins, 10% Moderators)
         $roleId = $this->faker->randomElement([
             1, 1, 1, 1, 1, 1, 1, 1, // User
             2,                      // Admin
@@ -25,7 +26,10 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'full_name' => $this->faker->name(),
             'academic_title' => $this->faker->randomElement(['Dr.', 'Prof.', 'Mr.', 'Ms.', null]),
-            'password' => 'password', // hashed by model cast
+            
+            // Cryptographic hashing is automatically handled by the Model's 'hashed' cast
+            'password' => 'password', 
+            
             'role_id' => $roleId,
             'bio' => $this->faker->sentence(10),
             'profile_picture' => $this->faker->optional()->imageUrl(200, 200, 'people'),

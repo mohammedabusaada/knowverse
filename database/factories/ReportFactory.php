@@ -12,11 +12,14 @@ class ReportFactory extends Factory
 
     public function definition(): array
     {
+        // Dynamically resolve the polymorphic target entity
         $targetType = $this->faker->randomElement([Post::class, Comment::class, User::class]);
         $target = $targetType::inRandomOrder()->first() ?? $targetType::factory();
+        
+        // Simulate the moderation lifecycle state machine
         $status = $this->faker->randomElement(ReportStatus::cases());
 
-        // Assign appropriate reason based on target type
+        // Contextual Reason Resolution: Ensure the violation type logically matches the reported entity
         if ($targetType === User::class) {
             $reasonType = $this->faker->randomElement([ReportReason::HARASSMENT, ReportReason::IMPERSONATION]);
         } else {
@@ -30,6 +33,8 @@ class ReportFactory extends Factory
             'reason_type' => $reasonType,
             'reason'      => $this->faker->sentence(),
             'status'      => $status,
+            
+            // Record the administrative audit trail only if the ticket is no longer pending
             'resolved_by' => $status !== ReportStatus::PENDING ? User::factory() : null,
             'resolved_at' => $status !== ReportStatus::PENDING ? now() : null,
             'created_at'  => $this->faker->dateTimeBetween('-1 month', 'now'),

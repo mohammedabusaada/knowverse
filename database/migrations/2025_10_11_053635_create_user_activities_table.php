@@ -32,13 +32,11 @@ return new class extends Migration
             // Timestamp
             $table->timestamp('created_at')->useCurrent();
 
-            // --- INDEXES ---
             
-            // 1. For showing a specific user's activity feed (Latest first)
+            // Optimization 1: User-centric feed retrieval (Latest actions first)
             $table->index(['user_id', 'created_at']);
 
-            // 2. For showing the history/timeline of a specific Post or Comment
-            // This replaces the standard morph index with a more powerful version
+            // Optimization 2: Entity-centric timeline retrieval (Replaces default morph index)
             $table->index(['target_type', 'target_id', 'created_at'], 'target_history_timeline');
         });
     }

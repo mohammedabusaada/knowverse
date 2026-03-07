@@ -5,22 +5,26 @@ namespace App\Policies;
 use App\Models\Report;
 use App\Models\User;
 
+/**
+ * Secures the moderation reporting infrastructure.
+ * Enforces strict Role-Based Access Control (RBAC) to protect sensitive oversight queues.
+ */
 class ReportPolicy
 {
     /**
-     * Allow admins to see the list of reports.
+     * Allow admins and moderators to see the list of reports.
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->canModerate();
     }
 
     /**
-     * Allow admins to view a specific report.
+     * Allow admins and moderators to view a specific report.
      */
     public function view(User $user, Report $report): bool
     {
-        return $user->isAdmin();
+        return $user->canModerate();
     }
 
     /**
@@ -28,7 +32,7 @@ class ReportPolicy
      */
     public function manageReports(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->canModerate();
     }
 
     /**
@@ -40,8 +44,15 @@ class ReportPolicy
     }
 
     /**
-     * Only admins can update or delete report records.
+     * Only admins and moderators can update or delete report records.
      */
-    public function update(User $user, Report $report): bool { return $user->isAdmin(); }
-    public function delete(User $user, Report $report): bool { return $user->isAdmin(); }
+    public function update(User $user, Report $report): bool 
+    { 
+        return $user->canModerate(); 
+    }
+
+    public function delete(User $user, Report $report): bool 
+    { 
+        return $user->canModerate(); 
+    }
 }

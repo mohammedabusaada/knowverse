@@ -1,6 +1,13 @@
+@import 'katex/dist/katex.min.css';
+@import 'highlight.js/styles/github-dark.min.css';
+@import 'easymde/dist/easymde.min.css';
+@import 'font-awesome/css/font-awesome.min.css';
+
 @import "tailwindcss";
 
-/* 1. Setting up dynamic color variables based on theme (Dark/Light) */
+/* ==========================================================================
+   1. Global Theme Variables (Dark/Light Modes)
+   ========================================================================== */
 @layer base {
     :root {
         --color-paper: #f7f4ef;
@@ -22,23 +29,35 @@
         --color-rule: rgba(237, 232, 223, 0.12);
     }
 
-    /* Basic Body settings */
+    /* Base Document Styling */
     body {
         background-color: var(--color-paper);
         color: var(--color-ink);
-        font-family: 'EB Garamond', Georgia, serif;
-        /* Vintage paper texture for light mode */
+        font-family: var(--font-serif);
+        /* Subtle vintage paper noise texture for light mode */
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     }
 
     .dark body {
-        /* Removing texture in dark mode for a cleaner look */
+        /* Clean background for dark mode to prevent visual clutter */
         background-image: none; 
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    ::selection {
+        background-color: var(--color-ink, #1f2937);
+        color: var(--color-paper, #ffffff);
     }
 }
 
-/* 2. Injecting these variables into Tailwind to use them as standard classes */
+/* ==========================================================================
+   2. Tailwind v4 Theme Configuration Integration
+   ========================================================================== */
 @theme {
+    /* Colors Mapping */
     --color-paper: var(--color-paper);
     --color-aged: var(--color-aged);
     --color-ink: var(--color-ink);
@@ -47,25 +66,110 @@
     --color-accent-warm: var(--color-accent-warm);
     --color-rule: var(--color-rule);
 
+    /* Typography Mapping */
     --font-serif: 'EB Garamond', Georgia, serif;
     --font-heading: 'Libre Baskerville', Georgia, serif;
     --font-mono: 'DM Mono', monospace;
+
+    /* Global Keyframes available for arbitrary values (e.g. animate-[fadeUp...]) */
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseHighlight {
+        0% { background-color: var(--color-accent); opacity: 0.2; }
+        50% { background-color: var(--color-accent); opacity: 0.1; }
+        100% { background-color: transparent; }
+    }
 }
 
-/* 3. Other legacy settings (such as Custom Variant and Animations) */
+/* ==========================================================================
+   3. Custom Utilities & UI Overrides
+   ========================================================================== */
 @custom-variant dark (&:where(.dark, .dark *));
 
-@keyframes pulseHighlight {
-    0% { background-color: var(--color-accent); opacity: 0.2; }
-    50% { background-color: var(--color-accent); opacity: 0.1; }
-    100% { background-color: transparent; }
-}
+@layer utilities {
+    
+    /* Elegant contextual highlight for deep-linked comments */
+    .pulse-comment {
+        animation: pulseHighlight 1.2s ease-out 1;
+        border-radius: 0.125rem;
+    }
 
-.pulse-comment {
-    animation: pulseHighlight 1.2s ease-out 1;
-    border-radius: 0.125rem;
-}
+    /* Zero-UI Scrollbar for horizontal lists (Profile Tabs, Dropdowns) */
+    .scrollbar-hide {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Webkit */
+    }
 
-html {
-    scroll-behavior: smooth;
+    /* ----------------------------------------------------------------------
+       EasyMDE Markdown Editor Theme Overrides
+       Ensures the editor respects our Academic Dark/Light styling natively.
+       ---------------------------------------------------------------------- */
+    .editor-toolbar {
+        border-color: var(--color-rule) !important;
+        background-color: var(--color-aged) !important;
+        opacity: 0.9;
+    }
+    .editor-toolbar button {
+        color: var(--color-ink) !important;
+    }
+    .editor-toolbar button:hover, .editor-toolbar button.active {
+        background-color: var(--color-paper) !important;
+        border-color: var(--color-rule) !important;
+    }
+    .CodeMirror {
+        border-color: var(--color-rule) !important;
+        background-color: var(--color-paper) !important;
+        color: var(--color-ink) !important;
+        font-family: var(--font-serif) !important;
+        font-size: 1.1rem;
+    }
+    .CodeMirror-cursor {
+        border-left-color: var(--color-ink) !important;
+    }
+
+    /* ----------------------------------------------------------------------
+       Prose (Markdown) Academic Styling Overrides
+       ---------------------------------------------------------------------- */
+    .prose h1, .prose h2, .prose h3, .prose h4 {
+        font-family: var(--font-heading);
+        color: var(--color-ink);
+        font-weight: 700;
+        margin-top: 2em;
+        margin-bottom: 0.75em;
+        line-height: 1.2;
+    }
+    
+    .prose h1 { font-size: 2.25em; border-bottom: 1px solid var(--color-rule); padding-bottom: 0.3em; }
+    .prose h2 { font-size: 1.75em; }
+    .prose h3 { font-size: 1.35em; }
+
+    .prose blockquote {
+        border-left: 4px double var(--color-rule);
+        padding: 1em 1.5em;
+        margin: 1.5em 0;
+        font-style: italic;
+        color: var(--color-muted);
+        background-color: var(--color-aged);
+        border-radius: 0.125rem;
+    }
+
+    .prose ul { list-style-type: disc; padding-left: 1.5em; margin: 1em 0; }
+    .prose ol { list-style-type: decimal; padding-left: 1.5em; margin: 1em 0; }
+    .prose li { margin-bottom: 0.5em; }
+
+    .prose a {
+        color: var(--color-accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        transition: color 0.2s ease;
+    }
+    .prose a:hover { color: var(--color-ink); }
+
+    .prose strong, .prose b { font-weight: 700; color: var(--color-ink); }
 }

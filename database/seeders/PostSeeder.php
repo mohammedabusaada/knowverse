@@ -31,24 +31,27 @@ class PostSeeder extends Seeder
             'Logic / Critical Thinking' => $tags->whereIn('name', ['Logical Fallacies','Argumentation','Epistemology','Critical Thinking']),
         ];
 
-        foreach ($users as $user) {
-            $posts = Post::factory(rand(1, 5))->create(['user_id' => $user->id]);
+        // Mute Model Events here as well
+        Post::withoutEvents(function () use ($users, $tagCategories) {
+            foreach ($users as $user) {
+                $posts = Post::factory(rand(1, 5))->create(['user_id' => $user->id]);
 
-            $posts->each(function ($post) use ($tagCategories) {
-                $assignedTags = collect();
+                $posts->each(function ($post) use ($tagCategories) {
+                    $assignedTags = collect();
 
-                // Pick 1–2 tags from different categories for diversity
-                foreach ($tagCategories as $categoryTags) {
-                    if ($categoryTags->count() && rand(0, 1)) { // 50% chance to include a tag from this category
-                        $assignedTags->push($categoryTags->random()->id);
+                    // Pick 1–2 tags from different categories for diversity
+                    foreach ($tagCategories as $categoryTags) {
+                        if ($categoryTags->count() && rand(0, 1)) {
+                            $assignedTags->push($categoryTags->random()->id);
+                        }
                     }
-                }
 
-                // Attach 1–3 total tags max
-                $assignedTags = $assignedTags->unique()->take(rand(1, 3));
+                    // Attach 1–3 total tags max
+                    $assignedTags = $assignedTags->unique()->take(rand(1, 3));
 
-                $post->tags()->attach($assignedTags->toArray());
-            });
-        }
+                    $post->tags()->attach($assignedTags->toArray());
+                });
+            }
+        });
     }
 }

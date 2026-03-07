@@ -6,6 +6,10 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use App\Services\ContentModerationService;
 
+/**
+ * Data Integrity Guard: Lexical Analysis Rule.
+ * Injects the ModerationService to scan user inputs for prohibited language prior to persistence.
+ */
 class CleanContent implements ValidationRule
 {
     protected $moderationService;

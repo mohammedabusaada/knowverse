@@ -6,6 +6,10 @@ use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
+/**
+ * Encapsulated UI Component for the Global Notification Bell.
+ * Handles its own state hydration and optimized data retrieval.
+ */
 class NotificationDropdown extends Component
 {
     public $notifications;
@@ -25,6 +29,7 @@ class NotificationDropdown extends Component
             ->where('is_read', false)
             ->count();
 
+        // Fetch recent alerts utilizing Eager Loading (with) to prevent N+1 DB queries in the view
         $this->notifications = Notification::where('user_id', $userId)
             ->with(['actor', 'target'])
             ->latest()

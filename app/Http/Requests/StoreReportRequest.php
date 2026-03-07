@@ -8,17 +8,27 @@ use App\Rules\NoDuplicateReport;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
+/**
+ * Orchestrates the reporting system logic.
+ * Handles polymorphic target resolution and prevents redundant or illogical reports.
+ */
 class StoreReportRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
+        // Require authentication to submit reports
         return $this->user() !== null;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
-        // Use the MorphMap from your AppServiceProvider to get the full class name
-        // This ensures 'post' becomes 'App\Models\Post'
+        // Resolve the fully qualified class name using the MorphMap definition
         $modelClass = Relation::getMorphedModel($this->target_type) ?? $this->target_type;
 
         return [
@@ -26,12 +36,21 @@ class StoreReportRequest extends FormRequest
             'target_id'   => [
                 'required', 
                 'integer',
-                // Custom rule to check database for duplicates
+                // Idempotency: Prevent duplicate pending reports from the same scholar
                 new NoDuplicateReport($modelClass, (int) $this->target_id),
-                // Custom inline check: Prevent self-reporting if target is a user
+                
                 function ($attribute, $value, $fail) use ($modelClass) {
+                    // Self-Reporting Constraint
                     if ($modelClass === \App\Models\User::class && (int)$value === (int)$this->user()->id) {
-                        $fail('You cannot report yourself.');
+                        $fail('You cannot report your own profile.');
+                    }
+                    
+                    // State Verification: Block reports on accounts already under administrative suspension
+                    if ($modelClass === \App\Models\User::class) {
+                        $targetUser = \App\Models\User::find($value);
+                        if ($targetUser && $targetUser->is_banned) {
+                            $fail('This account is already suspended and under review.');
+                        }
                     }
                 }
             ],

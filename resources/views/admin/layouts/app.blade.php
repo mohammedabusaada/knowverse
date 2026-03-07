@@ -17,43 +17,46 @@
         }
     </script>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    {{-- Academic Typography Stack for consistency --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex h-screen overflow-hidden">
+{{-- Using KnowVerse official colors (bg-paper, text-ink) --}}
+<body class="font-serif antialiased bg-paper text-ink flex h-screen overflow-hidden">
 
     {{-- Sidebar --}}
     @include('admin.layouts.sidebar')
 
     {{-- Main Content Area --}}
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-aged/10">
         
         {{-- Topbar --}}
-        <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 z-10">
+        <header class="bg-paper border-b border-rule h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 z-10 shadow-sm">
             <div class="flex items-center gap-4">
                 {{-- Mobile menu toggle button --}}
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-muted hover:bg-aged rounded-sm transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 
-                <h2 class="text-xl font-bold tracking-tight text-gray-800 dark:text-white truncate">
+                <h2 class="text-xl font-heading font-bold tracking-tight text-ink truncate">
                     @yield('header', 'Dashboard')
                 </h2>
             </div>
 
             <div class="flex items-center gap-4">
                 {{-- Dark mode button --}}
-                <button @click="darkMode = !darkMode" class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition">
-                    <x-icons.sun x-show="darkMode" class="w-5 h-5 text-yellow-400" x-cloak />
+                <button @click="darkMode = !darkMode" class="p-2 rounded-sm hover:bg-aged text-muted transition-colors focus:outline-none">
+                    <x-icons.sun x-show="darkMode" class="w-5 h-5 text-accent" x-cloak />
                     <x-icons.moon x-show="!darkMode" class="w-5 h-5" x-cloak />
                 </button>
                 
                 {{-- Admin Profile Picture --}}
-                <a href="{{ route('profile.show', auth()->user()->username) }}" class="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-4 ml-2">
-                    <x-user-avatar :user="auth()->user()" size="sm" class="ring-2 ring-gray-100 dark:ring-gray-800" />
+                <a href="{{ route('profile.show', auth()->user()->username) }}" class="flex items-center gap-2 border-l border-rule pl-4 ml-2 hover:opacity-80 transition-opacity">
+                    <x-user-avatar :user="auth()->user()" size="sm" class="border border-rule" />
                 </a>
             </div>
         </header>

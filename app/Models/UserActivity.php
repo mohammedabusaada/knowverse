@@ -28,15 +28,10 @@ class UserActivity extends Model
     {
         parent::boot();
 
-        // Automatically set created_at on creation since $timestamps is false
         static::creating(function ($activity) {
             $activity->created_at = $activity->created_at ?? now();
         });
     }
-
-    // ------------------------------------------------------------------
-    // Relationships
-    // ------------------------------------------------------------------
 
     public function user(): BelongsTo
     {
@@ -47,10 +42,6 @@ class UserActivity extends Model
     {
         return $this->morphTo();
     }
-
-    // ------------------------------------------------------------------
-    // Scopes
-    // ------------------------------------------------------------------
 
     public function scopeForUser($query, User $user)
     {
@@ -74,18 +65,14 @@ class UserActivity extends Model
         ]);
     }
 
-    // ------------------------------------------------------------------
-    // Utility
-    // ------------------------------------------------------------------
-
     public static function log(User $user, string $action, ?Model $target = null, ?string $details = null): self
     {
         return self::create([
-            'user_id' => $user->id,
-            'action' => $action,
-            'target_id' => $target?->id,
-            'target_type' => $target ? get_class($target) : null,
-            'details' => $details,
+            'user_id'     => $user->id,
+            'action'      => $action,
+            'target_id'   => $target?->getKey(),
+            'target_type' => $target ? $target->getMorphClass() : null,
+            'details'     => $details,
         ]);
     }
 

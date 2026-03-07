@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +34,7 @@ class LoginRequest extends FormRequest
 
     /**
      * Attempt to authenticate the request using email or username.
+     * Manages automatic reactivation for soft-deleted accounts.
      */
     public function authenticate(): void
     {
@@ -44,12 +47,11 @@ class LoginRequest extends FormRequest
             ? 'email'
             : 'username';
 
-        $credentials = [
-            $field => $login,
-            'password' => $this->input('password'),
-        ];
+        // 1. Retrieve the user, explicitly including temporarily deactivated (soft-deleted) accounts
+        $user = User::withTrashed()->where($field, $login)->first();
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        // 2. Validate credentials manually against the retrieved user record
+        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -57,6 +59,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // 3. Reactivation Protocol: Restore account if it was previously deactivated
+        if ($user->trashed()) {
+            $user->restore();
+        }
+
+        // 4. Authenticate the session
+        Auth::login($user, $this->boolean('remember'));
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -43,7 +43,7 @@
             </span>
         </template>
         <template x-if="selected.length === 0">
-            <span class="text-sm font-serif italic text-muted py-1">No disciplines selected yet.</span>
+            <span class="text-sm font-serif italic text-muted py-1">No Tags selected yet.</span>
         </template>
     </div>
 
@@ -52,7 +52,7 @@
         <input
             type="text"
             x-model="query"
-            placeholder="Search disciplines..."
+            placeholder="Search tags..."
             class="w-full px-4 py-2.5 mb-2 rounded-sm border border-rule bg-transparent text-ink font-serif text-sm
                    placeholder:text-muted placeholder:italic
                    focus:outline-none focus:ring-0 focus:border-ink transition-colors"
@@ -84,6 +84,6 @@
     </template>
 
     <p class="mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
-        Select up to {{ $max }} disciplines.
+        Select up to {{ $max }} tags.
     </p>
 </div>

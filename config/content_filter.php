@@ -7,21 +7,21 @@ return [
     |--------------------------------------------------------------------------
     |
     | Any content containing these strings (case-insensitive) will be 
-    | blocked before publication.
+    | blocked before publication. Maintain this list regularly.
     |
     */
 
     'blocked_words' => [
-        // Toxicity
-        'idiot', 'moron', 'dumbass', 'fucker', 'bitched', 
+        // Toxicity & Profanity
+        'fuck', 'asshole', 'shit', 'bitch', 'idiot', 'moron', 'dumbass', 
         
-        // Hate Speech (Add the actual slurs here)
-        'racist_slur_1', 'homophobic_slur_1', 'nazi', 'hitler',
+        // Hate Speech & Extremism
+        'nazi', 'hitler', 'racist_slur_here',
         
-        // Scams
+        // Spam & Scams
         'whatsapp +', 'telegram @', 'make money fast', 'free crypto',
         
-        // Inappropriate
+        // NSFW / Inappropriate
         'porn', 'brazzers', 'sex video', 'xxx',
     ],
 ];

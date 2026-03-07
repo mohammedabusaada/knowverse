@@ -15,16 +15,20 @@
 
     {{-- Left Side: Ink Background --}}
     <div class="hidden md:flex w-1/2 bg-ink text-paper flex-col justify-center items-center px-10 py-16 relative overflow-hidden">
-        {{-- Subtle texture overlay --}}
         <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3C/filter%3E%3Crect width=\'400\' height=\'400\' filter=\'url(%23n)\' opacity=\'0.04\'/%3E%3C/svg%3E');"></div>
         
-        <x-application-logo class="w-auto h-16 mb-8 hover:opacity-80 transition-opacity" />
+        {{-- Text Logo: Massive and Dominant --}}
+        <a href="/" class="font-heading font-bold text-6xl tracking-[0.1em] uppercase text-paper hover:opacity-80 transition-all duration-300 mb-12 block border-b-4 border-paper/10 pb-4">
+            KnowVerse
+        </a>
 
-        <h1 class="text-4xl md:text-5xl font-heading font-bold mb-4 tracking-tight">
-            The Archive Awaits
+        {{-- Main Heading: Same font, slightly smaller than Logo --}}
+        <h1 class="text-4xl font-heading font-bold mb-4 tracking-tight text-aged uppercase">
+            Welcome Back
         </h1>
-        <p class="text-lg text-aged italic text-center max-w-md leading-relaxed border-l-2 border-paper/20 pl-4">
-            Join the discourse and start your journey of academic discovery.
+        
+        <p class="text-lg font-serif text-aged italic text-center max-w-md leading-relaxed border-l-2 border-paper/20 pl-4">
+            Sign in to continue sharing and discovering academic knowledge within our community.
         </p>
     </div>
 
@@ -65,7 +69,7 @@
                         value="{{ old('login') }}"
                         autocomplete="username"
                         class="w-full px-0 py-3 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:text-muted/50 placeholder:italic"
-                        placeholder="Enter your credential..."
+                        placeholder="Enter your email or username..."
                     />
                 </div>
 
@@ -88,19 +92,19 @@
                         <span class="ml-2 text-sm italic font-serif group-hover:text-ink">Remember me</span>
                     </label>
                     <a href="{{ route('password.request') }}" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors">
-                        Lost password?
+                        Forgot password?
                     </a>
                 </div>
 
                 <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-xs py-4 transition-colors mt-4">
-                    Enter the Verse
+                    Sign In
                 </button>
             </form>
 
             <p class="mt-12 text-center text-muted font-serif italic text-[15px]">
-                Not a member yet?
+                Don't have an account?
                 <a href="{{ route('register') }}" class="text-ink font-bold border-b border-ink hover:text-accent transition-colors ml-1">
-                    Apply for Access
+                    Register Now
                 </a>
             </p>
         </div>

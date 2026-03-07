@@ -7,11 +7,15 @@ use App\Models\UserActivity;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tag;
 
-
+/**
+ * Centralized Activity Logger (Audit Trail).
+ * Acts as the single source of truth for tracking domain events and user actions across the platform.
+ */
 class ActivityService
 {
-    /**
-     * Core activity logger.
+/**
+     * Core persistence method for logging activities.
+     * Utilizes polymorphic relations to dynamically link actions to diverse entities.
      */
     public static function log(
         User $user,
@@ -29,7 +33,7 @@ class ActivityService
     }
 
     // ==========================================================
-    //  DOMAIN EVENTS
+    //  DOMAIN EVENTS (Action Specific Loggers)
     // ==========================================================
 
     public static function postCreated(User $user, Model $post): void
@@ -70,11 +74,11 @@ class ActivityService
         );
     }
 
-    public static function bestAnswerSelected(User $user, Model $comment): void
+public static function authorsPickSelected(User $user, Model $comment): void
     {
         self::log(
             $user,
-            'best_answer_selected',
+            'authors_pick_selected',
             $comment
         );
     }
@@ -103,8 +107,9 @@ class ActivityService
         );
     }
 
-    /**
-     * Reputation change hook (called by ReputationService).
+/**
+     * Hook to log changes in a scholar's academic standing.
+     * Invoked automatically by the ReputationService to ensure data consistency.
      */
     public static function reputationChanged(
         User $user,
@@ -113,7 +118,7 @@ class ActivityService
         ?string $action = null
     ): void {
         if ($delta === 0) {
-            return;
+            return; // Ignore zero-impact transactions to prevent database bloat
         }
 
         self::log(

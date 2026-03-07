@@ -15,17 +15,26 @@ use Illuminate\Database\Eloquent\Relations\{
 };
 use League\CommonMark\CommonMarkConverter;
 
+/**
+ * Primary Discussion Entity
+ * Manages scholarly posts and enforces global visibility constraints.
+ */
 class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
     // ------------------------------------------------------------------
-    // Constants
+    // State Constants for Post Lifecycle
     // ------------------------------------------------------------------
     public const STATUS_DRAFT = 'draft';
     public const STATUS_PUBLISHED = 'published';
     public const STATUS_ARCHIVED = 'archived';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'user_id',
         'title',
@@ -39,53 +48,81 @@ class Post extends Model
         'downvote_count',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'view_count' => 'integer',
         'upvote_count' => 'integer',
         'downvote_count' => 'integer',
+        'is_hidden' => 'boolean',
         'deleted_at' => 'datetime',
     ];
 
-
-
+    /**
+     * Boot the model to apply global visibility and state logic.
+     */
     protected static function booted()
-{
-    static::addGlobalScope('visibility', function ($builder) {
-        // 1. If we are in the admin area, show everything
-        if (Request::is('admin/*')) {
-            return;
-        }
-
-        // 2. Handle authenticated users
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            // Admins see everything everywhere
-            if ($user->isAdmin()) {
+    {
+        /**
+         * Scope 1: Visibility Logic
+         * Restrict hidden content to its author and system administrators.
+         */
+        static::addGlobalScope('visibility', function ($builder) {
+            if (app()->runningInConsole() || Request::is('admin/*')) {
                 return;
             }
 
-            // Users see public content OR their own hidden content 
-            // (so they can see why it was hidden)
-            $builder->where(function ($query) use ($user) {
-                $query->where('is_hidden', false)
-                      ->orWhere('user_id', $user->id);
+            if (Auth::check()) {
+                $user = Auth::user();
+                
+                // Administrators possess master-view permissions
+                if ($user->isAdmin()) {
+                    return;
+                }
+
+                $builder->where(function ($query) use ($user) {
+                    $query->where('posts.is_hidden', false)
+                          ->orWhere('posts.user_id', $user->id);
+                });
+            } else {
+                // Anonymous guests are restricted to public records only
+                $builder->where('posts.is_hidden', false);
+            }
+        });
+
+        /**
+         * Scope 2: Active Author Logic
+         * Hide content belonging to temporarily deactivated (soft-deleted) scholars.
+         */
+        static::addGlobalScope('activeAuthor', function ($builder) {
+            if (app()->runningInConsole() || Request::is('admin/*')) {
+                return;
+            }
+
+            $builder->where(function ($query) {
+                // Include orphaned posts (where author is hard-deleted -> user_id is null)
+                // OR include posts where the associated author is currently active.
+                $query->whereNull('posts.user_id')
+                      ->orWhereHas('user');
             });
-        } else {
-            // 3. Guests only see non-hidden content
-            $builder->where('is_hidden', false);
-        }
-    });
-}
+        });
+    }
+
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
 
+    /**
+     * Relationship: Defensive mapping to handle orphaned posts with a fallback UI identity.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withDefault([
-            'username' => 'deleted_user',
-            'full_name' => 'Deleted User',
+            'username' => 'deleted_scholar',
+            'full_name' => 'Deleted Scholar',
             'profile_picture' => null,
             'role_id' => 1,
         ]);
@@ -93,6 +130,7 @@ class Post extends Model
 
     public function comments(): HasMany
     {
+        // Returns only top-level comments
         return $this->hasMany(Comment::class)->whereNull('parent_id');
     }
 
@@ -138,30 +176,24 @@ class Post extends Model
     }
 
     // ------------------------------------------------------------------
-    // Scopes
+    // Query Scopes
     // ------------------------------------------------------------------
 
     public function scopePublished($query)
     {
-        return $query->where('status', self::STATUS_PUBLISHED);
+        return $query->where('posts.status', self::STATUS_PUBLISHED);
     }
 
     public function scopePopular($query)
     {
-        return $query->orderByDesc('view_count');
+        return $query->orderByDesc('posts.view_count');
     }
 
     public function scopeVisible($query)
-{
-    return $query->where('is_hidden', false);
-}
+    {
+        return $query->where('posts.is_hidden', false);
+    }
 
-
-
-      /**
-     * Required by feature/tags-controller
-     * Filter posts by given tag IDs
-     */
     public function scopeFilterByTags($query, ?array $tagIds = null)
     {
         if (!$tagIds) {
@@ -173,32 +205,37 @@ class Post extends Model
         });
     }
 
-
     // ------------------------------------------------------------------
-    // Utility Methods
+    // Utility Methods & Helpers
     // ------------------------------------------------------------------
 
+    /**
+     * Safely increment the view counter.
+     */
     public function incrementViewCount(): void
     {
         $this->increment('view_count');
     }
 
+    /**
+     * Calculate the net score of the post.
+     */
     public function totalVotes(): int
     {
         return $this->upvote_count - $this->downvote_count;
     }
 
+    /**
+     * Accessor: Generates a full asset URL for the cover image.
+     */
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) {
-            return null;
-        }
-
-        return asset('storage/' . $this->image);
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
-
-
+    /**
+     * Accessor: Converts raw Markdown body into sanitized HTML.
+     */
     public function getFormattedBodyAttribute(): string
     {
         $converter = new CommonMarkConverter([
@@ -206,32 +243,33 @@ class Post extends Model
             'allow_unsafe_links' => false,
         ]);
 
-        return $converter->convert($this->body)->getContent();
+        return $converter->convert($this->body ?? '')->getContent();
     }
 
+    /**
+     * Re-calculates and persists aggregate vote counts.
+     */
     public function updateVoteCounts(): void
-{
-    $up = $this->votes()->where('value', 1)->count();
-    $down = $this->votes()->where('value', -1)->count();
+    {
+        $this->update([
+            'upvote_count'   => $this->votes()->where('value', 1)->count(),
+            'downvote_count' => $this->votes()->where('value', -1)->count(),
+        ]);
+    }
 
-    $this->update([
-        'upvote_count'   => $up,
-        'downvote_count' => $down,
-    ]);
-}
-
-public function isSavedBy(?User $user): bool
+    /**
+     * Checks if a specific scholar has saved this post.
+     */
+    public function isSavedBy(?User $user): bool
     {
         if (!$user) {
             return false;
         }
-        
-        // Check loaded relationship first to avoid extra query if already eager loaded
+
         if ($this->relationLoaded('savedByUsers')) {
-            return $this->savedByUsers->contains($user);
+            return $this->savedByUsers->contains('id', $user->id);
         }
 
-        return $this->savedByUsers()->where('user_id', $user->id)->exists();
+        return $this->savedByUsers()->wherePivot('user_id', $user->id)->exists();
     }
-
 }

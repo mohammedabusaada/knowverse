@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
 
-            // Authorization
+            // Role-Based Access Control (RBAC) integration
             $table->foreignId('role_id')
                 ->constrained('roles')
                 ->cascadeOnDelete()
@@ -32,19 +32,19 @@ return new class extends Migration
             // Profile & Preferences
             $table->text('bio')->nullable()->comment('Short user biography or description');
             $table->string('profile_picture')->nullable();
-            $table->boolean('public_follow_lists')->default(true); // Added this row
+            $table->boolean('public_follow_lists')->default(true);
 
-            // Reputation & Metrics
+            // Reputation
             $table->integer('reputation_points')
                 ->default(0)
                 ->comment('Cumulative sum of user reputation (synced with reputations table)');
 
-            // Analytics & Tracking
+            // Temporal tracking and administrative status
             $table->timestamp('last_login_at')->nullable()->comment('Date and time of last login');
-
-            // Banned status
             $table->timestamp('banned_at')->nullable();
 
+            // Enables temporary account deactivation (Soft Deletes)
+            $table->softDeletes();
             $table->timestamps();
         });
 

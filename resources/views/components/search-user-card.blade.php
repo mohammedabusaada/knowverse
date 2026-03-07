@@ -1,26 +1,23 @@
-@props([
-    'user',
-])
+@props(['user'])
 
 <a href="{{ route('profile.show', $user->username) }}"
-   class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800
-          border border-gray-200 dark:border-gray-700
-          rounded-xl hover:shadow-md transition">
+   class="group flex items-center gap-4 p-4 bg-paper border border-rule rounded-sm hover:border-ink hover:shadow-md transition-all">
 
-    {{-- Avatar --}}
-    <img
-        src="{{ $user->profile_picture_url }}"
-        alt="{{ $user->display_name }}"
-        class="w-12 h-12 rounded-full object-cover shrink-0">
+    {{-- Scholar Portrait --}}
+    <x-user-avatar :user="$user" size="md" class="grayscale opacity-90 group-hover:grayscale-0 transition-all border border-rule" />
 
-    {{-- User Info --}}
+    {{-- Scholar Metadata --}}
     <div class="flex-1 min-w-0">
-        <p class="font-semibold dark:text-white truncate">
-            {{ $user->display_name }}
-        </p>
+        <p class="font-heading font-bold text-ink truncate text-base group-hover:text-accent transition-colors">
+    {{ $user->display_name }}
+</p>
 
-        <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+        <p class="font-mono text-[10px] uppercase tracking-widest text-muted truncate mt-1">
             {{ '@' . $user->username }}
         </p>
+    </div>
+    
+    <div class="text-muted group-hover:text-ink transition-colors pr-1">
+        &rarr;
     </div>
 </a>

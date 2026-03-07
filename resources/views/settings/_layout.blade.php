@@ -1,51 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex flex-col md:flex-row gap-10 min-h-[70vh]">
+<div class="max-w-4xl mx-auto px-4 py-8 animate-[fadeUp_0.8s_ease_both]">
     
-    {{-- Settings Sidebar --}}
-    <aside class="w-full md:w-64 flex-shrink-0">
-        <div class="sticky top-24 space-y-8">
-            <div>
-                <h2 class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-3 mb-5">
-                    Settings
-                </h2>
-                
-                <nav class="space-y-1.5">
-                    <x-settings-nav-link href="{{ route('profile.edit') }}" :active="request()->routeIs('profile.edit')">
-                        <x-icons.user class="w-5 h-5" />
-                        <span>Public Profile</span>
-                    </x-settings-nav-link>
+    {{-- Configuration Navigation Routing --}}
+    <nav class="flex flex-wrap gap-6 border-b border-rule mb-10 pb-2 font-mono text-[10px] uppercase tracking-widest">
+        <a href="{{ route('profile.show', auth()->user()->username) }}" class="text-muted hover:text-ink transition-colors flex items-center gap-1.5 mr-auto">
+            &larr; Back to Profile
+        </a>
 
-                    <x-settings-nav-link href="{{ route('settings.notifications') }}" :active="request()->routeIs('settings.notifications')">
-                        <x-icons.bell class="w-5 h-5" />
-                        <span>Notifications</span>
-                    </x-settings-nav-link>
+        <a href="{{ route('profile.edit') }}" class="transition-colors pb-2 border-b-2 {{ request()->routeIs('profile.edit') ? 'border-ink text-ink font-bold' : 'border-transparent text-muted hover:text-ink hover:border-ink/50' }}">
+            Public Profile
+        </a>
 
-                    <x-settings-nav-link href="{{ route('settings.security') }}" :active="request()->routeIs('settings.security')">
-                        <x-icons.lock class="w-5 h-5" />
-                        <span>Security</span>
-                    </x-settings-nav-link>
-                </nav>
-            </div>
+        <a href="{{ route('settings.notifications') }}" class="transition-colors pb-2 border-b-2 {{ request()->routeIs('settings.notifications') ? 'border-ink text-ink font-bold' : 'border-transparent text-muted hover:text-ink hover:border-ink/50' }}">
+            Notifications
+        </a>
 
-            <div class="pt-6 border-t-2 border-gray-200 dark:border-gray-800">
-                <a href="{{ route('profile.show', auth()->user()->username) }}" 
-                   class="group flex items-center gap-3 px-3 py-2 text-sm font-bold text-gray-500 hover:text-black dark:hover:text-white transition-colors">
-                    <x-icons.arrow-left class="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                    Back to Profile
-                </a>
-            </div>
-        </div>
-    </aside>
+        <a href="{{ route('settings.security') }}" class="transition-colors pb-2 border-b-2 {{ request()->routeIs('settings.security') ? 'border-ink text-ink font-bold' : 'border-transparent text-muted hover:text-ink hover:border-ink/50' }}">
+            Security
+        </a>
+    </nav>
 
-    {{-- Settings Content Area --}}
-<main class="flex-1">
-        <div class="bg-white dark:bg-black border-2 border-black dark:border-white rounded-2xl shadow-sm min-h-[500px]">
-            <div class="p-6 md:p-10">
-                @yield('settings-content')
-            </div>
-        </div>
+    {{-- Dynamic Settings Module Injection --}}
+    <main class="bg-paper">
+        @yield('settings-content')
     </main>
+
 </div>
 @endsection

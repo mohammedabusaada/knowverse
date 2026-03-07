@@ -7,8 +7,7 @@
     $filters = [
         'all'        => 'Overview',
         'posts'      => 'Discussions',
-        'votes'      => 'Endorsements',
-        'reputation' => 'Standing',
+        'comments'   => 'Replies',
     ];
 @endphp
 
