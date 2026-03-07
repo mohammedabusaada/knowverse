@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             'full_name' => 'System Administrator',
             'role_id' => 2, // Admin
             'password' => 'admin1234',
+            'profile_picture' => null,
         ]);
 
         // 2. Create a fixed Moderator account
@@ -31,6 +32,7 @@ class UserSeeder extends Seeder
             'full_name' => 'Community Moderator',
             'role_id' => 3, // Moderator
             'password' => 'moderator1234',
+            'profile_picture' => null,
         ]);
 
         // Generate multiple random users (mix of user/admin/mod by weight)

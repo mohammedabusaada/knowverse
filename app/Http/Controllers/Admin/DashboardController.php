@@ -8,6 +8,10 @@ use App\Enums\ReportStatus;
 
 class DashboardController extends Controller
 {
+    /**
+     * Provides a high-level administrative overview of the platform's vital signs.
+     * Aggregates core metrics including user growth, content volume, and moderation queue status.
+     */
     public function index()
     {
         return view('admin.dashboard', [

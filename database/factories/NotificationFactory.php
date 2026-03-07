@@ -2,11 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Notification;
-use App\Models\User;
-use App\Models\Post;
-use App\Models\Comment;
-use App\Models\Tag;
+use App\Models\{Notification, User, Post, Comment, Tag};
 use App\Enums\NotificationType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -16,15 +12,14 @@ class NotificationFactory extends Factory
 
     public function definition(): array
     {
-        // Pick a random enum case directly
+        // Dynamically resolve a valid notification state from the backed Enum
         $type = $this->faker->randomElement(NotificationType::cases());
-
         $actor = User::inRandomOrder()->first() ?? User::factory()->create();
         
         $targetId = null;
         $targetType = null;
 
-        // Logic based on the Enum Value
+        // Polymorphic Target Resolution: Map the notification type to the appropriate Eloquent model
         switch ($type) {
             case NotificationType::POST_COMMENTED:
             case NotificationType::POST_UPVOTED:
@@ -53,6 +48,7 @@ class NotificationFactory extends Factory
                 break;
         }
 
+        // Simulate realistic user engagement (e.g., 70% read rate)
         $isRead = $this->faker->boolean(70);
 
         return [
@@ -60,7 +56,7 @@ class NotificationFactory extends Factory
             'actor_id'    => $actor->id,
             'target_id'   => $targetId,
             'target_type' => $targetType,
-            'type'        => $type, // Laravel will handle the Enum casting
+            'type'        => $type, // Utilize Eloquent's native Enum casting for persistence
             'message'     => $this->faker->sentence(),
             'is_read'     => $isRead,
             'read_at'     => $isRead ? $this->faker->dateTimeBetween('-1 month', 'now') : null,

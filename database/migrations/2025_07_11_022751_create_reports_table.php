@@ -17,12 +17,11 @@ return new class extends Migration
             // Polymorphic Target (Post, Comment, etc.)
             $table->morphs('target'); 
 
-            // Categorized reason
-            $table->string('reason_type', 50)->index(); 
-            
-            // Optional custom text from user
+            // Violation categorization based on ReportReason Enum
+            $table->string('reason_type', 50)->index();             
             $table->text('reason')->nullable();
 
+            // Moderation workflow state management
             $table->string('status')->default('pending')->index();
 
             // Admin who handled the report
@@ -36,9 +35,10 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Combined index for the Admin Dashboard filters
+            // Multi-column index to optimize administrative filtering
             $table->index(['reporter_id', 'status']);
 
+            // Idempotency Constraint: Prevents a user from filing multiple active reports on the same entity
             $table->unique(['reporter_id', 'target_type', 'target_id'], 'unique_report_per_user');
         });
     }

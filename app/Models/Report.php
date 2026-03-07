@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
 use App\Enums\ReportStatus;
 use App\Enums\ReportReason;
 
+/**
+ * Moderation Report Entity
+ * Facilitates the reporting and resolution lifecycle of content violations.
+ */
 class Report extends Model
 {
     use HasFactory, SoftDeletes;
@@ -20,43 +24,50 @@ class Report extends Model
         'reason_type',
         'reason',
         'status',
-        'resolved_by', // Standardized naming
+        'resolved_by',
         'resolved_at',
     ];
 
+    /**
+     * Cast attributes to Enums and specific data types to guarantee type safety throughout the application.
+     */
     protected $casts = [
-        'status' => ReportStatus::class,
+        'status'      => ReportStatus::class,
         'reason_type' => ReportReason::class,
         'resolved_at' => 'datetime',
     ];
 
     /**
-     * Set default attribute values.
+     * Default model attributes. Every new report requires moderation by default.
      */
     protected $attributes = [
         'status' => ReportStatus::PENDING,
     ];
 
-    // ------------------------------------------------------------------
+    // ==============================================================================
     // Relationships
-    // ------------------------------------------------------------------
+    // ==============================================================================
 
+    /**
+     * The user who submitted the report.
+     */
     public function reporter(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reporter_id');
     }
 
     /**
-     * The admin who resolved or dismissed this report.
+     * The moderator or administrator who finalized the report.
      */
     public function resolver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'resolved_by');
     }
 
-    /**
-     * Get the reported model (Post, Comment, etc.). 
-     * Bypasses global scopes so admins can view hidden/deleted content.
+/**
+     * Polymorphic Target Resolution
+     * CRITICAL: Bypasses visibility filters to ensure moderators can inspect 
+     * deleted or hidden content that has been flagged. 
      */
     public function target(): MorphTo
     {
@@ -65,9 +76,9 @@ class Report extends Model
             ->withTrashed();
     }
 
-    // ------------------------------------------------------------------
-    // Scopes
-    // ------------------------------------------------------------------
+    // ==============================================================================
+    // Query Scopes
+    // ==============================================================================
 
     public function scopePending($query)
     {
@@ -84,29 +95,29 @@ class Report extends Model
         return $query->where('status', ReportStatus::DISMISSED);
     }
 
-    // ------------------------------------------------------------------
-    // Utility Methods
-    // ------------------------------------------------------------------
+    // ==============================================================================
+    // State Transitions
+    // ==============================================================================
 
     /**
-     * Mark the report as resolved and record the admin responsible.
+     * Transitions the report to a resolved state and logs the acting admin.
      */
     public function markAsResolved(User $admin): void
     {
         $this->update([
-            'status' => ReportStatus::RESOLVED,
+            'status'      => ReportStatus::RESOLVED,
             'resolved_by' => $admin->id,
             'resolved_at' => now(),
         ]);
     }
 
     /**
-     * Mark the report as dismissed.
+     * Transitions the report to a dismissed state and logs the acting admin.
      */
     public function markAsDismissed(User $admin): void
     {
         $this->update([
-            'status' => ReportStatus::DISMISSED,
+            'status'      => ReportStatus::DISMISSED,
             'resolved_by' => $admin->id,
             'resolved_at' => now(),
         ]);

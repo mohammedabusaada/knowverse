@@ -18,7 +18,11 @@ class Comment extends Model
 {
     use HasFactory, SoftDeletes;
 
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'post_id',
         'user_id',
@@ -30,11 +34,68 @@ class Comment extends Model
         'downvote_count',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'upvote_count' => 'integer',
         'downvote_count' => 'integer',
+        'is_hidden' => 'boolean',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Boot the model to apply global visibility and state logic.
+     */
+    protected static function booted()
+    {
+        /**
+         * Scope 1: Visibility Logic
+         * Restricts flagged or hidden content to its owner and system administrators.
+         */
+        static::addGlobalScope('visibility', function ($builder) {
+            // Bypass filtering for administrative routes
+            if (Request::is('admin/*')) {
+                return;
+            }
+
+            if (Auth::check()) {
+                $user = Auth::user();
+
+                // Administrators possess master-view access
+                if ($user->isAdmin()) {
+                    return;
+                }
+
+                $builder->where(function ($query) use ($user) {
+                    $query->where('comments.is_hidden', false)
+                          ->orWhere('comments.user_id', $user->id);
+                });
+            } else {
+                // Anonymous guests see public content only
+                $builder->where('comments.is_hidden', false);
+            }
+        });
+
+        /**
+         * Scope 2: Active Author Logic
+         * Hides responses belonging to temporarily deactivated (soft-deleted) scholars.
+         */
+        static::addGlobalScope('activeAuthor', function ($builder) {
+            if (Request::is('admin/*')) {
+                return;
+            }
+
+            $builder->where(function ($query) {
+                // Include orphaned comments (author is permanently deleted -> user_id is null)
+                // OR include comments where the associated author is currently active.
+                $query->whereNull('comments.user_id')
+                      ->orWhereHas('user');
+            });
+        });
+    }
 
     // ------------------------------------------------------------------
     // Relationships
@@ -48,8 +109,8 @@ class Comment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withDefault([
-            'username' => 'deleted_user',
-            'full_name' => 'Deleted User',
+            'username' => 'deleted_scholar',
+            'full_name' => 'Deleted Scholar',
             'profile_picture' => null,
             'role_id' => 1,
         ]);
@@ -86,77 +147,63 @@ class Comment extends Model
     }
 
     // ------------------------------------------------------------------
-    // Utility
+    // Query Scopes
     // ------------------------------------------------------------------
 
+    public function scopeVisible($query)
+    {
+        return $query->where('comments.is_hidden', false);
+    }
+
+    // ------------------------------------------------------------------
+    // Utility & Helper Methods
+    // ------------------------------------------------------------------
+
+    /**
+     * Calculate the net vote score of the comment.
+     */
     public function totalVotes(): int
     {
         return $this->upvote_count - $this->downvote_count;
     }
 
+    /**
+     * Determine if the current comment is a reply to another comment.
+     */
     public function isReply(): bool
     {
         return !is_null($this->parent_id);
     }
 
-    public function getBodyHtmlAttribute()
+    /**
+     * Accessor: Converts Markdown body into sanitized HTML for display.
+     */
+    public function getBodyHtmlAttribute(): string
     {
         $converter = new CommonMarkConverter([
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]);
 
-        return $converter->convert($this->body)->getContent();
+        return $converter->convert($this->body ?? '')->getContent();
     }
 
+    /**
+     * Synchronizes aggregate vote counts for performance optimization.
+     */
     public function updateVoteCounts(): void
-{
-    $up = $this->votes()->where('value', 1)->count();
-    $down = $this->votes()->where('value', -1)->count();
+    {
+        $this->update([
+            'upvote_count'   => $this->votes()->where('value', 1)->count(),
+            'downvote_count' => $this->votes()->where('value', -1)->count(),
+        ]);
+    }
 
-    $this->update([
-        'upvote_count'   => $up,
-        'downvote_count' => $down,
-    ]);
-}
-
-public function increaseSpamScore(int $amount = 1): void
-{
-    $this->increment('spam_score', $amount);
-}
-public function scopeVisible($query)
-{
-    return $query->where('is_hidden', false);
-}
-
-protected static function booted()
-{
-    static::addGlobalScope('visibility', function ($builder) {
-        // 1. If we are in the admin area, show everything
-        if (Request::is('admin/*')) {
-            return;
-        }
-
-        // 2. Handle authenticated users
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            // Admins see everything everywhere
-            if ($user->isAdmin()) {
-                return;
-            }
-
-            // Users see public content OR their own hidden content 
-            // (so they can see why it was hidden)
-            $builder->where(function ($query) use ($user) {
-                $query->where('is_hidden', false)
-                      ->orWhere('user_id', $user->id);
-            });
-        } else {
-            // 3. Guests only see non-hidden content
-            $builder->where('is_hidden', false);
-        }
-    });
-}
-
+    /**
+     * Increment the spam counter for moderation purposes.
+     */
+    public function increaseSpamScore(int $amount = 1): void
+    {
+        $this->increment('spam_score', $amount);
+    }
 }

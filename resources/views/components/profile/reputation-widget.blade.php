@@ -1,33 +1,25 @@
-@props(['user'])
-
-@php
-    $points = $user->reputation_points ?? 0;
-    
-    $rank = match(true) {
-        $points >= 5000 => 'Sage',
-        $points >= 1000 => 'Expert',
-        $points >= 100 => 'Scholar',
-        default => 'Novice',
-    };
-@endphp
-
-<div class="flex items-center gap-5 p-5 rounded-2xl bg-white dark:bg-black border-2 border-gray-200 dark:border-gray-800 shadow-sm mb-8">
-    <div class="p-3.5 bg-gray-100 dark:bg-gray-900 rounded-xl text-black dark:text-white border border-gray-200 dark:border-gray-800">
-        <x-icons.chart class="w-7 h-7" />
+<div class="bg-paper border border-rule rounded-sm p-8 shadow-sm relative overflow-hidden">
+    {{-- Aesthetic Watermark Background --}}
+    <div class="absolute top-0 right-0 opacity-[0.03] -mr-8 -mt-8 pointer-events-none select-none">
+        <span class="text-[120px] font-serif">§</span>
     </div>
-    
-    <div>
-        <div class="flex items-center gap-3">
-            <span class="text-3xl font-black text-black dark:text-white leading-none">
-                {{ number_format($points) }}
-            </span>
-            <span class="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded bg-black text-white dark:bg-white dark:text-black">
-                {{ $rank }}
-            </span>
+
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-1">
+                Current Standing
+            </p>
+            {{-- Resolves academic title dynamically from the User model --}}
+            <h2 class="font-heading text-4xl font-bold {{ $user->getStandingColor() }}">
+                {{ $user->getAcademicStanding() }}
+            </h2>
         </div>
 
-        <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-2 uppercase tracking-widest">
-            Total Reputation Points
+        <div class="flex gap-10">
+            <div class="text-center md:text-right">
+                <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Total Endorsements</p>
+                <p class="text-3xl font-bold text-ink">{{ number_format($user->reputation_points) }}</p>
+            </div>
         </div>
     </div>
 </div>

@@ -5,10 +5,14 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\NotificationPreference;
 
+/**
+ * Oversees User lifecycle and default configuration provisioning. [cite: 37]
+ */
 class UserObserver
 {
-    /**
-     * Handle the User "created" event.
+/**
+     * Initializes default Notification Preferences upon account provisioning. [cite: 38]
+     * Ensures every new scholar has a standard experience from the first login. [cite: 39, 40]
      */
    public function created(User $user): void
 {

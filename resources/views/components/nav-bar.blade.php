@@ -20,16 +20,16 @@
 
         {{-- Center Search --}}
         <div class="hidden md:flex flex-1 justify-center px-12 max-w-2xl">
-            <x-search-bar placeholder="Search the archive..." />
+            <x-search-bar placeholder="Search discussions..." />
         </div>
 
         {{-- Right Navigation --}}
         <div class="hidden md:flex items-center gap-6 shrink-0">
             
-            {{-- Text-based Theme Toggle --}}
+            {{-- Theme Toggle --}}
             <button 
                 @click="darkMode = !darkMode"
-                class="font-mono text-xs uppercase tracking-[0.1em] text-muted hover:text-ink transition-colors"
+                class="font-mono text-xs uppercase tracking-[0.1em] text-muted hover:text-ink transition-colors focus:outline-none"
             >
                 <span x-show="!darkMode">◑ Dark</span>
                 <span x-show="darkMode" x-cloak>◐ Light</span>
@@ -40,10 +40,10 @@
 
                 <div x-data="{ open: false }" class="relative ml-2">
                     <button @click="open = !open" class="flex items-center focus:outline-none group">
-                        <x-user-avatar :user="auth()->user()" size="sm" class="border border-rule group-hover:border-accent transition-colors" />
+                        <x-user-avatar :user="auth()->user()" size="sm" class="border border-rule group-hover:border-ink transition-colors" />
                     </button>
 
-                    {{-- Classic Dropdown Menu --}}
+                    {{-- User Dropdown Menu --}}
                     <div 
                         x-show="open" 
                         @click.away="open = false"
@@ -57,7 +57,7 @@
                         x-cloak
                     >
                         <div class="px-4 py-2 border-b border-rule mb-1">
-                            <p class="font-mono text-[10px] text-muted uppercase tracking-[0.15em]">Scholar</p>
+                            <p class="font-mono text-[10px] text-muted uppercase tracking-[0.15em]">Signed in as</p>
                             <p class="text-sm font-bold text-ink truncate font-heading">{{ auth()->user()->username }}</p>
                         </div>
 
@@ -72,7 +72,7 @@
                         
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-1.5 text-sm font-serif text-accent-warm hover:bg-aged hover:text-accent-warm transition-colors">
+                            <button type="submit" class="w-full text-left px-4 py-1.5 text-sm font-serif text-accent-warm hover:bg-aged hover:text-accent-warm transition-colors focus:outline-none">
                                 Sign out
                             </button>
                         </form>
@@ -80,13 +80,13 @@
                 </div>
             @else
                 <a href="{{ route('login') }}" class="font-mono text-xs uppercase tracking-[0.1em] text-muted hover:text-ink transition-colors">Sign in</a>
-                <a href="{{ route('register') }}" class="font-mono text-xs uppercase tracking-[0.1em] text-ink border-b border-ink pb-0.5 hover:text-accent hover:border-accent transition-colors">Subscribe</a>
+                <a href="{{ route('register') }}" class="font-mono text-xs uppercase tracking-[0.1em] text-ink border-b border-ink pb-0.5 hover:text-accent transition-colors">Register</a>
             @endauth
         </div>
 
         {{-- Mobile Menu Toggle --}}
         <div class="md:hidden flex items-center">
-            <button @click="mobileOpen = !mobileOpen" class="text-muted hover:text-ink transition-colors">
+            <button @click="mobileOpen = !mobileOpen" class="text-muted hover:text-ink transition-colors focus:outline-none">
                 <span class="font-mono text-xs uppercase tracking-widest" x-show="!mobileOpen">Menu</span>
                 <span class="font-mono text-xs uppercase tracking-widest" x-show="mobileOpen" x-cloak>Close</span>
             </button>
@@ -96,7 +96,7 @@
     {{-- Mobile Menu Panel --}}
     <div x-show="mobileOpen" x-transition x-cloak class="absolute top-full left-0 w-full md:hidden bg-paper border-b border-rule px-6 py-8 shadow-xl">
         <div class="mb-6">
-            <x-search-bar placeholder="Search archive..." />
+            <x-search-bar placeholder="Search discussions..." />
         </div>
 
         @auth
@@ -112,28 +112,28 @@
             </div>
             
             <div class="space-y-3 flex flex-col mb-6">
-                <a href="{{ route('profile.show', auth()->user()->username) }}" class="font-serif text-lg text-ink hover:text-accent transition-colors">My Profile</a>
+                <a href="{{ route('profile.show', auth()->user()->username) }}" class="font-serif text-lg text-ink hover:text-accent-warm transition-colors">My Profile</a>
                 @if(auth()->user()->canModerate())
-                    <a href="{{ route('admin.dashboard') }}" class="font-serif text-lg text-ink hover:text-accent transition-colors">Admin Panel</a>
+                    <a href="{{ route('admin.dashboard') }}" class="font-serif text-lg text-ink hover:text-accent-warm transition-colors">Admin Panel</a>
                 @endif
-                <a href="{{ route('profile.edit') }}" class="font-serif text-lg text-ink hover:text-accent transition-colors">Settings</a>
+                <a href="{{ route('profile.edit') }}" class="font-serif text-lg text-ink hover:text-accent-warm transition-colors">Settings</a>
             </div>
 
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="font-mono text-xs uppercase tracking-[0.1em] text-accent-warm hover:opacity-70 transition-opacity">
+                <button type="submit" class="font-mono text-xs uppercase tracking-[0.1em] text-accent-warm hover:opacity-70 transition-opacity focus:outline-none">
                     Sign out
                 </button>
             </form>
         @else
             <div class="flex flex-col gap-4">
-                <a href="{{ route('login') }}" class="font-serif text-lg text-ink hover:text-accent transition-colors">Sign in</a>
-                <a href="{{ route('register') }}" class="font-serif text-lg text-ink hover:text-accent transition-colors">Create Account</a>
+                <a href="{{ route('login') }}" class="font-serif text-lg text-ink hover:text-accent-warm transition-colors">Sign in</a>
+                <a href="{{ route('register') }}" class="font-serif text-lg text-ink hover:text-accent-warm transition-colors">Create Account</a>
             </div>
         @endauth
 
         <div class="mt-8 pt-6 border-t border-rule">
-            <button @click="darkMode = !darkMode" class="font-mono text-xs uppercase tracking-[0.1em] text-muted hover:text-ink transition-colors">
+            <button @click="darkMode = !darkMode" class="font-mono text-xs uppercase tracking-[0.1em] text-muted hover:text-ink transition-colors focus:outline-none">
                 <template x-if="darkMode"><span>◐ Switch to Light Mode</span></template>
                 <template x-if="!darkMode"><span>◑ Switch to Dark Mode</span></template>
             </button>

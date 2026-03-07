@@ -19,19 +19,18 @@ return new class extends Migration
             $table->string('action')
                 ->comment('Triggering event (e.g., post_upvote, comment_accepted)');
 
-            // Delta: how much the reputation changed (+ or -)
+            // Delta: how much the reputation changed (+ or -) (impact on user standing)
             $table->integer('delta')
                 ->comment('Change in reputation points (e.g., +10, -2)');
 
             // Polymorphic source of reputation change (post, comment, etc.)
-            $table->nullableMorphs('source'); // Polymorphic origin (post, comment, etc.)
+            $table->nullableMorphs('source');
 
-            // Optional description or moderator/system note
             $table->text('note')->nullable();
 
             $table->timestamp('created_at')->useCurrent();
 
-            // Optimized index for user history queries
+            // Query optimization for historical reputation timeline rendering
             $table->index(['user_id', 'created_at']);
         });
     }

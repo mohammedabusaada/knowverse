@@ -15,36 +15,21 @@ class UserActivityController extends Controller
      */
     public function index(Request $request, User $user)
     {
-        $this->authorize('view', $user);
 
         $viewer = Auth::user();
         $type = $request->query('type', 'all');
 
-        // Start the query using our Model scopes
         $query = UserActivity::forUser($user)
             ->withTargets()
             ->feed();
 
-        // Apply semantic filters
         match ($type) {
-            'posts' => $query->whereIn('action', [
-                'post_created', 
-                'comment_created', 
-                'best_answer_selected'
-            ]),
-
-            'votes' => $query->whereIn('action', [
-                'vote_up', 
-                'vote_down', 
-                'vote_removed'
-            ]),
-
-            'reputation' => $query->where('action', 'reputation_changed'),
-
-            default => null,
+            'posts'    => $query->where('action', 'post_created'),
+            'comments' => $query->where('action', 'comment_created'),
+            default    => null,
         };
 
-        // Fetch and filter by visibility policy
+        // Secure Item-Level Filtering
         $activities = $query->get()->filter(function ($activity) use ($viewer) {
             return $viewer 
                 ? $viewer->can('view', $activity) 

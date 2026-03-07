@@ -5,13 +5,13 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * System Namespace Protection.
+ * Prevents users from hijacking critical application routes (e.g., /admin, /posts) 
+ * via dynamic profile routing /{username}.
+ */
 class ReservedUsername implements ValidationRule
 {
-
-    /**
-     * The list of reserved words that cannot be used as usernames.
-     * Adding 'posts', 'tags', etc., prevents users from breaking resource routes.
-     */
     protected array $reserved = [
         'search', 'admin', 'dashboard', 'settings', 'login', 
         'register', 'logout', 'api', 'posts', 'comments', 

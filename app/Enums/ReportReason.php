@@ -2,12 +2,17 @@
 
 namespace App\Enums;
 
+/**
+ * Defines the standard set of violation reasons across the platform.
+ * Backed Enums guarantee data integrity at the application layer before interacting 
+ * with the database, preventing injection of invalid report categories.
+ */
 enum ReportReason: string
 {
     case SPAM = 'spam';
     case HARASSMENT = 'harassment';
     case HATE_SPEECH = 'hate_speech';
-    case VIOLENCE = 'violence'; // Added to match the Moderation Service logic
+    case VIOLENCE = 'violence';
     case MISINFORMATION = 'misinformation';
     case INAPPROPRIATE_CONTENT = 'inappropriate_content';
     case COPYRIGHT = 'copyright';
@@ -15,7 +20,8 @@ enum ReportReason: string
     case OTHER = 'other';
 
     /**
-     * Label shown to users in dropdowns/tables
+     * Provides a human-readable, presentation-ready label for the frontend UI.
+     * * @return string
      */
     public function label(): string
     {
@@ -33,7 +39,9 @@ enum ReportReason: string
     }
 
     /**
-     * Optional: Longer description for tooltips or modal details
+     * Provides detailed contextual descriptions for moderation guidelines 
+     * and user tooltips during the reporting process.
+     * * @return string
      */
     public function description(): string
     {
@@ -46,11 +54,14 @@ enum ReportReason: string
     }
 
     /**
-     * Reasons allowed per target type
+     * Dynamically filters available report reasons based on the target entity context.
+     * This prevents illogical reports (e.g., reporting a User Profile for 'Copyright violation'), 
+     * maintaining a coherent User Experience (UX).
+     * * @param string $targetType The fully qualified class name or morph map alias.
+     * @return array<ReportReason>
      */
     public static function for(string $targetType): array
     {
-        // Normalize the target type (e.g., from Post::class to 'post')
         $type = strtolower(class_basename($targetType));
 
         return match ($type) {

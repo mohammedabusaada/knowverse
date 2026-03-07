@@ -8,6 +8,11 @@ use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\ReportStatus;
 
+/**
+ * Queue Spam Mitigation: Idempotency Guard.
+ * Ensures a scholar cannot flood the moderation dashboard by repeatedly reporting 
+ * the exact same entity while it is still pending review.
+ */
 class NoDuplicateReport implements ValidationRule
 {
     public function __construct(
@@ -17,11 +22,12 @@ class NoDuplicateReport implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // If targetType is null (invalid input), let the 'in:post,comment,user' validator handle it
+        // Bypass evaluation if the target type is inherently invalid
         if (!$this->targetType) {
             return;
         }
 
+        // Query existing active reports by the authenticated user
         $exists = Report::where('reporter_id', Auth::id())
             ->where('target_type', $this->targetType)
             ->where('target_id', $this->targetId)

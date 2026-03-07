@@ -2,10 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\UserActivity;
-use App\Models\User;
-use App\Models\Post;
-use App\Models\Comment;
+use App\Models\{UserActivity, User, Post, Comment};
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserActivityFactory extends Factory
@@ -14,21 +11,23 @@ class UserActivityFactory extends Factory
 
     public function definition(): array
     {
+        // Define the universe of trackable domain events
         $actions = [
             'post_created',
             'comment_created',
             'vote_up',
             'vote_down',
             'vote_removed',
-            'best_answer_selected',
+            'authors_pick_selected',
             'reputation_changed',
             'login',
             'logout',
         ];
 
         $action = $this->faker->randomElement($actions);
-
         $target = null;
+
+        // Polymorphic resolution: Attach the audit trail to the corresponding database entity
         if (str_contains($action, 'post')) {
             $target = Post::inRandomOrder()->first();
         } elseif (str_contains($action, 'comment') || str_contains($action, 'vote')) {

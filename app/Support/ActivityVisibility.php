@@ -14,7 +14,7 @@ class ActivityVisibility
             // Public content creation
             'post_created'            => 'public',
             'comment_created'         => 'public',
-            'best_answer_selected'    => 'public',
+            'authors_pick_selected'    => 'public',
             'user_followed_user'      => 'public',
             'user_followed_tag'       => 'public',
 

@@ -14,17 +14,19 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            // Ensure post_id and user_id exist or create them
+            // Maintain referential integrity by explicitly linking to existing or newly generated entities
             'post_id' => Post::inRandomOrder()->value('id') ?? Post::factory(),
             'user_id' => User::inRandomOrder()->value('id') ?? User::factory(),
             
-            'parent_id' => null, // Will be handled for replies in the Seeder
+            // Relational hierarchy (threaded replies) is orchestrated at the Seeder level
+            'parent_id' => null, 
             'body' => $this->faker->paragraph(rand(1, 3)),
             
-            // New moderation fields
-            'is_hidden' => $this->faker->boolean(5), // 5% chance to be hidden
-            'spam_score' => $this->faker->numberBetween(0, 2), // Start with a low spam score
+            // Simulate realistic moderation states with weighted probabilities
+            'is_hidden' => $this->faker->boolean(5), // 5% probability of being administratively concealed
+            'spam_score' => $this->faker->numberBetween(0, 2), // Baseline heuristic spam score
             
+            // Seed realistic platform engagement metrics
             'upvote_count' => $this->faker->numberBetween(0, 100),
             'downvote_count' => $this->faker->numberBetween(0, 20),
             'created_at' => $this->faker->dateTimeThisYear(),

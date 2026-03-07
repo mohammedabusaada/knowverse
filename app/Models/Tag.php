@@ -21,7 +21,9 @@ class Tag extends Model
         'updated_at' => 'datetime',
     ];
 
-     // AUTO GENERATE SLUG ON CREATE/UPDATE
+    /**
+     * Bootstrap model events to maintain SEO-friendly URL slugs automatically.
+     */
     protected static function boot()
     {
         parent::boot();
@@ -35,19 +37,33 @@ class Tag extends Model
         });
     }
 
-     // RELATIONSHIP: POSTS
+    // ==============================================================================
+    // Relationships
+    // ==============================================================================
+
+    /**
+     * Relationship: Associated discussions within this topic.
+     */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'post_tags');
     }
 
-    // RELATIONSHIP: FOLLOWERS (users who follow this tag)
+    /**
+     * Relationship: Scholars who have subscribed to updates for this topic.
+     */
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tag_follows');
     }
 
-    // SCOPE: POPULAR TAGS
+    // ==============================================================================
+    // Scopes & Discovery
+    // ==============================================================================
+
+    /**
+     * Filters tags based on activity volume (Post count).
+     */
     public function scopePopular($query, int $limit = 10)
     {
         return $query->withCount('posts')
@@ -55,17 +71,19 @@ class Tag extends Model
                      ->limit($limit);
     }
 
-    // REQUIRED SCOPE FOR FILTERING POSTS BY TAGS
-public function scopeFilterByTags($query, ?array $tagIds = null)
-{
-    if (!$tagIds) {
-        return $query;
-    }
+    /**
+     * Utility scope to filter a result set based on a specific array of tag IDs.
+     */
+    public function scopeFilterByTags($query, ?array $tagIds = null)
+    {
+        if (!$tagIds) {
+            return $query;
+        }
 
-    return $query->whereHas('posts', function ($postQuery) use ($tagIds) {
-        $postQuery->whereHas('tags', function ($tagQuery) use ($tagIds) {
-            $tagQuery->whereIn('tags.id', $tagIds);
+        return $query->whereHas('posts', function ($postQuery) use ($tagIds) {
+            $postQuery->whereHas('tags', function ($tagQuery) use ($tagIds) {
+                $tagQuery->whereIn('tags.id', $tagIds);
+            });
         });
-    });
-}
+    }
 }

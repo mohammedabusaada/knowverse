@@ -1,17 +1,15 @@
 @extends('settings._layout')
 
 @section('settings-content')
-    <div class="mb-10">
-        <h1 class="text-3xl font-black text-black dark:text-white">Notification Preferences</h1>
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
-            Control which activities trigger a notification alert.
+    <div class="mb-8 border-b border-rule pb-4">
+        <h1 class="font-heading text-3xl font-bold text-ink">Notifications Preferences</h1>
+        <p class="font-serif text-[15px] italic text-muted mt-2">
+            Configure the notifications you wish to receive from the community.
         </p>
     </div>
 
     @if (session('success'))
-        <x-alert type="success" class="mb-8">
-            {{ session('success') }}
-        </x-alert>
+        <x-alert type="success">{{ session('success') }}</x-alert>
     @endif
 
     <form method="POST" action="{{ route('settings.notifications.update') }}" class="space-y-12">
@@ -25,18 +23,21 @@
 
             @if(count($visibleTypes) > 0)
                 <section>
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-5 border-b-2 border-gray-100 dark:border-gray-800 pb-2">
+                    <h3 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-5 border-b border-rule pb-2">
                         {{ ucfirst($categoryName) }}
                     </h3>
 
                     <div class="space-y-6">
                         @foreach ($visibleTypes as $type)
+                            @php
+                                // Fetch the human-readable label from the config file
+                                $label = config("notification-preferences.categories.{$type->value}.label", str_replace('_', ' ', ucfirst($type->value)));
+                            @endphp
                             <div class="flex items-center justify-between group">
-                                <div>
-                                    <label for="pref_{{ $type->value }}" class="text-sm font-bold text-black dark:text-white cursor-pointer block mb-1">
-                                        {{ str_replace('_', ' ', ucfirst($type->value)) }}
+                                <div class="pr-6">
+                                    <label for="pref_{{ $type->value }}" class="text-base font-serif font-bold text-ink cursor-pointer block mb-1 group-hover:text-accent-warm transition-colors">
+                                        {{ $label }}
                                     </label>
-                                    <p class="text-xs font-medium text-gray-500">Receive alerts for this activity</p>
                                 </div>
 
                                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
@@ -48,12 +49,7 @@
                                         class="sr-only peer"
                                         {{ $user->notificationEnabled($type) ? 'checked' : '' }}
                                     >
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-800 
-                                        peer-checked:after:translate-x-full peer-checked:after:border-white 
-                                        after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-                                        after:bg-white after:border-gray-300 after:border after:rounded-full 
-                                        after:h-5 after:w-5 after:transition-all dark:border-gray-600 
-                                        peer-checked:bg-black dark:peer-checked:bg-white"></div>
+                                    <div class="w-11 h-6 bg-rule rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-paper after:border after:border-rule after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ink"></div>
                                 </label>
                             </div>
                         @endforeach
@@ -62,10 +58,10 @@
             @endif
         @endforeach
 
-        <div class="pt-8 border-t-2 border-gray-200 dark:border-gray-800 flex justify-end">
-            <x-button type="submit" primary size="lg">
+        <div class="pt-8 border-t border-rule flex justify-end">
+            <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
                 Save Preferences
-            </x-button>
+            </button>
         </div>
     </form>
 @endsection

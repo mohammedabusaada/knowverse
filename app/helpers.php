@@ -20,8 +20,8 @@ function activity_description(App\Models\UserActivity $activity): string
         'vote_down' => 
             "Downvoted a " . class_basename($target),
 
-        'best_answer_selected' => 
-            "Selected a best answer",
+        'authors_pick_selected' => 
+            "Highlighted a response as Author's Pick",
 
         'reputation_changed' => 
             "Reputation changed " . e($activity->details),

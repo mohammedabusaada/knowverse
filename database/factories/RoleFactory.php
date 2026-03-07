@@ -12,7 +12,8 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->randomElement(['user', 'admin']),
+            // Seed foundational RBAC (Role-Based Access Control) definitions
+            'name' => $this->faker->unique()->randomElement(['user', 'admin', 'moderator']),
             'description' => $this->faker->sentence(6),
         ];
     }

@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\NotificationService;
-use App\Services\ActivityService;
+use App\Services\{NotificationService, ActivityService};
 use App\Enums\NotificationType;
 use App\Rules\CleanContent;
-
 
 class CommentController extends Controller
 {
     /**
-     * Store a new comment or reply.
+     * Persists a new response to a discussion.
+     * Enforces strict content sanitization via the CleanContent rule to mitigate XSS vulnerabilities.
      */
     public function store(Request $request)
     {
@@ -25,14 +24,13 @@ class CommentController extends Controller
         ]);
 
         $validated['user_id'] = Auth::id();
+        Comment::create($validated);
 
-        $comment = Comment::create($validated);
-
-        return back()->with('status', 'Comment added.');
+        return back()->with('status', 'Response successfully added to the discussion.');
     }
 
     /**
-     * Update an existing comment.
+     * Updates an existing comment while verifying authorization policies.
      */
     public function update(Request $request, Comment $comment)
     {
@@ -44,26 +42,24 @@ class CommentController extends Controller
 
         $comment->update($validated);
 
-        return back()->with('status', 'Comment updated successfully.');
+        return back()->with('status', 'Response refined successfully.');
     }
 
     /**
-     * Delete a comment.
+     * Executes a soft-delete on the comment, preserving the relational integrity of child replies.
      */
     public function destroy(Comment $comment)
     {
         $this->authorize('delete', $comment);
 
         $comment->delete();
-
-        return back()->with('status', 'Comment deleted.');
+        return back()->with('status', 'Response moved to trash.');
     }
 
     /**
-     * Mark comment as best.
-     */
-    /**
-     * Mark comment as best.
+     * Elevates a comment to "Author's Pick".
+     * Orchestrates a multi-step transaction: updating post state, awarding reputation points, 
+     * logging activity, and dispatching real-time notifications.
      */
     public function markAsBest(Comment $comment)
     {
@@ -71,63 +67,36 @@ class CommentController extends Controller
 
         $post = $comment->post;
 
-        // Prevent re-selecting
+        // Idempotency check: prevent duplicate awards if already marked as Author's Pick
         if ($post->best_comment_id === $comment->id) {
             return back();
         }
 
-        // Set best comment
-        $post->update([
-            'best_comment_id' => $comment->id,
-        ]);
+        $post->update(['best_comment_id' => $comment->id]);
 
-        // --------------------------------------------------
-        // Reputation
-        // --------------------------------------------------
+        // Reward the ecosystem participants
+        $comment->user->addReputation('authors_pick_received', null, $comment);
+        $post->user->addReputation('authors_pick_awarded', null, $comment);
 
-        // Comment owner (receiver)
-        $comment->user->addReputation(
-            'best_answer_received',
-            null,
-            $comment
-        );
+        ActivityService::authorsPickSelected($post->user, $comment);
 
-        // Post owner (actor)
-        $post->user->addReputation(
-            'best_answer_awarded',
-            null,
-            $comment
-        );
-
-        // --------------------------------------------------
-        // Activity (public)
-        // --------------------------------------------------
-        ActivityService::bestAnswerSelected(
-            $post->user,
-            $comment
-        );
-
-        // --------------------------------------------------
-        // Notification (ONLY receiver)
-        // --------------------------------------------------
         app(NotificationService::class)->notify(
             recipient: $comment->user,
-            type: NotificationType::BEST_ANSWER_RECEIVED,
+            type: NotificationType::AUTHORS_PICK_RECEIVED,
             actor: $post->user,
             target: $comment
         );
 
-        // Check if the current logged-in user ID matches the post owner ID to show the reputation toast
-        if ($post->user_id === Auth::id()) {
-            return back()->with([
-                'status' => 'Best comment selected.',
-                'reputation_delta' => config('reputation.points.best_answer_awarded', 2),
-            ]);
-        }
-
-        return back()->with('status', 'Best comment selected.');
+        return back()->with([
+            'status' => 'Response successfully accepted as the Author\'s Pick.',
+            'reputation_delta' => config('reputation.points.authors_pick_awarded', 2), 
+        ]);
     }
 
+    /**
+     * Reverses the "Author's Pick" designation.
+     * Executes a reputation rollback to maintain ledger accuracy.
+     */
     public function unmarkBest(Comment $comment)
     {
         $this->authorize('unmarkBest', $comment);
@@ -135,25 +104,16 @@ class CommentController extends Controller
         $post = $comment->post;
 
         if ($post->best_comment_id === $comment->id) {
-
-            // Undo rep for comment author
-            $comment->user->removeReputation('best_answer_received', $comment);
-
-            // Undo rep for post author
-            $post->user->removeReputation('best_answer_awarded', $comment);
-
-            // Remove best comment
+            $comment->user->removeReputation('authors_pick_received', $comment);
+            $post->user->removeReputation('authors_pick_awarded', $comment);
             $post->update(['best_comment_id' => null]);
 
-            // Compare IDs to ensure only the actor sees the reputation deduction toast
-            if ($post->user_id === Auth::id()) {
-                return back()->with([
-                    'status' => 'Best comment removed.',
-                    'reputation_delta' => -abs(config('reputation.points.best_answer_awarded', 2)),
-                ]);
-            }
+            return back()->with([
+                'status' => 'Author\'s Pick designation retracted.',
+                'reputation_delta' => -abs(config('reputation.points.authors_pick_awarded', 2)),
+            ]);
         }
 
-        return back()->with('status', 'Best comment removed.');
+        return back();
     }
 }

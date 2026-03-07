@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Post;
-use App\Models\User;
-use App\Models\Tag;
+use App\Models\{Post, User, Tag};
 
 class SearchController extends Controller
 {
     /**
-     * Main search results page.
+     * Handles the primary search interface, distributing queries across 
+     * Discussions, Scholars, and Topics (Tags).
      */
     public function index(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
         $type = $request->query('type', 'posts');
-        // Handle array of tags from query string
+        
+        // Handle array of tags from query string (used for deep filtering)
         $selectedTags = (array) $request->query('tags', []);
 
-        // Initial state for empty search (unless tags are selected)
+        // Fast-path return for completely empty queries
         if ($q === '' && empty($selectedTags)) {
             return view('search.results', [
                 'q' => '',
@@ -32,10 +32,9 @@ class SearchController extends Controller
             ]);
         }
 
-        // 1. Define Base Queries
+        // 1. Construct Base Queries
         $postsBase = Post::published();
         
-        // Filter by Keyword if present
         if ($q !== '') {
             $postsBase->where(function ($query) use ($q) {
                 $query->where('title', 'like', "%{$q}%")
@@ -43,7 +42,6 @@ class SearchController extends Controller
             });
         }
 
-        // Filter by Tags if present
         if (!empty($selectedTags)) {
             $postsBase->whereHas('tags', function ($query) use ($selectedTags) {
                 $query->whereIn('name', $selectedTags);
@@ -57,14 +55,14 @@ class SearchController extends Controller
 
         $tagsBase = Tag::where('name', 'like', "%{$q}%");
 
-        // 2. Calculate Counts
+        // 2. Aggregate counts for Tab Badges
         $counts = [
             'posts' => $postsBase->count(),
             'users' => $usersBase->count(),
             'tags'  => $tagsBase->count(),
         ];
 
-        // 3. Load Paginated Data
+        // 3. Resolve specific paginated dataset based on active Tab ($type)
         $posts = $users = $tags = collect();
 
         if ($type === 'posts') {
@@ -79,12 +77,13 @@ class SearchController extends Controller
     }
 
     /**
-     * Live search suggestions (JSON for Alpine.js/Search Bar).
+     * Provides a fast, lightweight JSON endpoint for Alpine.js Live Search suggestions.
      */
     public function suggestions(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
 
+        // Prevent heavy DB queries for single-character searches
         if (strlen($q) < 2) {
             return response()->json(['posts' => [], 'users' => [], 'tags' => []]);
         }
@@ -98,11 +97,11 @@ class SearchController extends Controller
             'users' => User::where('username', 'like', "%{$q}%")
                 ->orWhere('full_name', 'like', "%{$q}%")
                 ->limit(5)
-                ->get(['id', 'username', 'full_name']),
+                ->get(['id', 'username', 'full_name', 'profile_picture']), // Include avatar for UI
 
             'tags' => Tag::where('name', 'like', "%{$q}%")
                 ->limit(5)
-                ->get(['id', 'name']),
+                ->get(['id', 'name', 'slug']), // Include slug for routing
         ]);
     }
 }

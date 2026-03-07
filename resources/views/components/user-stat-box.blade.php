@@ -3,11 +3,11 @@
     'label' => '',
 ])
 
-<div class="p-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center transition hover:border-black dark:hover:border-white">
-    <div class="text-3xl font-black text-black dark:text-white mb-1">
-        {{ $value }}
+<div class="p-5 bg-paper rounded-sm border border-rule text-center transition-colors hover:border-ink">
+    <div class="text-3xl font-heading font-black text-ink mb-1">
+        {{ is_numeric($value) ? number_format($value) : $value }}
     </div>
-    <div class="text-gray-500 dark:text-gray-400 text-[10px] uppercase font-bold tracking-widest">
+    <div class="text-muted text-[10px] uppercase font-mono font-bold tracking-widest">
         {{ $label }}
     </div>
 </div>

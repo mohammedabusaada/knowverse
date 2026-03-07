@@ -10,15 +10,15 @@ class ActivityPresenter
     public static function title(UserActivity $activity): string
     {
         return match ($activity->action) {
-            'post_created'           => 'Created a post',
-            'comment_created'        => 'Commented',
+            'post_created'           => 'Published a discussion',
+            'comment_created'        => 'Contributed a response',
             'vote_up'                => 'Upvoted',
             'vote_down'              => 'Downvoted',
-            'vote_removed'           => 'Removed a vote',
-            'best_answer_selected'   => 'Selected a best answer',
-            'reputation_changed'     => 'Reputation changed',
-            'user_followed_user' => 'Started following a user',
-            'user_followed_tag'  => 'Started following a tag',
+            'vote_removed'           => 'Retracted a vote',
+            'authors_pick_selected'   => 'Accepted a response (Author\'s Pick)',
+            'reputation_changed'     => 'Reputation updated',
+            'user_followed_user'     => 'Followed a scholar',
+            'user_followed_tag'      => 'Followed a topic',
             'login'                  => 'Logged in',
             'logout'                 => 'Logged out',
             default                  => Str::headline($activity->action),

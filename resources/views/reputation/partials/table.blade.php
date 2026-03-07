@@ -1,5 +1,5 @@
 <div class="border border-rule rounded-sm bg-paper shadow-sm">
-    <div class="divide-y divide-rule">
+    <div class="flex flex-col">
         @forelse ($history as $entry)
             <x-reputation-item 
                 :type="$entry->action" 
@@ -10,8 +10,8 @@
             />
         @empty
             <div class="p-16 text-center bg-aged/10">
-                <span class="block text-2xl mb-2 opacity-50">✦</span>
-                <p class="font-serif text-muted italic text-[15px]">No standing history recorded yet.</p>
+                <span class="block text-2xl mb-2 opacity-50 text-muted">✦</span>
+                <p class="font-serif text-muted italic text-[15px]">The ledger is empty. No scholarly endorsements have been recorded yet.</p>
             </div>
         @endforelse
     </div>

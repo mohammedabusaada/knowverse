@@ -51,8 +51,8 @@
                     {{ $target instanceof \App\Models\Post ? 'a post' : 'a comment' }}
                 @break
 
-                @case('best_answer_selected')
-                    <span class="font-medium">Selected a best answer</span>
+                @case('authors_pick_selected')
+                    <span class="font-medium">Highlighted an Author's Pick</span>
                 @break
 
                 @case('reputation_changed')

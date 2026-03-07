@@ -5,9 +5,9 @@
     
     {{-- Header & Search --}}
     <div class="mb-12">
-        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink tracking-tight mb-4">Explore Disciplines</h1>
+        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink tracking-tight mb-4">Explore Tags</h1>
         <p class="font-serif text-lg text-muted italic mb-8">
-            Follow your favorite academic topics to curate your personal archive.
+            Follow your favorite academic topics.
         </p>
 
         {{-- Search Filter --}}
@@ -18,7 +18,7 @@
             <input 
                 x-model="search"
                 type="text" 
-                placeholder="Filter disciplines..." 
+                placeholder="Filter tags..." 
                 class="block w-full pl-6 pr-3 py-2 bg-transparent border-none text-ink font-serif text-lg placeholder:text-muted focus:ring-0 transition-colors"
             >
         </div>
@@ -57,7 +57,7 @@
                     </p>
 
                     <div class="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-muted">
-                        <span>{{ number_format($tag->posts_count) }} entries</span>
+                        <span>{{ number_format($tag->posts_count) }} discussions</span>
                         <span>&bull;</span>
                         <a href="{{ route('tags.show', $tag->slug) }}" class="text-ink hover:text-accent transition-colors">
                             Explore &rarr;

@@ -13,7 +13,7 @@ class IsAdmin
     {
         $user = $request->user();
 
-        // Allow admin (2), and moderator (3)
+        // Privilege Verification: Permit only System Administrators (2) and Moderators (3)
         if (!$user || !in_array($user->role_id, [2, 3])) {
             abort(403, 'Unauthorized. Admins and Moderators only.');
         }

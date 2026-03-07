@@ -73,7 +73,7 @@ class AppServiceProvider extends ServiceProvider
                 ->salutation("Regards,\n" . config('app.name') . ' Academic Community');
         });
 
-        // Register custom Blade directives (Monochrome Update)
+        // Register custom Blade directives
         Blade::directive('highlight', function ($expression) {
             return "<?php
                 echo preg_replace(

@@ -7,6 +7,10 @@ use App\Models\Tag;
 use App\Enums\NotificationType;
 use Illuminate\Auth\Access\AuthorizationException;
 
+/**
+ * Manages the platform's Social Graph interactions (Following Users/Tags).
+ * Handles relationship persistence, idempotent operations, and event propagation.
+ */
 class FollowService
 {
     public function __construct(
@@ -14,40 +18,31 @@ class FollowService
     ) {}
 
     // ==========================================================
-    // User ↔ User
+    // User ↔ User Subgraph
     // ==========================================================
 
-    /**
-     * Follow a user.
-     *
+/**
+     * Establishes a directional connection between two scholars.
      * @throws AuthorizationException
      */
     public function followUser(User $actor, User $target): void
     {
-        // --------------------------------------------------
-        // Guards
-        // --------------------------------------------------
+        // 1. Architectural Guard: Prevent self-referential relationships
         if ($actor->id === $target->id) {
             throw new AuthorizationException('You cannot follow yourself.');
         }
 
+        // 2. Idempotency Check: Halt if the relationship already exists
         if ($actor->following()->whereKey($target->id)->exists()) {
             return;
         }
 
-        // --------------------------------------------------
-        // Persist
-        // --------------------------------------------------
+        // 3. Persist Edge in the Social Graph
         $actor->following()->attach($target->id);
 
-        // --------------------------------------------------
-        // Activity
-        // --------------------------------------------------
+        // 4. Propagate State Changes (Activity & Notification)
         ActivityService::userFollowedUser($actor, $target);
 
-        // --------------------------------------------------
-        // Notification (respects preferences automatically)
-        // --------------------------------------------------
         $this->notifications->notify(
             recipient: $target,
             type: NotificationType::USER_FOLLOWED,
@@ -55,8 +50,8 @@ class FollowService
         );
     }
 
-    /**
-     * Unfollow a user.
+/**
+     * Severs an existing user-to-user connection.
      */
     public function unfollowUser(User $actor, User $target): void
     {
@@ -64,31 +59,26 @@ class FollowService
     }
 
     // ==========================================================
-    // User ↔ Tag
+    // User ↔ Tag Subgraph
     // ==========================================================
 
-    /**
-     * Follow a tag.
+/**
+     * Subscribes a user to a specific taxonomy/topic stream.
      */
     public function followTag(User $actor, Tag $tag): void
     {
+        // Idempotency check to prevent duplicate pivot rows
         if ($actor->followedTags()->whereKey($tag->id)->exists()) {
             return;
         }
 
-        // --------------------------------------------------
-        // Persist
-        // --------------------------------------------------
+        // Persist Subscription
         $actor->followedTags()->attach($tag->id);
 
-        // --------------------------------------------------
-        // Activity
-        // --------------------------------------------------
+        // Propagate State Changes
         ActivityService::userFollowedTag($actor, $tag);
 
-        // --------------------------------------------------
-        // Notification (if tag has an owner)
-        // --------------------------------------------------
+        // Notify the topic's creator if applicable
         if ($tag->user) {
             $this->notifications->notify(
                 recipient: $tag->user,
@@ -100,7 +90,7 @@ class FollowService
     }
 
     /**
-     * Unfollow a tag.
+     * Unsubscribes a user from a topic stream.
      */
     public function unfollowTag(User $actor, Tag $tag): void
     {

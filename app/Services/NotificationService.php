@@ -6,8 +6,13 @@ use App\Enums\NotificationType;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * Centralized Notification Dispatcher.
+ * Orchestrates multi-channel alerts (Database & WebSockets) while enforcing user privacy 
+ * preferences and preventing notification fatigue (Deduplication).
+ */
 class NotificationService
 {
     public function __construct(
@@ -15,7 +20,7 @@ class NotificationService
     ) {}
 
     /**
-     * Create and send a notification to a user.
+     * Dispatch an alert, subject to deduplication and privacy policy constraints.
      */
     public function notify(
         User $recipient,
@@ -25,18 +30,17 @@ class NotificationService
         ?string $message = null
     ): ?Notification {
 
-        // 1. Prevent self-notifications
+        // 1. Guard: Silent termination if the actor and recipient are identical (Self-action)
         if ($actor && $actor->id === $recipient->id) {
             return null;
         }
 
-        // 2. Preferences Check
+        // 2. Guard: Respect explicit opt-out preferences (unless it is a mandatory system alert)
         if (!$type->isMandatory() && !$this->preferences->shouldNotify($recipient, $type)) {
             return null;
         }
 
-        // 3. Handle "Deduplication" for specific types (e.g., Votes)
-        // We don't want to create a new row every time someone clicks upvote/downvote
+        // 3. Optimization: Deduplicate high-frequency events (e.g., toggling upvotes rapidly)
         if ($this->shouldDeDuplicate($type)) {
             $existing = Notification::where([
                 'user_id'     => $recipient->id,
@@ -46,17 +50,18 @@ class NotificationService
             ])->first();
 
             if ($existing) {
+                // Surface the existing notification back to the top of the inbox feed
                 $existing->update([
-                    'actor_id' => $actor?->id, // Update to the latest person who interacted
-                    'is_read'  => false,       // Pop it back up as unread
-                    'created_at' => now(),     // Bring to top of list
+                    'actor_id'   => $actor?->id,
+                    'is_read'    => false,
+                    'created_at' => now(), 
                 ]);
                 return $existing;
             }
         }
 
-        // 4. Create notification record
-        return Notification::create([
+        // 4. Persistence: Create a new definitive database record
+        $notification = Notification::create([
             'user_id'     => $recipient->id,
             'actor_id'    => $actor?->id,
             'type'        => $type,
@@ -65,10 +70,21 @@ class NotificationService
             'target_type' => $target ? get_class($target) : null,
             'is_read'     => false,
         ]);
+
+        // 5. Real-Time Delivery: Broadcast to connected WebSocket clients
+        try {
+            event(new \App\Events\RealTimeNotification($notification));
+        } catch (\Exception $e) {
+            // Graceful Degradation: Log failure silently to prevent the main HTTP request from crashing 
+            // if the external socket server (e.g., Reverb/Pusher) goes offline.
+            Log::warning('RealTimeNotification Broadcast Failed: ' . $e->getMessage());
+        }
+
+        return $notification;
     }
 
     /**
-     * Determine which notification types should not be duplicated.
+     * Identifies actions that require state updates (upsert) rather than continuous row creation.
      */
     protected function shouldDeDuplicate(NotificationType $type): bool
     {
@@ -82,7 +98,7 @@ class NotificationService
     }
 
     /**
-     * Mark all unread notifications as read.
+     * Bulk operational utility to clear the user's active inbox state.
      */
     public function markAllAsRead(User $user): int
     {

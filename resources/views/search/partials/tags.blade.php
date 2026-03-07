@@ -1,18 +1,18 @@
 @if($tags->isEmpty())
-    <x-search-empty icon="tag" message="No tags found matching your search." />
+    <div class="py-20 text-center border border-dashed border-rule bg-aged/10">
+        <span class="block text-2xl mb-2 opacity-50 text-muted">✦</span>
+        <h3 class="font-serif text-lg text-ink font-bold mb-1">No Topics Found</h3>
+        <p class="font-serif text-sm text-muted italic">There are no records classified under this topic yet.</p>
+    </div>
 @else
-    <div class="flex flex-wrap gap-3">
+    {{-- Grid layout to display the Tag Cards --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 sm:p-4">
         @foreach($tags as $tag)
-            <a href="{{ route('posts.index', ['tags' => [$tag->name]]) }}"
-               class="px-5 py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-800 text-sm font-bold 
-                      bg-gray-50 dark:bg-gray-900 text-black dark:text-white 
-                      hover:border-black dark:hover:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
-                <span class="opacity-50 mr-1">#</span>{{ $tag->name }}
-            </a>
+            <x-search-tag-card :tag="$tag" />
         @endforeach
     </div>
 
-    <div class="mt-10">
+    <div class="mt-8 pt-4 border-t border-rule">
         {{ $tags->links() }}
     </div>
 @endif
