@@ -6,15 +6,16 @@ import './save-post.js';
 import './echo';
 
 import hljs from 'highlight.js';
-import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
 import { marked } from 'marked';
+import renderMathInElement from 'katex/dist/contrib/auto-render.js';
 
 window.hljs = hljs;
-window.renderMathInElement = renderMathInElement;
 window.marked = marked;
+window.EasyMDE = EasyMDE;
+window.renderMathInElement = renderMathInElement;
+
 
 window.Alpine = Alpine;
-window.EasyMDE = EasyMDE;
 
 // 1. Global Keyboard Shortcuts
 window.addEventListener('keydown', (e) => {
