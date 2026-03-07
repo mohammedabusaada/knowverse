@@ -7,7 +7,6 @@
 
 @pushOnce('styles')
     <style>
-    /* EasyMDE Theme Adjustments to match Academic Design */
     .editor-toolbar {
         border: none !important;
         border-bottom: 1px solid var(--color-rule, #e5e7eb) !important;
@@ -37,7 +36,6 @@
         letter-spacing: 0.1em !important;
     }
 
-    /* Preview Container Image Constraints */
     .prose img {
         display: inline-block !important; 
         max-width: 48% !important; 
@@ -52,7 +50,6 @@
         vertical-align: middle; 
     }
     
-    /* Dark Mode EasyMDE Overrides */
     .dark .editor-toolbar { border-bottom-color: #374151 !important; background-color: transparent !important; }
     .dark .editor-toolbar button, .dark .editor-toolbar a { color: #9ca3af !important; }
     .dark .editor-toolbar button:hover, .dark .editor-toolbar button.active { background-color: #374151 !important; color: #ffffff !important; }
@@ -69,11 +66,10 @@
 @endpushOnce
 
 <div 
-    x-data="setupMarkdownEditor('{{ $id }}', '{{ $autosaveId }}')" 
+    x-data="setupMarkdownEditor('{{ $id }}', '{{ $id . $autosaveId }}')" 
     x-init="init()"
     class="mb-12 border border-rule bg-paper rounded-sm shadow-sm"
 >
-    {{-- Header / Mode Toggle --}}
     <div class="flex items-center justify-between border-b border-rule px-6 py-4 bg-aged/30">
         <label class="font-mono text-[10px] tracking-widest uppercase text-muted font-bold">
             Discussion Content
@@ -102,7 +98,6 @@
         </div>
     </div>
 
-    {{-- Editor Area --}}
     <div class="p-2">
         <div x-show="mode === 'write'">
             <textarea name="{{ $name }}" id="{{ $id }}">{{ $value }}</textarea>
@@ -123,10 +118,6 @@
 
 @pushOnce('scripts')
     <script>
-    /**
-     * Initializes the EasyMDE Editor instance and binds it to Alpine.js state.
-     * Manages Markdown rendering, LaTeX parsing, and Image Upload capabilities.
-     */
     function setupMarkdownEditor(editorId, autosaveId) {
         return {
             mode: 'write',
@@ -139,12 +130,12 @@
                 let config = {
                     element: document.getElementById(editorId),
                     spellChecker: false,
+                    autoDownloadFontAwesome: false,
                     status: ["lines", "words"],
                     placeholder: "Draft your scholarly post here...\n\n- Use Markdown for structure.\n- Use $...$ or $$...$$ for LaTeX mathematical equations.\n- Drag & drop or paste images directly into this area.",
                     
-                    // Image upload handler integrated with Laravel backend
                     uploadImage: true,
-                    imageUploadFunction: function(file, onSuccess, onError) {
+                    imageUploadFunction: (file, onSuccess, onError) => {
                         const formData = new FormData();
                         formData.append('image', file);
 
@@ -182,7 +173,6 @@
                     ],
                 };
 
-                // Conditionally enable autosave to prevent data loss on new drafts
                 if (autosaveId) {
                     config.autosave = {
                         enabled: true,
@@ -201,7 +191,6 @@
                     this.compiledMarkdown = window.marked.parse(markdownText, { breaks: true });
                 }
 
-                // Render MathJax & Syntax Highlighting after DOM updates
                 this.$nextTick(() => {
                     if (window.renderMathInElement) {
                         window.renderMathInElement(this.$refs.previewContainer, {
