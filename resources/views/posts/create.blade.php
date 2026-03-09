@@ -31,7 +31,7 @@
           }">
         @csrf
 
-        {{-- Document Title --}}
+        {{-- Discussion Title --}}
         <div class="mb-8">
             <input 
                 type="text" 
@@ -56,7 +56,7 @@
             />
         </div>
 
-        {{-- Manuscript Body (Markdown Editor) --}}
+        {{-- Body (Markdown Editor) --}}
         <x-markdown-editor 
             name="body" 
             :value="old('body')" 
