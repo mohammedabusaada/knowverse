@@ -45,7 +45,7 @@ class ReportModerationService
                 $target->update(['banned_at' => now()]); 
                 $wasActionTaken = true; 
             } else {
-                // Phase 2: Content Penalties (Hide discussions or responses)
+                // Phase 2: Content Penalties (Hide discussions or comments)
                 $wasActionTaken = match ($report->reason_type) {
                     ReportReason::SPAM => $this->handleSpam($target),
                     default => $this->hideContent($target),
@@ -114,7 +114,7 @@ class ReportModerationService
     {
         if (!$model || $model instanceof User) return false;
 
-        // Referential Integrity: Nullify 'Author Pick' status if the hidden item was a selected response
+        // Referential Integrity: Nullify 'Author Pick' status if the hidden item was a selected comment
         if ($model instanceof \App\Models\Comment) {
             $model->post()->where('best_comment_id', $model->id)
                   ->update(['best_comment_id' => null]);

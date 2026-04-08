@@ -18,9 +18,7 @@
         <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3C/filter%3E%3Crect width=\'400\' height=\'400\' filter=\'url(%23n)\' opacity=\'0.04\'/%3E%3C/svg%3E');"></div>
         
         {{-- Text Logo: Massive and Dominant --}}
-        <a href="/" class="font-heading font-bold text-6xl tracking-[0.1em] uppercase text-paper hover:opacity-80 transition-all duration-300 mb-12 block border-b-4 border-paper/10 pb-4">
-            KnowVerse
-        </a>
+         <x-application-logo class="w-auto h-16 mb-8" />
 
         {{-- Main Heading: Same font, slightly smaller than Logo --}}
         <h1 class="text-4xl font-heading font-bold mb-4 tracking-tight text-aged uppercase">
@@ -68,7 +66,7 @@
                         required
                         value="{{ old('login') }}"
                         autocomplete="username"
-                        class="w-full px-0 py-3 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:text-muted/50 placeholder:italic"
+                        class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
                         placeholder="Enter your email or username..."
                     />
                 </div>
@@ -81,7 +79,7 @@
                         name="password"
                         required
                         autocomplete="current-password"
-                        class="w-full px-0 py-3 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg placeholder:text-muted/50 placeholder:italic"
+                        class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
                         placeholder="••••••••"
                     />
                 </div>

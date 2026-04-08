@@ -81,7 +81,7 @@ class Comment extends Model
 
         /**
          * Scope 2: Active Author Logic
-         * Hides responses belonging to temporarily deactivated (soft-deleted) scholars.
+         * Hides comments belonging to temporarily deactivated (soft-deleted) scholars.
          */
         static::addGlobalScope('activeAuthor', function ($builder) {
             if (Request::is('admin/*')) {
@@ -183,6 +183,9 @@ class Comment extends Model
         $converter = new CommonMarkConverter([
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
+            'renderer' => [
+                'soft_break' => "<br>\n",
+            ],
         ]);
 
         return $converter->convert($this->body ?? '')->getContent();

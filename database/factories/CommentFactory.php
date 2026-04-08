@@ -26,9 +26,12 @@ class CommentFactory extends Factory
             'is_hidden' => $this->faker->boolean(5), // 5% probability of being administratively concealed
             'spam_score' => $this->faker->numberBetween(0, 2), // Baseline heuristic spam score
             
-            // Seed realistic platform engagement metrics
-            'upvote_count' => $this->faker->numberBetween(0, 100),
-            'downvote_count' => $this->faker->numberBetween(0, 20),
+            // ---------------------------------------------------------
+            // Set counters to 0. They will be mathematically calculated
+            // by the VotesSeeder after real votes are generated.
+            // ---------------------------------------------------------
+            'upvote_count' => 0,
+            'downvote_count' => 0,
             'created_at' => $this->faker->dateTimeThisYear(),
             'updated_at' => now(),
         ];

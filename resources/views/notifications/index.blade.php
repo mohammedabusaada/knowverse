@@ -18,7 +18,7 @@
                 </button>
             </form>
 
-            <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Purge all records?');">
+            <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Clear all notifications?');">
                 @csrf @method('DELETE')
                 <button class="font-mono text-[10px] uppercase tracking-[0.1em] px-4 py-1.5 border border-accent-warm/30 text-accent-warm hover:bg-accent-warm/10 transition-colors rounded-sm shadow-sm focus:outline-none">
                     Clear all

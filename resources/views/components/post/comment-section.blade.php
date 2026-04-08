@@ -17,18 +17,12 @@
                 <input type="hidden" name="post_id" value="{{ $post->id }}">
                 
                 <div class="border border-rule bg-paper p-1 focus-within:border-accent focus-within:shadow-sm transition-all">
-                    <textarea 
-                        name="body" 
-                        placeholder="Contribute your insights to the discussion..." 
-                        rows="3" 
-                        required 
-                        class="w-full bg-transparent border-none focus:ring-0 resize-y text-ink font-serif text-[15px] placeholder:text-muted/50 p-4 leading-relaxed"
-                    ></textarea>
+                    <x-markdown-editor name="body" id="comment-body" label="Comment Content" required />
                 </div>
 
                 <div class="flex justify-end mt-4">
                     <button type="submit" class="font-mono text-[10px] uppercase tracking-widest font-bold bg-ink text-paper px-8 py-2.5 border border-ink hover:bg-transparent hover:text-ink transition-colors shadow-sm focus:outline-none">
-                        Publish Response
+                        Post Comment
                     </button>
                 </div>
             </form>
@@ -50,7 +44,7 @@
             @endif
         @empty
             <div class="py-20 text-center">
-                <p class="font-serif text-muted italic text-lg">There are no responses yet. Be the first to contribute.</p>
+                <p class="font-serif text-muted italic text-lg">There are no comments yet. Be the first to contribute.</p>
             </div>
         @endforelse
     </div>

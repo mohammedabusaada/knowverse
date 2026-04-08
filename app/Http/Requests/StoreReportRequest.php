@@ -14,21 +14,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  */
 class StoreReportRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        // Require authentication to submit reports
         return $this->user() !== null;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
-        // Resolve the fully qualified class name using the MorphMap definition
         $modelClass = Relation::getMorphedModel($this->target_type) ?? $this->target_type;
 
         return [
@@ -36,20 +28,28 @@ class StoreReportRequest extends FormRequest
             'target_id'   => [
                 'required', 
                 'integer',
-                // Idempotency: Prevent duplicate pending reports from the same scholar
                 new NoDuplicateReport($modelClass, (int) $this->target_id),
                 
                 function ($attribute, $value, $fail) use ($modelClass) {
-                    // Self-Reporting Constraint
-                    if ($modelClass === \App\Models\User::class && (int)$value === (int)$this->user()->id) {
-                        $fail('You cannot report your own profile.');
-                    }
-                    
-                    // State Verification: Block reports on accounts already under administrative suspension
+                    $user = $this->user();
+
+                    // Self-Reporting Constraint for Users
                     if ($modelClass === \App\Models\User::class) {
+                        if ((int)$value === (int)$user->id) {
+                            $fail('You cannot report your own profile.');
+                        }
+                        
                         $targetUser = \App\Models\User::find($value);
                         if ($targetUser && $targetUser->is_banned) {
                             $fail('This account is already suspended and under review.');
+                        }
+                    } 
+                    // Self-Reporting Constraint for Posts and Comments
+                    elseif (in_array($modelClass, [\App\Models\Post::class, \App\Models\Comment::class])) {
+                        $target = $modelClass::find($value);
+                        if ($target && (int)$target->user_id === (int)$user->id) {
+                            // Automatically adapt message (e.g., "You cannot report your own post.")
+                            $fail("You cannot report your own " . strtolower(class_basename($modelClass)) . ".");
                         }
                     }
                 }

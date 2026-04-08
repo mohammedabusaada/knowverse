@@ -22,7 +22,7 @@
             {{-- Academic Statistics Grid --}}
             <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-rule">
                 <x-user-stat-box label="Discussions" :value="$user->posts_count ?? $user->posts()->count()" />
-                <x-user-stat-box label="Responses" :value="$user->all_comments_count ?? $user->allComments()->count()" />
+                <x-user-stat-box label="Comments" :value="$user->all_comments_count ?? $user->allComments()->count()" />
                 <x-user-stat-box label="Followers" :value="$user->followers_count ?? $user->followers()->count()" />
             </div>
         </div>

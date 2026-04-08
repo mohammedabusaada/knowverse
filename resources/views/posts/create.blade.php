@@ -39,7 +39,7 @@
                 value="{{ old('title') }}" 
                 placeholder="Title of your discussion..." 
                 required 
-                class="w-full bg-transparent border-none text-4xl sm:text-5xl font-heading font-black text-ink placeholder:text-muted/30 focus:ring-0 p-0 transition-colors"
+                class="w-full bg-paper border border-rule px-6 py-4 rounded-sm shadow-sm text-3xl sm:text-4xl font-heading font-bold text-ink placeholder:text-muted/80 focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all"
             />
             @error('title')
                 <p class="text-accent-warm font-mono text-[10px] uppercase tracking-widest mt-3 font-bold">{{ $message }}</p>

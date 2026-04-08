@@ -80,7 +80,7 @@ class ReputationService
 
             $sum = (int) $record->delta;
 
-            // 1. Ledger Cleanup: Purge the targeted transactional entries
+            // 1. Ledger Cleanup: delete the targeted transactional entries
             $query->delete();
 
             // 2. Cache Reconcile: Adjust the user's aggregate standing

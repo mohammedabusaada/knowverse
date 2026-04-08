@@ -147,7 +147,7 @@ class ProfileController extends Controller
 
     /**
      * Terminate the user account permanently (GDPR Compliance).
-     * Overrides soft deletes to purge all associated data.
+     * Overrides soft deletes to delete all associated data.
      */
     public function destroy(Request $request)
     {

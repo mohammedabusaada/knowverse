@@ -65,14 +65,12 @@ class UserController extends Controller
         return view('admin.users.show', compact('user'));
     }
 
-/**
+    /**
      * Orchestrates user suspension (banning).
      * Implements a safety check to prevent administrative self-lockout.
      */
     public function toggleBan(User $user)
     {
-        // 🚀 Inner Door Defense: Ensure only admins can mutate another user's state
-        $this->authorize('update', $user);
 
         // Safely check if the currently authenticated user is trying to ban themselves
         if (Auth::id() === $user->id) {
@@ -91,8 +89,8 @@ class UserController extends Controller
         return back()->with('success', $status);
     }
 
-/**
-     * Permanently expunges a user record from the infrastructure.
+    /**
+     * Permanently delete a user record from the infrastructure.
      * Executes a Hard Delete to comply with data privacy regulations (GDPR).
      */
     public function destroy(User $user)

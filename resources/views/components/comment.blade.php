@@ -14,17 +14,19 @@
 
         {{-- Scholar Avatar --}}
         <div class="shrink-0 hidden sm:block pt-1">
-            <x-user-avatar :user="$comment->user" size="sm" class="grayscale opacity-80 group-hover/comment:grayscale-0 transition-all" />
+            <a href="{{ route('profile.show', $comment->user->username) }}" class="block">
+                <x-user-avatar :user="$comment->user" size="sm" class="grayscale opacity-80 group-hover/comment:grayscale-0 transition-all hover:ring-2 ring-accent" />
+            </a>
         </div>
 
         <div class="flex-1 min-w-0">
             
-            {{-- Response Header --}}
+            {{-- Comment Header --}}
             <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="min-w-0 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span class="font-heading font-bold text-ink text-base">
+                    <a href="{{ route('profile.show', $comment->user->username) }}" class="font-heading font-bold text-ink text-base hover:text-accent transition-colors">
                         {{ $comment->user->display_name }}
-                    </span>
+                    </a>
 
                     {{-- Original Author Badge --}}
                     @if($comment->user_id === $comment->post->user_id)
@@ -66,18 +68,18 @@
                         @else
                             <form method="POST" action="{{ route('comments.best', $comment) }}">
                                 @csrf
-                                <button class="block w-full text-left px-4 py-1.5 text-sm font-serif font-bold text-accent hover:bg-accent/10 transition-colors">Highlight Response</button>
+                                <button class="block w-full text-left px-4 py-1.5 text-sm font-serif font-bold text-accent hover:bg-accent/10 transition-colors">Author's Pick</button>
                             </form>
                         @endif
                         <div class="my-1 border-t border-rule"></div>
                     @endif
 
                     @can('update', $comment)
-                        <button @click="showEdit = !showEdit" class="block w-full text-left px-4 py-1.5 text-sm font-serif text-ink hover:bg-aged transition-colors">Edit Response</button>
+                        <button @click="showEdit = !showEdit" class="block w-full text-left px-4 py-1.5 text-sm font-serif text-ink hover:bg-aged transition-colors">{{ is_null($comment->parent_id) ? 'Edit Comment' : 'Edit Reply' }}</button>
                     @endcan
 
                     @can('delete', $comment)
-                        <form action="{{ route('comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Permanently delete this response?');">
+                        <form action="{{ route('comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Move this comment to the trash?');">
                             @csrf @method('DELETE')
                             <button class="block w-full text-left px-4 py-1.5 text-sm font-serif text-accent-warm hover:bg-accent-warm/10 transition-colors">Delete</button>
                         </form>
@@ -91,13 +93,13 @@
             {{-- Hidden Warning --}}
             @if($comment->is_hidden)
                 <div class="mb-4 text-[13px] font-serif text-accent-warm italic border-l-2 border-accent-warm pl-3 bg-accent-warm/5 py-2">
-                    This response is concealed from public indexing due to guideline violations.
+                    This comment is restricted from public view due to community guideline violations.
                 </div>
             @endif
 
-            {{-- Rendered Response Body --}}
+            {{-- Rendered Comment Body --}}
             <div x-show="!showEdit" x-transition.opacity class="prose dark:prose-invert max-w-none font-serif text-ink text-[15px] leading-relaxed mb-4 break-words">
-                {!! \Illuminate\Support\Str::markdown($comment->body, ['html_input' => 'escape']) !!}
+                {!! $comment->body_html !!}
             </div>
 
             {{-- Inline Edit Form --}}
@@ -105,7 +107,9 @@
                 <div x-show="showEdit" x-cloak x-transition class="mb-4 border border-rule bg-paper p-1 shadow-sm focus-within:border-accent transition-colors">
                     <form action="{{ route('comments.update', $comment) }}" method="POST">
                         @csrf @method('PUT')
-                        <textarea name="body" rows="3" required class="w-full bg-transparent border-none focus:ring-0 text-ink font-serif text-[15px] p-3 resize-y">{{ $comment->body }}</textarea>
+                        <x-markdown-editor name="body" id="edit-comment-{{ $comment->id }}" required>
+    {{ $comment->body }}
+</x-markdown-editor>
                         
                         <div class="flex gap-3 mt-2 justify-end p-2 border-t border-rule bg-aged/10">
                             <button type="button" @click="showEdit = false" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
@@ -128,11 +132,11 @@
                     @csrf
                     <input type="hidden" name="post_id" value="{{ $comment->post_id }}">
                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                    <textarea name="body" rows="2" placeholder="Draft your reply..." required class="w-full bg-transparent border-none focus:ring-0 text-ink font-serif text-[15px] p-3 resize-y"></textarea>
+                    <x-markdown-editor name="body" id="reply-comment-{{ $comment->id }}" required />
                     
                     <div class="flex gap-3 mt-2 justify-end p-2 border-t border-rule">
                         <button type="button" @click="showReply = false" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
-                        <button type="submit" class="font-mono text-[10px] uppercase tracking-widest text-paper bg-ink px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Append Note</button>
+                        <button type="submit" class="font-mono text-[10px] uppercase tracking-widest text-paper bg-ink px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Post Reply</button>
                     </div>
                 </form>
             </div>

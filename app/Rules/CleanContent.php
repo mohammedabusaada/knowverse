@@ -22,7 +22,7 @@ class CleanContent implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($this->moderationService->containsBlockedWords($value)) {
-            $fail("The {$attribute} contains inappropriate language.");
+            $fail("The {$attribute} contains prohibited content, inappropriate language, or excessive external links.");
         }
     }
 }

@@ -11,7 +11,7 @@ class VoteFactory extends Factory
 
     public function definition(): array
     {
-        // Polymorphic Target Selection: Votes can be cast on either Discussions or Responses
+        // Polymorphic Target Selection: Votes can be cast on either Discussions or Comment
         $targetType = $this->faker->randomElement([Post::class, Comment::class]);
         $target = $targetType::inRandomOrder()->first();
 

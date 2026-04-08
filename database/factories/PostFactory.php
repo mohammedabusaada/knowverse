@@ -29,10 +29,13 @@ class PostFactory extends Factory
             // Consensus metric ('Author's Pick') is contextually orchestrated within the Seeder
             'best_comment_id' => null, 
             
-            // Engagement metrics simulation
+            // ---------------------------------------------------------
+            // View counts remain random (no external table), but 
+            // votes are set to 0 to be calculated by the VotesSeeder.
+            // ---------------------------------------------------------
             'view_count' => $this->faker->numberBetween(0, 2000),
-            'upvote_count' => $this->faker->numberBetween(0, 300),
-            'downvote_count' => $this->faker->numberBetween(0, 50),
+            'upvote_count' => 0,
+            'downvote_count' => 0,
             'created_at' => $this->faker->dateTimeThisYear(),
             'updated_at' => now(),
         ];

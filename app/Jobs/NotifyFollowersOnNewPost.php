@@ -36,21 +36,20 @@ class NotifyFollowersOnNewPost implements ShouldQueue
      */
     public function handle(NotificationService $notificationService): void
     {
-        $author = $this->post->user;
+        $post = $this->post; 
+        $author = $post->user;
 
         // ------------------------------------------------------------------
         // Phase 1: Notify the Author's Direct Followers
         // ------------------------------------------------------------------
-        // Utilizing chunk() to iterate through records in manageable batches (100 at a time).
-        // This is a critical optimization technique to prevent RAM exhaustion.
-        $author->followers()->chunk(100, function ($followers) use ($author, $notificationService) {
+        $author->followers()->chunk(100, function ($followers) use ($author, $notificationService, $post) {
             foreach ($followers as $follower) {
                 $notificationService->notify(
                     recipient: $follower,
                     type: NotificationType::NEW_POST_FOLLOWING,
                     actor: $author,
-                    target: $this->post,
-                    message: "A scholar you follow published: {$this->post->title}"
+                    target: $post,
+                    message: "A scholar you follow published: {$post->title}"
                 );
             }
         });
@@ -59,10 +58,6 @@ class NotifyFollowersOnNewPost implements ShouldQueue
         // Phase 2: Notify Topic (Tag) Subscribers
         // ------------------------------------------------------------------
         if (!empty($this->tagIds)) {
-            
-            // Retrieve users subscribed to the selected tags.
-            // Constraint 1: Exclude the author to prevent self-notification.
-            // Constraint 2: Exclude direct followers to prevent redundant duplicate notifications.
             $usersToNotify = User::whereHas('followedTags', function ($query) {
                     $query->whereIn('tags.id', $this->tagIds);
                 })
@@ -77,8 +72,8 @@ class NotifyFollowersOnNewPost implements ShouldQueue
                     recipient: $userToNotify,
                     type: NotificationType::NEW_POST_TAG,
                     actor: $author,
-                    target: $this->post,
-                    message: "A new discussion was published under a topic you follow: {$this->post->title}"
+                    target: $post,
+                    message: "A new discussion was published under a topic you follow: {$post->title}"
                 );
             }
         }

@@ -50,6 +50,7 @@
             {{-- Maintaining state for required identity fields during partial updates --}}
             <input type="hidden" name="username" value="{{ auth()->user()->username }}">
             <input type="hidden" name="full_name" value="{{ auth()->user()->full_name }}">
+            <input type="hidden" name="email" value="{{ auth()->user()->email }}">
 
             <div class="flex items-center justify-between">
                 <div class="pr-6">
@@ -59,6 +60,12 @@
                     <p class="text-sm font-serif italic text-muted leading-relaxed">
                         Allow others to view your following and followers network.
                     </p>
+                    
+                    @if($errors->has('public_follow_lists') || $errors->any())
+                        <p class="text-xs font-mono text-accent-warm mt-2 font-bold">
+                            {{ $errors->first() }}
+                        </p>
+                    @endif
                 </div>
                 
                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
@@ -166,7 +173,7 @@
         <div class="bg-accent-warm/5 border border-accent-warm/20 p-6 rounded-sm">
             <h3 class="text-lg font-heading font-bold text-accent-warm mb-1">Delete Account</h3>
             <p class="text-[14px] font-serif italic text-muted mb-6 leading-relaxed">
-                Permanently purge your scholarly record and data. This action is irreversible.
+                Permanently delete your scholarly record and data. This action is irreversible.
             </p>
 
             <div x-data="{ open: {{ $errors->userDeletion->any() ? 'true' : 'false' }}, confirmText: '' }">

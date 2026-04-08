@@ -63,12 +63,12 @@
                         </div>
 
                     @elseif($report->target_type === \App\Models\Comment::class)
-                        <p class="font-heading font-bold text-ink mb-3">Response on a Discussion</p>
+                        <p class="font-heading font-bold text-ink mb-3">Comment on a Discussion</p>
                         <div class="font-serif text-[15px] text-muted line-clamp-4 prose dark:prose-invert border-l-2 border-rule pl-4 italic">
                             {{ strip_tags($report->target->body) }}
                         </div>
                         <div class="mt-5 pt-4 border-t border-rule font-mono text-[9px] uppercase tracking-widest text-muted">
-                            <strong>Type:</strong> Response &bull; <a href="{{ route('admin.users.show', $report->target->user_id) }}" class="hover:text-accent">Author ID: {{ $report->target->user_id }}</a>
+                            <strong>Type:</strong> Comment &bull; <a href="{{ route('admin.users.show', $report->target->user_id) }}" class="hover:text-accent">Author ID: {{ $report->target->user_id }}</a>
                         </div>
 
                     @elseif($report->target_type === \App\Models\User::class)

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>KnowVerse - Logged Out</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex bg-paper text-ink font-serif antialiased">

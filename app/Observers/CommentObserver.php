@@ -8,7 +8,7 @@ use App\Enums\NotificationType;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Monitors the lifecycle of Scholarly Responses (Comments).
+ * Monitors the lifecycle of Scholarly Comments.
  * Orchestrates content moderation, reputation rewarding, and notification dispatching.
  */
 class CommentObserver
@@ -24,7 +24,7 @@ class CommentObserver
         // Content Integrity: Prevent prohibited language from entering the database
         if ($this->moderationService->containsBlockedWords($comment->body)) {
             throw ValidationException::withMessages([
-                'body' => 'Your response contains language that violates community guidelines.'
+                'body' => 'Your comment contains language that violates community guidelines.'
             ]);
         }
     }

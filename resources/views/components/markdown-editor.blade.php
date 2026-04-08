@@ -2,7 +2,8 @@
     'name' => 'body',
     'value' => '',
     'id' => 'markdown-editor',
-    'autosaveId' => null
+    'autosaveId' => null,
+    'label' => 'Discussion Content'
 ])
 
 @pushOnce('styles')
@@ -72,7 +73,7 @@
 >
     <div class="flex items-center justify-between border-b border-rule px-6 py-4 bg-aged/30">
         <label class="font-mono text-[10px] tracking-widest uppercase text-muted font-bold">
-            Discussion Content
+            {{ $label }}
         </label>
 
         <div class="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest">
@@ -132,7 +133,7 @@
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
                     status: ["lines", "words"],
-                    placeholder: "Draft your scholarly post here...\n\n- Use Markdown for structure.\n- Use $...$ or $$...$$ for LaTeX mathematical equations.\n- Drag & drop or paste images directly into this area.",
+                    placeholder: "Draft your scholarly content here...\n\n- Use Markdown for structure.\n- Use $...$ or $$...$$ for LaTeX mathematical equations.\n- Drag & drop or paste images directly into this area.",
                     
                     uploadImage: true,
                     imageUploadFunction: (file, onSuccess, onError) => {

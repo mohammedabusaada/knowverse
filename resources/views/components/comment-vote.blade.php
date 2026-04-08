@@ -17,7 +17,7 @@
     
     <button 
         @if($isAuthor) 
-            disabled title="You cannot evaluate your own response." class="p-0.5 opacity-30 cursor-not-allowed text-muted"
+            disabled title="You cannot evaluate your own comment." class="p-0.5 opacity-30 cursor-not-allowed text-muted"
         @else
             @click="@auth @if(auth()->user()->hasVerifiedEmail()) voteAction(1) @else window.location.href='{{ route('verification.notice') }}' @endif @else window.location.href='{{ route('login') }}' @endauth"
             :class="vote === 1 ? 'text-ink' : 'text-muted hover:text-ink'"
@@ -34,7 +34,7 @@
 
     <button 
         @if($isAuthor) 
-            disabled title="You cannot evaluate your own response." class="p-0.5 opacity-30 cursor-not-allowed text-muted"
+            disabled title="You cannot evaluate your own comment." class="p-0.5 opacity-30 cursor-not-allowed text-muted"
         @else
             @click="@auth @if(auth()->user()->hasVerifiedEmail()) voteAction(-1) @else window.location.href='{{ route('verification.notice') }}' @endif @else window.location.href='{{ route('login') }}' @endauth"
             :class="vote === -1 ? 'text-accent-warm' : 'text-muted hover:text-accent-warm'"
