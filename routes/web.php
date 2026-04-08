@@ -121,7 +121,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckBanned::class])->group(func
     */
     Route::middleware('verified')->group(function () {
 
-        // Discussion & Response Management
+        // Discussion & Comment Management
         Route::resource('posts', PostController::class)->except(['show', 'index']);
         Route::resource('comments', CommentController::class)->only(['store', 'update', 'destroy']);
         

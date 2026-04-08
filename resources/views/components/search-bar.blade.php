@@ -86,6 +86,21 @@
                     </template>
                 </div>
             </template>
+
+            {{-- Topics Suggestion Group --}}
+            <template x-if="results.tags && results.tags.length > 0">
+                <div class="p-2 border-t border-rule bg-aged/5">
+                    <h3 class="px-3 py-2 text-[9px] font-mono text-muted uppercase tracking-widest font-bold">Topics</h3>
+                    <div class="flex flex-wrap gap-2 p-2">
+                        <template x-for="tag in results.tags" :key="tag.id">
+                            <a :href="'/tags/' + tag.slug" @click="open = false"
+                               class="inline-flex items-center px-2 py-1 bg-paper border border-rule text-[11px] font-mono text-ink hover:border-ink transition-colors">
+                                #<span x-text="tag.name"></span>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </div>

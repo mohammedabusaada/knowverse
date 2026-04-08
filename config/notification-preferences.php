@@ -25,7 +25,7 @@ return [
             'default' => true,
         ],
         'authors_pick_received' => [
-            'label'   => 'My response is selected as Author\'s Pick',
+            'label'   => 'My Comment is selected as Author\'s Pick',
             'default' => true,
         ],
         'report_resolved' => [

@@ -46,7 +46,7 @@
             <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-muted italic font-serif">
                 <span class="font-bold text-ink">{{ $post->user->display_name }}</span>
                 <span class="opacity-50">&bull;</span>
-                <span>{{ $post->all_comments_count ?? $post->allComments()->count() }} responses</span>
+                <span>{{ $post->all_comments_count ?? $post->allComments()->count() }} comments</span>
                 <span class="opacity-50">&bull;</span>
                 <span>{{ $post->created_at->diffForHumans() }}</span>
                 

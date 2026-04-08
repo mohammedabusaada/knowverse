@@ -7,9 +7,9 @@
     // 1. Map internal action types to scholarly terminology
     $displayTitle = match ($type) {
         'post_upvoted'         => 'Discussion Upvoted',
-        'comment_upvoted'      => 'Response Upvoted',
+        'comment_upvoted'      => 'Comment Upvoted',
         'post_downvoted'       => 'Discussion Downvoted',
-        'comment_downvoted'    => 'Response Downvoted',
+        'comment_downvoted'    => 'Comment Downvoted',
         'authors_pick_received' => 'Highlighted as Author\'s Pick',
         'authors_pick_awarded'  => 'Selected an Author\'s Pick',
         default                => str_replace('_', ' ', ucfirst($type)),

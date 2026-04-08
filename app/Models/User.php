@@ -58,6 +58,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         'banned_at'         => 'datetime',
         'password'          => 'hashed',
         'reputation_points' => 'integer',
+        'public_follow_lists' => 'boolean',
     ];
 
     // ============================================

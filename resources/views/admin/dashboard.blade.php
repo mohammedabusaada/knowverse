@@ -19,10 +19,10 @@
             <p class="mt-4 text-3xl font-heading font-black text-ink">{{ number_format($totalPosts) }}</p>
         </div>
 
-        {{-- Total Responses --}}
+        {{-- Total Comments --}}
         <div class="bg-paper border border-rule rounded-sm p-6 shadow-sm hover:border-ink transition-colors">
             <div class="flex items-center justify-between">
-                <p class="font-mono text-[10px] uppercase tracking-widest text-muted font-bold">Total Responses</p>
+                <p class="font-mono text-[10px] uppercase tracking-widest text-muted font-bold">Total Comments</p>
                 <span class="p-2 bg-aged text-ink rounded-sm">
                     <x-icons.chat class="w-4 h-4" />
                 </span>

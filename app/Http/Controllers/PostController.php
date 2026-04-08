@@ -53,13 +53,32 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Validate Input & Enforce Minimum Quality Constraints
         $validated = $request->validate([
-            'title'   => ['required', 'string', 'max:255', new CleanContent],
-            'body'    => ['required', 'string', new CleanContent],
+            'title'   => ['required', 'string', 'min:10', 'max:255', new CleanContent],
+            'body'    => ['required', 'string', 'min:30', new CleanContent],
             'image'   => ['nullable', 'image', 'max:4096'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
+        ], [
+            'title.min' => 'The title must be at least 10 characters to ensure clarity.',
+            'body.min'  => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
         ]);
+
+        // 2. Anti-Spam Check: Prevent exact duplicates from the same user within the last hour
+        $duplicatePost = Post::where('user_id', Auth::id())
+            ->where('created_at', '>=', now()->subHour())
+            ->where(function ($query) use ($request) {
+                $query->where('title', $request->title)
+                      ->orWhere('body', $request->body);
+            })
+            ->exists();
+
+        if ($duplicatePost) {
+            return back()->withInput()->withErrors([
+                'title' => 'You have already posted a discussion with the same title or content within the last hour. Please wait before posting again.',
+            ]);
+        }
 
         $validated['user_id'] = Auth::id();
         $validated['status']  = Post::STATUS_PUBLISHED;
@@ -130,17 +149,21 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
+        // Enforce the same Minimum Quality Constraints during edits
         $validated = $request->validate([
-            'title'   => ['required', 'string', 'max:255', new CleanContent],
-            'body'    => ['required', 'string', new CleanContent],
+            'title'   => ['required', 'string', 'min:10', 'max:255', new CleanContent],
+            'body'    => ['required', 'string', 'min:30', new CleanContent],
             'image'   => ['nullable', 'image', 'max:4096'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
+        ], [
+            'title.min' => 'The title must be at least 10 characters to ensure clarity.',
+            'body.min'  => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
         ]);
 
         /**
-         * 1. If a new image is uploaded, purge the old asset and store the new one.
-         * 2. If the 'remove_image' flag is present and no new file is provided, purge the asset.
+         * 1. If a new image is uploaded, delete the old asset and store the new one.
+         * 2. If the 'remove_image' flag is present and no new file is provided, delete the asset.
          */
         if ($request->hasFile('image')) {
             // Clean up old image asset if it exists to free up space
@@ -149,7 +172,7 @@ class PostController extends Controller
             }
 
             $validated['image'] = $request->file('image')->store('post_images', 'public');
-        }elseif ($request->boolean('remove_image')) {
+        } elseif ($request->boolean('remove_image')) {
             if ($post->image) {
                 Storage::disk('public')->delete($post->image);
                 $validated['image'] = null;

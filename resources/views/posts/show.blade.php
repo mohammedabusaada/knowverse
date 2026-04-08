@@ -75,13 +75,13 @@
                     {{-- Moderation Notice --}}
                     @if($post->is_hidden)
                         <div class="mb-8 p-5 bg-aged border-l-2 border-accent-warm text-ink text-sm font-serif italic shadow-sm">
-                            <strong>Notice:</strong> This discussion is currently restricted from public view pending review for community guideline adherence.
+                            <strong>Notice:</strong> This discussion is restricted from public view due to community guideline violations.
                         </div>
                     @endif
 
                     {{-- Rendered Markdown Content --}}
                     <div class="prose prose-lg dark:prose-invert max-w-none text-ink font-serif leading-relaxed mb-12" id="post-content">
-                        {!! \Illuminate\Support\Str::markdown($post->body, ['html_input' => 'escape']) !!}
+                        {!! $post->formatted_body !!}
                     </div>
 
                     {{-- Topics / Tags --}}
@@ -186,7 +186,7 @@
          * and Syntax Highlighting (highlight.js) after the DOM loads.
          */
         document.addEventListener("DOMContentLoaded", function() {
-            const contentContainer = document.getElementById('post-content');
+            const contentContainer = document.querySelector('article');
             
             if (contentContainer && window.renderMathInElement && window.hljs) {
                 // Render LaTeX equations

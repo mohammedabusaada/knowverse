@@ -12,7 +12,7 @@ use App\Rules\CleanContent;
 class CommentController extends Controller
 {
     /**
-     * Persists a new response to a discussion.
+     * Persists a new comment to a discussion.
      * Enforces strict content sanitization via the CleanContent rule to mitigate XSS vulnerabilities.
      */
     public function store(Request $request)
@@ -26,7 +26,10 @@ class CommentController extends Controller
         $validated['user_id'] = Auth::id();
         Comment::create($validated);
 
-        return back()->with('status', 'Response successfully added to the discussion.');
+        if ($request->filled('parent_id')) {
+    return back()->with('status', 'Reply posted successfully.');
+}
+return back()->with('status', 'Comment successfully added to the discussion.');
     }
 
     /**
@@ -37,12 +40,13 @@ class CommentController extends Controller
         $this->authorize('update', $comment);
 
         $validated = $request->validate([
-            'body' => ['required', 'string', 'max:2000', new CleanContent],
+            'body' => ['required', 'string', 'max:3000', new CleanContent],
         ]);
 
         $comment->update($validated);
 
-        return back()->with('status', 'Response refined successfully.');
+        $message = is_null($comment->parent_id) ? 'Comment refined successfully.' : 'Reply refined successfully.';
+        return back()->with('status', $message);
     }
 
     /**
@@ -53,7 +57,8 @@ class CommentController extends Controller
         $this->authorize('delete', $comment);
 
         $comment->delete();
-        return back()->with('status', 'Response moved to trash.');
+        $message = is_null($comment->parent_id) ? 'Comment moved to trash.' : 'Reply moved to trash.';
+        return back()->with('status', $message);
     }
 
     /**
@@ -88,7 +93,7 @@ class CommentController extends Controller
         );
 
         return back()->with([
-            'status' => 'Response successfully accepted as the Author\'s Pick.',
+            'status' => 'Comment successfully accepted as the Author\'s Pick.',
             'reputation_delta' => config('reputation.points.authors_pick_awarded', 2), 
         ]);
     }

@@ -5,13 +5,13 @@ namespace App\Policies;
 use App\Models\{Comment, User};
 
 /**
- * Enforces authorization logic for scholarly responses.
+ * Enforces authorization logic for scholarly comments.
  * Protects content mutation and governs the "Author's Pick" reputation economy.
  */
 class CommentPolicy
 {
 /**
-     * Determines whether a user can modify a specific response.
+     * Determines whether a user can modify a specific comments.
      * Grants access exclusively to the original author or the moderation team.
      */
     public function update(User $user, Comment $comment): bool
@@ -20,7 +20,7 @@ class CommentPolicy
     }
 
 /**
-     * Determines whether a user can delete a specific response.
+     * Determines whether a user can delete a specific comment.
      * Restricts destructive actions to the owner or administrative personnel.
      */
     public function delete(User $user, Comment $comment): bool
@@ -30,7 +30,7 @@ class CommentPolicy
 
 /**
      * GOVERNANCE & ANTI-FARMING SECURITY:
-     * 1. Grants the discussion owner the authority to highlight a response as the 'Author's Pick'.
+     * 1. Grants the discussion owner the authority to highlight a comment as the 'Author's Pick'.
      * 2. Strictly prohibits self-awarding to prevent reputation point manipulation.
      */
     public function markBest(User $user, Comment $comment): bool

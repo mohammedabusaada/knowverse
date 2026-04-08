@@ -16,7 +16,7 @@
             </h1>
 
             <p class="text-lg md:text-xl font-serif italic text-muted max-w-2xl leading-relaxed mb-10 pl-5 border-l-4 border-double border-rule">
-                A platform for academic knowledge exchange — structured, peer-reviewed in spirit, and built for scholars who take discourse seriously.
+                A platform for academic knowledge exchange. Structured, community-validated, and built for scholars who take discourse seriously.
             </p>
 
             <div class="flex flex-wrap items-center gap-6">
@@ -67,7 +67,7 @@
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-4 flex-1">
                     <h2 class="font-mono text-[10px] tracking-[0.2em] uppercase text-muted font-bold">
-                        Recent Additions
+                        Recent Discussions
                     </h2>
                     <div class="hidden sm:block flex-1 h-px bg-rule mx-4"></div>
                 </div>
@@ -93,7 +93,7 @@
                             <div class="flex flex-wrap gap-3 text-[13px] text-muted font-serif italic">
                                 <span class="font-bold text-ink">{{ $post->user->display_name }}</span>
                                 <span class="opacity-50">&bull;</span>
-                                <span>{{ $post->comments_count ?? 0 }} responses</span>
+                                <span>{{ $post->comments_count ?? 0 }} comments</span>
                                 <span class="opacity-50">&bull;</span>
                                 <span>{{ $post->created_at->diffForHumans() }}</span>
                             </div>

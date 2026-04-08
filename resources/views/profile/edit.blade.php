@@ -66,7 +66,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {{-- Username Field --}}
                 <div>
-                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Pseudonym / Username</label>
+                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Username</label>
                     <input type="text" name="username" value="{{ old('username', $user->username) }}" required
                            class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
                     @error('username') <span class="text-xs font-mono text-accent-warm block mt-1">{{ $message }}</span> @enderror
@@ -121,7 +121,7 @@
                 Cancel Edit
             </a>
             <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
-                Commit Updates
+                Save Changes
             </button>
         </div>
     </form>

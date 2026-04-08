@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>KnowVerse - Reset Password</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex bg-paper text-ink font-serif antialiased">
@@ -26,19 +27,19 @@
                 <div>
                     <label for="email" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Email</label>
                     <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required
-                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
+                           class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
 
                 <div>
                     <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">New Password</label>
                     <input id="password" type="password" name="password" required
-                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
+                           class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
 
                 <div>
                     <label for="password_confirmation" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Confirm New Password</label>
                     <input id="password_confirmation" type="password" name="password_confirmation" required
-                           class="w-full px-0 py-2 border-0 border-b border-rule bg-transparent focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg" />
+                           class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
 
                 <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-widest text-xs py-4 hover:bg-transparent hover:text-ink border border-ink transition-all mt-4">

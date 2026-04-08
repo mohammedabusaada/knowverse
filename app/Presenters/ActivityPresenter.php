@@ -11,11 +11,11 @@ class ActivityPresenter
     {
         return match ($activity->action) {
             'post_created'           => 'Published a discussion',
-            'comment_created'        => 'Contributed a response',
+            'comment_created'        => 'Contributed a comment',
             'vote_up'                => 'Upvoted',
             'vote_down'              => 'Downvoted',
             'vote_removed'           => 'Retracted a vote',
-            'authors_pick_selected'   => 'Accepted a response (Author\'s Pick)',
+            'authors_pick_selected'   => 'Accepted a comment (Author\'s Pick)',
             'reputation_changed'     => 'Reputation updated',
             'user_followed_user'     => 'Followed a scholar',
             'user_followed_tag'      => 'Followed a topic',
