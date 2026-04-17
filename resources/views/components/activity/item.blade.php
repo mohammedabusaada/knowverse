@@ -10,9 +10,6 @@
     <div class="flex-1 min-w-0">
         <div class="font-serif text-[15px] text-ink leading-relaxed">
             {!! activity_description($activity) !!}
-            @if ($activity->details)
-                <span class="text-muted italic ml-1">"{{ $activity->details }}"</span>
-            @endif
         </div>
 
         <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-muted mt-2">
