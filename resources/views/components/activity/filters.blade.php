@@ -7,7 +7,7 @@
     $filters = [
         'all'        => 'Overview',
         'posts'      => 'Discussions',
-        'comments'   => 'Replies',
+        'comments'   => 'Comments',
     ];
 @endphp
 
