@@ -12,7 +12,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
             <h3 class="font-heading text-2xl font-bold text-ink">Following</h3>
-            <p class="font-serif text-sm italic text-muted mt-1">Monitored scholars and research topics</p>
+            <p class="font-serif text-sm italic text-muted mt-1">Followed scholars and research topics</p>
         </div>
         
         <div class="flex flex-col sm:flex-row items-center gap-3">
