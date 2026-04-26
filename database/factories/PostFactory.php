@@ -12,28 +12,24 @@ class PostFactory extends Factory
 
     public function definition(): array
     {
-        $statuses = ['draft', 'published', 'archived'];
+        $academicTopics = [
+            'The Impact of Neural Networks on Modern Data Processing',
+            'Ethical Implications of AI-Powered Content Moderation',
+            'Evaluating Hybrid Referential Integrity in Distributed Databases',
+            'Blockchain Solutions for Verifiable Academic Credentialing',
+            'Cybersecurity Protocols in High-Traffic Educational Platforms',
+            'The Role of Peer Review in Digital Scholarly Discourse'
+        ];
 
         return [
             'user_id' => User::inRandomOrder()->value('id') ?? User::factory(),
-            'title' => $this->faker->sentence(6),
-            'body' => $this->faker->paragraphs(rand(3, 6), true),
-            'image' => $this->faker->optional(0.3)->imageUrl(640, 480, 'education', true),
-            
-            // Simulate diverse lifecycle states
-            'status' => $this->faker->randomElement($statuses),
-            
-            // Administrative Override: 10% probability of being globally hidden
-            'is_hidden' => $this->faker->boolean(10), 
-            
-            // Consensus metric ('Author's Pick') is contextually orchestrated within the Seeder
-            'best_comment_id' => null, 
-            
-            // ---------------------------------------------------------
-            // View counts remain random (no external table), but 
-            // votes are set to 0 to be calculated by the VotesSeeder.
-            // ---------------------------------------------------------
-            'view_count' => $this->faker->numberBetween(0, 2000),
+            'title' => $this->faker->randomElement($academicTopics),
+            'body' => "This scholarly discussion explores " . $this->faker->sentence() .
+                " Our methodology focuses on " . $this->faker->paragraph(3) .
+                " Preliminary results indicate a significant correlation between peer validation and content credibility.",
+            'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
+            'is_hidden' => $this->faker->boolean(10),
+            'view_count' => $this->faker->numberBetween(100, 5000),
             'upvote_count' => 0,
             'downvote_count' => 0,
             'created_at' => $this->faker->dateTimeThisYear(),

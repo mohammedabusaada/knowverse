@@ -39,7 +39,7 @@ class UserActivityFactory extends Factory
             'action'      => $action,
             'target_id'   => $target?->id,
             'target_type' => $target ? get_class($target) : null,
-            'details'     => $this->faker->sentence(),
+            'details'     => "The user performed a " . str_replace('_', ' ', $action) . " operation on a scholarly entry.",
             'created_at'  => $this->faker->dateTimeBetween('-30 days'),
         ];
     }
