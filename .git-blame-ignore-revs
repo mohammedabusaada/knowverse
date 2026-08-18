@@ -1,0 +1,10 @@
+# Revisions listed here are skipped by `git blame`, so that mechanical
+# reformatting does not obscure who actually authored each line.
+#
+# Configure locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub honours this file automatically in its blame view.
+
+# style: apply Laravel Pint across the codebase
+968e6362bd188b8e0d9e9aad43151840097fc973
