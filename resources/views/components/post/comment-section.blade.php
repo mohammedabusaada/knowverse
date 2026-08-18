@@ -4,7 +4,7 @@
     {{-- 1. Section Heading --}}
     <div class="flex items-baseline justify-between mb-8">
         <h2 class="font-heading text-2xl md:text-3xl font-bold text-ink">
-            Discussion
+            Comments
             <sup class="font-mono text-[10px] text-muted font-normal ml-1">[{{ $post->comments_count ?? $comments->count() }}]</sup>
         </h2>
     </div>

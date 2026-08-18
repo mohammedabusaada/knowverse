@@ -22,17 +22,21 @@ document.addEventListener("alpine:init", () => {
                     method: "POST",
                     body: formData,
                     headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json"
                     }
                 });
 
-                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json().catch(() => null);
 
-                const data = await res.json();
-
-                // Validation Guard: If the backend rejected the vote
-                if (data.success === false) {
-                    console.warn(data.error);
+                // Guard failures (voting on your own content, or not having enough
+                // reputation to downvote) return HTTP 403 with { success:false, error }.
+                // Surface that message to the user instead of failing silently.
+                if (!res.ok || !data || data.success === false) {
+                    const message = (data && data.error)
+                        ? data.error
+                        : 'Unable to register your vote. Please try again.';
+                    if (window.showToast) window.showToast(message, 'error');
                     return;
                 }
 
@@ -45,6 +49,7 @@ document.addEventListener("alpine:init", () => {
 
             } catch (error) {
                 console.error('Vote action failed:', error);
+                if (window.showToast) window.showToast('Network error — your vote was not saved.', 'error');
             } finally {
                 this.loading = false;
             }

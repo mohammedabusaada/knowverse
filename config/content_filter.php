@@ -24,4 +24,10 @@ return [
         // NSFW / Inappropriate
         'porn', 'brazzers', 'sex video', 'xxx',
     ],
+
+    /*
+    | Maximum number of external links allowed in a single submission before it is
+    | treated as spam. Trusted users (see reputation.privileges) bypass this limit.
+    */
+    'max_links' => 3,
 ];

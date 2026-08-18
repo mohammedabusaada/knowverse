@@ -21,6 +21,12 @@ class CommentObserver
      */
     public function saving(Comment $comment): void
     {
+        // Only screen the body when it actually changed — vote-count or other state
+        // updates must not re-run the moderation filter.
+        if (! $comment->isDirty('body')) {
+            return;
+        }
+
         // Content Integrity: Prevent prohibited language from entering the database
         if ($this->moderationService->containsBlockedWords($comment->body)) {
             throw ValidationException::withMessages([

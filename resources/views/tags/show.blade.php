@@ -39,7 +39,11 @@
                     <span class="text-ink font-bold">Discussions</span>
                 </div>
 
-                <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink truncate mb-4">
+                {{-- Adding the Icon to the Main Header --}}
+                <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink truncate mb-4 flex items-center gap-4">
+                    <div class="p-3 bg-aged/30 border border-rule rounded-md shrink-0 shadow-sm">
+                        <x-tag-icon :slug="$tag->slug" classes="w-8 h-8 md:w-10 md:h-10 text-ink" />
+                    </div>
                     {{ strtolower($tag->name) }}
                 </h1>
                 
@@ -48,7 +52,7 @@
                 </p>
 
                 <div class="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-ink">
-                    <span x-text="count">{{ $tag->followers_count ?? 0 }}</span>
+                    <span class="font-bold" x-text="count">{{ $tag->followers_count ?? 0 }}</span>
                     <span x-text="count === 1 ? 'Scholar following' : 'Scholars following'"></span>
                 </div>
             </div>
@@ -59,7 +63,7 @@
                             :class="isFollowing 
                                 ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' 
                                 : 'text-paper bg-ink border-ink hover:bg-transparent hover:text-ink'"
-                            class="font-mono text-xs uppercase tracking-[0.15em] px-6 py-2 border transition-all flex items-center justify-center gap-2"
+                            class="font-mono text-xs uppercase tracking-[0.15em] px-6 py-2 border transition-all flex items-center justify-center gap-2 rounded-sm"
                             :disabled="loading">
                         
                         <svg x-show="loading" class="animate-spin h-3 w-3 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" x-cloak>
@@ -79,7 +83,7 @@
         @forelse($posts as $post)
             <x-post-card :post="$post" />
         @empty
-            <div class="py-20 text-center border border-dashed border-rule bg-aged/10">
+            <div class="py-20 text-center border border-dashed border-rule bg-aged/10 rounded-xl">
                 <p class="font-serif text-muted italic text-lg mb-4">There are no discussions for this tag yet.</p>
                 <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="font-mono text-xs uppercase tracking-[0.15em] text-ink border-b border-ink hover:text-accent hover:border-accent transition-colors">
                     Start a Discussion &rarr;

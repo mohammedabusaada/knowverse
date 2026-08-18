@@ -46,6 +46,7 @@ class Post extends Model
         'view_count',
         'upvote_count',
         'downvote_count',
+        'pinned_at',
     ];
 
     /**
@@ -59,6 +60,7 @@ class Post extends Model
         'downvote_count' => 'integer',
         'is_hidden' => 'boolean',
         'deleted_at' => 'datetime',
+        'pinned_at' => 'datetime',
     ];
 
     /**
@@ -223,6 +225,14 @@ class Post extends Model
     public function totalVotes(): int
     {
         return $this->upvote_count - $this->downvote_count;
+    }
+
+    /**
+     * Whether this discussion is currently pinned to the top of the feed by its author.
+     */
+    public function isPinned(): bool
+    {
+        return ! is_null($this->pinned_at);
     }
 
     /**

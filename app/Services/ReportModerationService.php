@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Log;
 class ReportModerationService
 {
     public function __construct(
-        protected NotificationService $notificationService
+        protected NotificationService $notificationService,
+        protected ReputationService $reputationService
     ) {}
 
     /**
@@ -68,12 +69,17 @@ class ReportModerationService
         $author = ($target instanceof User) ? $target : ($target->user ?? null);
         $reporter = $report->reporter;
 
-        // Apply a strict penalty to the violator
-        if ($author) {
-            $penalty = 10;
-            $author->decrement('reputation_points', $penalty);
+        // For content violations the offending entity is the reputation source;
+        // for an account suspension there is no content source.
+        $source = ($target instanceof User) ? null : $target;
 
-            $message = ($target instanceof User) 
+        // Apply a strict penalty to the violator THROUGH the append-only ledger so the
+        // moderation outcome is fully auditable and the ledger invariant still holds.
+        if ($author) {
+            $this->reputationService->award($author, 'moderation_penalty', null, $source);
+            $penalty = abs((int) config('reputation.points.moderation_penalty', -10));
+
+            $message = ($target instanceof User)
                 ? "Your account has been suspended and you lost {$penalty} reputation points due to community guidelines violations."
                 : "A report against your content was resolved. You lost {$penalty} reputation points.";
 
@@ -90,10 +96,10 @@ class ReportModerationService
             }
         }
 
-        // Reward the whistleblower to incentivize community moderation
+        // Reward the whistleblower (also through the ledger) to incentivize moderation.
         if ($reporter) {
-            $reward = 2;
-            $reporter->increment('reputation_points', $reward);
+            $this->reputationService->award($reporter, 'report_reward');
+            $reward = (int) config('reputation.points.report_reward', 2);
 
             try {
                 $this->notificationService->notify(

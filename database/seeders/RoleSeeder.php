@@ -4,43 +4,29 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Role;
 
 class RoleSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed the three fixed roles.
+     *
+     * Idempotent and cross-database (works on MySQL and the SQLite test DB).
+     * Fixed IDs are required because the authorization layer references them
+     * directly: 1 = user, 2 = admin, 3 = moderator.
      */
     public function run(): void
     {
-        // Disable FK checks temporarily (safe for local dev)
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('roles')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $roles = [
+            ['id' => 1, 'name' => 'user',      'description' => 'Standard platform user with basic permissions.'],
+            ['id' => 2, 'name' => 'admin',     'description' => 'System administrator with full control.'],
+            ['id' => 3, 'name' => 'moderator', 'description' => 'Community moderator who handles reports and content.'],
+        ];
 
-        // Seed roles with fixed IDs to ensure consistent FK references
-        Role::insert([
-            [
-                'id' => 1,
-                'name' => 'user',
-                'description' => 'Standard platform user with basic permissions.',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 2,
-                'name' => 'admin',
-                'description' => 'System administrator with full control.',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 3,
-                'name' => 'moderator',
-                'description' => 'Community moderator who handles reports and content.',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        foreach ($roles as $role) {
+            DB::table('roles')->updateOrInsert(
+                ['id' => $role['id']],
+                $role + ['created_at' => now(), 'updated_at' => now()]
+            );
+        }
     }
 }

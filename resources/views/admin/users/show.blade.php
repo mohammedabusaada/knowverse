@@ -72,6 +72,28 @@
             </div>
         </div>
 
+        {{-- Role Management (RBAC) — assigned manually, never by reputation --}}
+        @if(auth()->id() !== $user->id)
+        <div class="pt-8 border-t border-rule">
+            <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 font-bold">Role Management (RBAC)</h3>
+            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+                @csrf @method('PATCH')
+                <div class="flex-1">
+                    <label class="block font-mono text-[10px] text-muted uppercase tracking-widest mb-2">Assigned Role</label>
+                    <select name="role_id" class="w-full bg-paper border border-rule px-4 py-3 font-serif text-ink focus:outline-none focus:border-ink">
+                        <option value="1" @selected($user->role_id === 1)>Standard User</option>
+                        <option value="3" @selected($user->role_id === 3)>Moderator</option>
+                        <option value="2" @selected($user->role_id === 2)>Administrator</option>
+                    </select>
+                </div>
+                <button type="submit" class="py-3 px-6 border border-ink text-ink font-mono text-[10px] uppercase tracking-widest hover:bg-ink hover:text-paper transition-all font-bold">
+                    Update Role
+                </button>
+            </form>
+            <p class="mt-3 font-serif text-xs text-muted italic">Roles are assigned manually by administrators and are never granted automatically by reputation.</p>
+        </div>
+        @endif
+
         {{-- Danger Zone Actions --}}
         <div class="pt-10 border-t border-accent-warm/30 flex flex-col sm:flex-row gap-4 p-6 bg-accent-warm/5 mt-8">
             

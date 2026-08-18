@@ -57,37 +57,50 @@ class ReputationService
      * Retracts reputation points previously distributed.
      * Crucial for restoring economic equilibrium when content is soft-deleted or downvoted.
      */
-    public function remove(User $user, string $action, ?Model $source = null): void 
+    public function remove(User $user, string $action, ?Model $source = null): void
     {
         DB::transaction(function () use ($user, $action, $source) {
 
+            // Locate the most recent ORIGINAL award for this (user, action, source).
+            // Reversal rows are stored under "{action}_reverted", so they are never
+            // matched here — guaranteeing each call neutralises exactly ONE prior
+            // contribution (e.g. one retracted upvote), even when several scholars
+            // have voted on the same target and produced multiple identical entries.
             $query = Reputation::where('user_id', $user->id)
                 ->where('action', $action);
 
-            // Scope the removal specifically to a polymorphic entity if contextualized
             if ($source) {
                 $query->where('source_id', $source->getKey())
                       ->where('source_type', $source->getMorphClass());
             }
 
-            // Retrieve only the LATEST single ledger entry for this action/source combination.
-            // Deleting all matching rows would destroy the points earned from OTHER users' votes.
             $record = $query->latest('id')->first();
 
             if (!$record) {
                 return;
             }
 
-            $sum = (int) $record->delta;
+            $delta = (int) $record->delta;
 
-            // 1. Ledger Cleanup: delete the targeted transactional entries
-            $query->delete();
+            // APPEND-ONLY INTEGRITY: a ledger entry is never deleted. Instead we append
+            // a compensating (negative) transaction, so the ledger remains a complete,
+            // immutable audit trail and the system invariant is preserved exactly:
+            //     user.reputation_points === SUM(reputations.delta WHERE user_id = user)
+            Reputation::record(
+                $user->id,
+                "{$action}_reverted",
+                -$delta,
+                $source,
+                "Reversal of ledger entry #{$record->id}"
+            );
 
-            // 2. Cache Reconcile: Adjust the user's aggregate standing
-            $user->decrement('reputation_points', $sum);
+            // Cache reconcile: move the denormalised aggregate by the same magnitude.
+            if ($delta !== 0) {
+                $user->decrement('reputation_points', $delta);
+            }
 
-            // 3. Transparency Audit: Log the reversal action
-            ActivityService::reputationChanged($user, -$sum, $source, "{$action}_reverted");
+            // Transparency audit.
+            ActivityService::reputationChanged($user, -$delta, $source, "{$action}_reverted");
         });
     }
 

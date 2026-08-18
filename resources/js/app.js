@@ -100,6 +100,35 @@ Alpine.start();
 // 3. Real-Time Notifications (Laravel Echo & Reverb)
 const userId = document.querySelector('meta[name="user-id"]')?.content;
 
+// Generic, globally-available toast for inline feedback (e.g. permission / validation
+// messages from AJAX actions such as voting). Non-clickable; XSS-safe via textContent.
+window.showToast = (message, type = 'info') => {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-8 right-8 z-50 flex items-center gap-3 px-5 py-3 rounded-sm bg-ink text-paper border border-rule shadow-xl transition-all duration-300 transform translate-y-4 opacity-0';
+
+    const icon = document.createElement('span');
+    icon.className = `font-mono font-bold ${type === 'error' ? 'text-accent-warm' : 'text-accent'}`;
+    icon.textContent = type === 'error' ? '!' : '✦';
+
+    const text = document.createElement('span');
+    text.className = 'font-serif text-sm tracking-wide';
+    text.textContent = message;
+
+    toast.append(icon, text);
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+    });
+
+    setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+};
+
 // Helper function to create a clickable, beautiful Toast notification
 const showBeautifulToast = (message, url) => {
     // Create an anchor tag instead of a div so it's clickable

@@ -1,11 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "knowverse/knowverse",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "KnowVerse - a secure academic discussion platform with a reputation ledger, RBAC governance and real-time collaboration.",
     "keywords": [
         "laravel",
-        "framework"
+        "academic",
+        "reputation-system",
+        "moderation",
+        "reverb"
     ],
     "license": "MIT",
     "require": {
