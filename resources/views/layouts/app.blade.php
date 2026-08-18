@@ -51,10 +51,10 @@
 
     {{-- Main Application Container --}}
     <div class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col lg:flex-row gap-10 py-10">
+        <div class="flex flex-col lg:flex-row gap-8 py-10">
             
             {{-- Application Sidebar --}}
-            <aside class="w-full lg:w-56 flex-shrink-0">
+            <aside class="w-full lg:w-48 flex-shrink-0">
                 @include('layouts.includes.sidebar')
             </aside>
 

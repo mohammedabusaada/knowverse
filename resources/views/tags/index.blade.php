@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    {{-- Tags List (Replaced Grid with Classic List) --}}
+    {{-- Tags List with Icons --}}
     <div class="flex flex-col border-t border-rule">
         @foreach($tags as $tag)
             @php
@@ -46,13 +46,17 @@
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-b border-rule hover:bg-aged/20 transition-colors group px-2"
             >
                 <div class="min-w-0 flex-1">
+                    {{-- Adding the Icon next to the Tag Name --}}
                     <h2 class="font-heading text-xl font-bold text-ink mb-1">
-                        <a href="{{ route('tags.show', $tag->slug) }}" class="hover:text-accent transition-colors">
+                        <a href="{{ route('tags.show', $tag->slug) }}" class="flex items-center gap-2.5 hover:text-accent transition-colors">
+                            <span class="p-1.5 bg-paper border border-rule rounded-md shrink-0 text-muted group-hover:text-accent transition-colors shadow-sm">
+                                <x-tag-icon :slug="$tag->slug" classes="w-5 h-5" />
+                            </span>
                             {{ strtolower($tag->name) }}
                         </a>
                     </h2>
                     
-                    <p class="font-serif text-[15px] text-muted line-clamp-2 leading-relaxed italic mb-2">
+                    <p class="font-serif text-[15px] text-muted line-clamp-2 leading-relaxed italic mb-2 mt-2">
                         {{ $tag->description ?? 'Academic discussions and research related to ' . strtolower($tag->name) . '.' }}
                     </p>
 
@@ -70,7 +74,7 @@
                         <button 
                             @click="toggle()"
                             :class="following ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' : 'text-ink border-ink hover:bg-ink hover:text-paper'"
-                            class="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-1.5 border transition-all"
+                            class="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-1.5 border transition-all rounded-sm"
                         >
                             <span x-text="following ? 'Unfollow' : 'Follow'"></span>
                         </button>
