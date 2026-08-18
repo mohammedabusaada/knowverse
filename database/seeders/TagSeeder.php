@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Tag;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class TagSeeder extends Seeder
@@ -25,7 +25,7 @@ class TagSeeder extends Seeder
             'Philosophy', 'Psychology', 'Sociology', 'Economics', 'History', 'Ethics',
 
             // Logic / Critical Thinking
-            'Logical Fallacies', 'Argumentation', 'Epistemology', 'Critical Thinking'
+            'Logical Fallacies', 'Argumentation', 'Epistemology', 'Critical Thinking',
         ];
 
         foreach ($tags as $tagName) {

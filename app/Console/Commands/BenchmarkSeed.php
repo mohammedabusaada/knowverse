@@ -33,11 +33,11 @@ class BenchmarkSeed extends Command
 
     public function handle(): int
     {
-        $nUsers    = max(1, (int) $this->option('users'));
-        $nPosts    = max(0, (int) $this->option('posts'));
+        $nUsers = max(1, (int) $this->option('users'));
+        $nPosts = max(0, (int) $this->option('posts'));
         $nComments = max(0, (int) $this->option('comments'));
-        $nVotes    = max(0, (int) $this->option('votes'));
-        $nTags     = max(0, (int) $this->option('tags'));
+        $nVotes = max(0, (int) $this->option('votes'));
+        $nTags = max(0, (int) $this->option('tags'));
 
         $this->info('KnowVerse benchmark dataset');
         $this->line("  connection={$this->laravel['config']['database.default']}  users={$nUsers} posts={$nPosts} comments={$nComments} votes={$nVotes} tags={$nTags}");
@@ -59,16 +59,16 @@ class BenchmarkSeed extends Command
         $this->info('Seeding users...');
         $password = Hash::make('password'); // single hash, reused for every benchmark account
         $this->bulk('users', $nUsers, 2000, fn ($i) => [
-            'username'            => 'bench_'.$i.'_'.Str::random(6),
-            'email'               => 'bench_'.$i.'_'.Str::random(6).'@bench.local',
-            'full_name'           => 'Bench Scholar '.$i,
-            'password'            => $password,
-            'role_id'             => 1,
-            'reputation_points'   => 0,
+            'username' => 'bench_'.$i.'_'.Str::random(6),
+            'email' => 'bench_'.$i.'_'.Str::random(6).'@bench.local',
+            'full_name' => 'Bench Scholar '.$i,
+            'password' => $password,
+            'role_id' => 1,
+            'reputation_points' => 0,
             'public_follow_lists' => true,
-            'email_verified_at'   => $now,
-            'created_at'          => $now,
-            'updated_at'          => $now,
+            'email_verified_at' => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
         $userIds = DB::table('users')->pluck('id')->all();
 
@@ -76,8 +76,8 @@ class BenchmarkSeed extends Command
         if ($nTags > 0) {
             $this->info('Seeding tags...');
             $this->bulk('tags', $nTags, 1000, fn ($i) => [
-                'name'       => 'BenchTopic'.$i,
-                'slug'       => 'benchtopic-'.$i,
+                'name' => 'BenchTopic'.$i,
+                'slug' => 'benchtopic-'.$i,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
@@ -87,16 +87,16 @@ class BenchmarkSeed extends Command
         // --- Posts ---------------------------------------------------------
         $this->info('Seeding posts...');
         $this->bulk('posts', $nPosts, 2000, fn ($i) => [
-            'user_id'        => $userIds[array_rand($userIds)],
-            'title'          => 'Benchmark discussion #'.$i.' on scholarly methodology',
-            'body'           => 'This synthetic scholarly discussion examines methodology, peer validation, and reproducibility for benchmark iteration '.$i.'. It is long enough to exercise rendering, search, and pagination paths realistically.',
-            'status'         => 'published',
-            'is_hidden'      => 0,
-            'view_count'     => random_int(0, 5000),
-            'upvote_count'   => 0,
+            'user_id' => $userIds[array_rand($userIds)],
+            'title' => 'Benchmark discussion #'.$i.' on scholarly methodology',
+            'body' => 'This synthetic scholarly discussion examines methodology, peer validation, and reproducibility for benchmark iteration '.$i.'. It is long enough to exercise rendering, search, and pagination paths realistically.',
+            'status' => 'published',
+            'is_hidden' => 0,
+            'view_count' => random_int(0, 5000),
+            'upvote_count' => 0,
             'downvote_count' => 0,
-            'created_at'     => $now,
-            'updated_at'     => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
         $postIds = DB::table('posts')->pluck('id')->all();
 
@@ -123,16 +123,16 @@ class BenchmarkSeed extends Command
         if ($nComments > 0 && $postIds) {
             $this->info('Seeding comments...');
             $this->bulk('comments', $nComments, 2000, fn ($i) => [
-                'post_id'        => $postIds[array_rand($postIds)],
-                'user_id'        => $userIds[array_rand($userIds)],
-                'parent_id'      => null,
-                'body'           => 'A synthetic scholarly comment contributing to benchmark discussion iteration '.$i.', written with enough length to render realistically.',
-                'is_hidden'      => 0,
-                'spam_score'     => 0,
-                'upvote_count'   => 0,
+                'post_id' => $postIds[array_rand($postIds)],
+                'user_id' => $userIds[array_rand($userIds)],
+                'parent_id' => null,
+                'body' => 'A synthetic scholarly comment contributing to benchmark discussion iteration '.$i.', written with enough length to render realistically.',
+                'is_hidden' => 0,
+                'spam_score' => 0,
+                'upvote_count' => 0,
                 'downvote_count' => 0,
-                'created_at'     => $now,
-                'updated_at'     => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
         $commentIds = DB::table('comments')->pluck('id')->all();
@@ -143,14 +143,14 @@ class BenchmarkSeed extends Command
             $rows = [];
             $made = 0;
             for ($i = 0; $i < $nVotes; $i++) {
-                $onPost   = empty($commentIds) || random_int(1, 100) <= 60;
+                $onPost = empty($commentIds) || random_int(1, 100) <= 60;
                 $targetId = $onPost ? $postIds[array_rand($postIds)] : $commentIds[array_rand($commentIds)];
                 $rows[] = [
-                    'user_id'     => $userIds[array_rand($userIds)],
+                    'user_id' => $userIds[array_rand($userIds)],
                     'target_type' => $onPost ? 'post' : 'comment', // alias, not FQCN
-                    'target_id'   => $targetId,
-                    'value'       => random_int(1, 100) <= 75 ? 1 : -1, // ~75% upvotes
-                    'created_at'  => $now,
+                    'target_id' => $targetId,
+                    'value' => random_int(1, 100) <= 75 ? 1 : -1, // ~75% upvotes
+                    'created_at' => $now,
                 ];
                 if (count($rows) >= 2000) {
                     $made += DB::table('votes')->insertOrIgnore($rows);
@@ -173,10 +173,10 @@ class BenchmarkSeed extends Command
             downvote_count = (SELECT COUNT(*) FROM votes WHERE votes.target_type='comment' AND votes.target_id=comments.id AND votes.value=-1)");
 
         // Approximate reputation for realistic profile/leaderboard rendering.
-        DB::statement("UPDATE users SET reputation_points = (
+        DB::statement('UPDATE users SET reputation_points = (
             COALESCE((SELECT SUM(p.upvote_count) * 5 + COUNT(p.id) * 5 FROM posts p WHERE p.user_id = users.id), 0)
             + COALESCE((SELECT SUM(c.upvote_count) * 2 + COUNT(c.id) * 2 FROM comments c WHERE c.user_id = users.id), 0)
-        )");
+        )');
 
         $elapsed = round(microtime(true) - $started, 1);
         $this->newLine();

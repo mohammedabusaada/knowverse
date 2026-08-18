@@ -11,11 +11,13 @@ class UserPresenter
 
     public function relationshipBadge(): ?string
     {
-        if (!Auth::check() || Auth::id() === $this->user->id) return null;
+        if (! Auth::check() || Auth::id() === $this->user->id) {
+            return null;
+        }
 
         $authUser = Auth::user();
         $theyFollowMe = $this->user->following()->where('followed_id', $authUser->id)->exists();
-        
+
         return $theyFollowMe ? 'Follows You' : null;
     }
 }

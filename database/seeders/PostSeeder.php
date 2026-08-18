@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Post;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class PostSeeder extends Seeder
 {
@@ -24,11 +24,11 @@ class PostSeeder extends Seeder
 
         // Group tags by category for diversity
         $tagCategories = [
-            'Computer Science' => $tags->whereIn('name', ['AI','Web Security','Networking','Machine Learning','Cybersecurity','Cryptography','Blockchain','Cloud Computing','Databases','Operating Systems']),
-            'Natural Sciences' => $tags->whereIn('name', ['Biology','Chemistry','Physics','Astronomy','Geology']),
-            'Mathematics & Data' => $tags->whereIn('name', ['Algebra','Calculus','Statistics','Data Analysis','Big Data']),
-            'Humanities & Social Sciences' => $tags->whereIn('name', ['Philosophy','Psychology','Sociology','Economics','History','Ethics']),
-            'Logic / Critical Thinking' => $tags->whereIn('name', ['Logical Fallacies','Argumentation','Epistemology','Critical Thinking']),
+            'Computer Science' => $tags->whereIn('name', ['AI', 'Web Security', 'Networking', 'Machine Learning', 'Cybersecurity', 'Cryptography', 'Blockchain', 'Cloud Computing', 'Databases', 'Operating Systems']),
+            'Natural Sciences' => $tags->whereIn('name', ['Biology', 'Chemistry', 'Physics', 'Astronomy', 'Geology']),
+            'Mathematics & Data' => $tags->whereIn('name', ['Algebra', 'Calculus', 'Statistics', 'Data Analysis', 'Big Data']),
+            'Humanities & Social Sciences' => $tags->whereIn('name', ['Philosophy', 'Psychology', 'Sociology', 'Economics', 'History', 'Ethics']),
+            'Logic / Critical Thinking' => $tags->whereIn('name', ['Logical Fallacies', 'Argumentation', 'Epistemology', 'Critical Thinking']),
         ];
 
         // Mute Model Events here as well

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('Tag display name');
             $table->string('slug')->unique()->comment('URL-friendly unique identifier');
-            
+
             $table->timestamps();
             $table->softDeletes();
 

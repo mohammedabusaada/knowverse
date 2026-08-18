@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyFollowersOnNewPost;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Rules\CleanContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Rules\CleanContent;
 use Illuminate\Support\Facades\Storage;
-use App\Jobs\NotifyFollowersOnNewPost;
 
 class PostController extends Controller
 {
@@ -21,9 +21,9 @@ class PostController extends Controller
         $selectedTags = (array) $request->get('tags', []);
 
         $posts = Post::with(['user' => function ($q) {
-                // Optimization: Eager load counts for Author Hover Card data
-                $q->withCount(['posts', 'followers']);
-            }, 'tags'])
+            // Optimization: Eager load counts for Author Hover Card data
+            $q->withCount(['posts', 'followers']);
+        }, 'tags'])
             ->published()
             ->when($selectedTags, function ($query) use ($selectedTags) {
                 $query->whereHas('tags', function ($q) use ($selectedTags) {
@@ -51,6 +51,7 @@ class PostController extends Controller
     public function create()
     {
         $tags = Tag::all();
+
         return view('posts.create', compact('tags'));
     }
 
@@ -61,14 +62,14 @@ class PostController extends Controller
     {
         // 1. Validate Input & Enforce Minimum Quality Constraints
         $validated = $request->validate([
-            'title'   => ['required', 'string', 'min:10', 'max:255', new CleanContent],
-            'body'    => ['required', 'string', 'min:30', new CleanContent],
-            'image'   => ['nullable', 'image', 'max:4096'],
+            'title' => ['required', 'string', 'min:10', 'max:255', new CleanContent],
+            'body' => ['required', 'string', 'min:30', new CleanContent],
+            'image' => ['nullable', 'image', 'max:4096'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
         ], [
             'title.min' => 'The title must be at least 10 characters to ensure clarity.',
-            'body.min'  => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
+            'body.min' => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
         ]);
 
         // 2. Anti-Spam Check: Prevent exact duplicates from the same user within the last
@@ -78,7 +79,7 @@ class PostController extends Controller
                 ->where('created_at', '>=', now()->subHour())
                 ->where(function ($query) use ($request) {
                     $query->where('title', $request->title)
-                          ->orWhere('body', $request->body);
+                        ->orWhere('body', $request->body);
                 })
                 ->exists();
 
@@ -90,7 +91,7 @@ class PostController extends Controller
         }
 
         $validated['user_id'] = Auth::id();
-        $validated['status']  = Post::STATUS_PUBLISHED;
+        $validated['status'] = Post::STATUS_PUBLISHED;
 
         // Handle cover image upload if provided during the initial publication
         if ($request->hasFile('image')) {
@@ -98,7 +99,7 @@ class PostController extends Controller
         }
 
         $post = Post::create($validated);
-        
+
         // Sync Many-to-Many tag relationships
         $post->tags()->sync($request->tag_ids ?? []);
 
@@ -131,7 +132,7 @@ class PostController extends Controller
 
         // Prioritize the 'Best Answer' to be the first in the comment sequence
         $sortedComments = $post->comments->sortByDesc(
-            fn($comment) => $comment->id === $post->best_comment_id
+            fn ($comment) => $comment->id === $post->best_comment_id
         );
 
         return view('posts.show', [
@@ -160,14 +161,14 @@ class PostController extends Controller
 
         // Enforce the same Minimum Quality Constraints during edits
         $validated = $request->validate([
-            'title'   => ['required', 'string', 'min:10', 'max:255', new CleanContent],
-            'body'    => ['required', 'string', 'min:30', new CleanContent],
-            'image'   => ['nullable', 'image', 'max:4096'],
+            'title' => ['required', 'string', 'min:10', 'max:255', new CleanContent],
+            'body' => ['required', 'string', 'min:30', new CleanContent],
+            'image' => ['nullable', 'image', 'max:4096'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
         ], [
             'title.min' => 'The title must be at least 10 characters to ensure clarity.',
-            'body.min'  => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
+            'body.min' => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
         ]);
 
         /**
@@ -197,7 +198,7 @@ class PostController extends Controller
     }
 
     /**
-     * Execute a Soft-Delete on a post. 
+     * Execute a Soft-Delete on a post.
      * NOTE: We keep the physical image to allow for record restoration (Restore).
      */
     public function destroy(Post $post)

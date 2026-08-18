@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,11 +23,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ==========================================================
-        // After all bulk data is inserted silently, we must calculate 
-        // the true reputation points for every scholar based on their 
+        // After all bulk data is inserted silently, we must calculate
+        // the true reputation points for every scholar based on their
         // generated content and received votes.
         // ==========================================================
-        
+
         $users = User::withCount([
             'posts',
             'allComments',
@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
             // Apply configuration point weights
             $totalPoints += ($postUpvotes * config('reputation.points.post_upvoted', 2));
             $totalPoints += ($commentUpvotes * config('reputation.points.comment_upvoted', 1));
-            
+
             // Subtract downvotes (Negative Reputation is ALLOWED based on our strategy)
             $totalPoints -= ($postDownvotes * abs(config('reputation.points.post_downvoted', 1)));
 

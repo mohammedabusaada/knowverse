@@ -67,8 +67,8 @@ class Tag extends Model
     public function scopePopular($query, int $limit = 10)
     {
         return $query->withCount('posts')
-                     ->orderByDesc('posts_count')
-                     ->limit($limit);
+            ->orderByDesc('posts_count')
+            ->limit($limit);
     }
 
     /**
@@ -76,7 +76,7 @@ class Tag extends Model
      */
     public function scopeFilterByTags($query, ?array $tagIds = null)
     {
-        if (!$tagIds) {
+        if (! $tagIds) {
             return $query;
         }
 

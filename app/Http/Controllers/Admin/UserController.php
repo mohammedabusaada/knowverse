@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Manages the scholar directory and enforces administrative governance.
@@ -13,16 +13,17 @@ use Illuminate\Http\Request;
  */
 class UserController extends Controller
 {
-/**
+    /**
      * Enforce strict access control: Only System Administrators can manage user accounts.
      * Moderators are restricted to content oversight and cannot modify user entities.
      */
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!$request->user()->isAdmin()) {
+            if (! $request->user()->isAdmin()) {
                 abort(403, 'Unauthorized access. Only System Administrators can manage user accounts.');
             }
+
             return $next($request);
         });
     }
@@ -38,10 +39,10 @@ class UserController extends Controller
         // Apply search constraints if a query string is provided
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('full_name', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('full_name', 'like', "%{$search}%");
             });
         }
 
@@ -61,7 +62,7 @@ class UserController extends Controller
 
         // Eager load recent activity or specific relations if needed for the show view
         $user->loadCount(['posts', 'allComments', 'followers', 'following']);
-        
+
         return view('admin.users.show', compact('user'));
     }
 
@@ -125,7 +126,7 @@ class UserController extends Controller
         }
 
         $user->forceDelete();
-        
+
         return back()->with('success', 'User account has been permanently removed from the system.');
     }
 }

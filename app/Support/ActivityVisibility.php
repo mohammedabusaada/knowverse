@@ -12,24 +12,23 @@ class ActivityVisibility
         return [
 
             // Public content creation
-            'post_created'            => 'public',
-            'comment_created'         => 'public',
-            'authors_pick_selected'    => 'public',
-            'user_followed_user'      => 'public',
-            'user_followed_tag'       => 'public',
-
+            'post_created' => 'public',
+            'comment_created' => 'public',
+            'authors_pick_selected' => 'public',
+            'user_followed_user' => 'public',
+            'user_followed_tag' => 'public',
 
             // Votes (private by default)
-            'vote_up'                 => 'private',
-            'vote_down'               => 'private',
-            'vote_removed'            => 'private',
+            'vote_up' => 'private',
+            'vote_down' => 'private',
+            'vote_removed' => 'private',
 
             // Reputation (private but visible to owner)
-            'reputation_changed'      => 'private',
+            'reputation_changed' => 'private',
 
             // Auth
-            'login'                   => 'private',
-            'logout'                  => 'private',
+            'login' => 'private',
+            'logout' => 'private',
         ];
     }
 

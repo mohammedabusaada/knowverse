@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Centralized Notification Dispatcher.
- * Orchestrates multi-channel alerts (Database & WebSockets) while enforcing user privacy 
+ * Orchestrates multi-channel alerts (Database & WebSockets) while enforcing user privacy
  * preferences and preventing notification fatigue (Deduplication).
  */
 class NotificationService
@@ -36,48 +36,49 @@ class NotificationService
         }
 
         // 2. Guard: Respect explicit opt-out preferences (unless it is a mandatory system alert)
-        if (!$type->isMandatory() && !$this->preferences->shouldNotify($recipient, $type)) {
+        if (! $type->isMandatory() && ! $this->preferences->shouldNotify($recipient, $type)) {
             return null;
         }
 
         // 3. Optimization: Deduplicate high-frequency events (e.g., toggling upvotes rapidly)
         if ($this->shouldDeDuplicate($type)) {
             $existing = Notification::where([
-                'user_id'     => $recipient->id,
-                'type'        => $type,
-                'target_id'   => $target?->getKey(),
+                'user_id' => $recipient->id,
+                'type' => $type,
+                'target_id' => $target?->getKey(),
                 'target_type' => $target ? get_class($target) : null,
             ])->first();
 
             if ($existing) {
                 // Surface the existing notification back to the top of the inbox feed
                 $existing->update([
-                    'actor_id'   => $actor?->id,
-                    'is_read'    => false,
-                    'created_at' => now(), 
+                    'actor_id' => $actor?->id,
+                    'is_read' => false,
+                    'created_at' => now(),
                 ]);
+
                 return $existing;
             }
         }
 
         // 4. Persistence: Create a new definitive database record
         $notification = Notification::create([
-            'user_id'     => $recipient->id,
-            'actor_id'    => $actor?->id,
-            'type'        => $type,
-            'message'     => $message,
-            'target_id'   => $target?->getKey(),
+            'user_id' => $recipient->id,
+            'actor_id' => $actor?->id,
+            'type' => $type,
+            'message' => $message,
+            'target_id' => $target?->getKey(),
             'target_type' => $target ? get_class($target) : null,
-            'is_read'     => false,
+            'is_read' => false,
         ]);
 
         // 5. Real-Time Delivery: Broadcast to connected WebSocket clients
         try {
             event(new \App\Events\RealTimeNotification($notification));
         } catch (\Exception $e) {
-            // Graceful Degradation: Log failure silently to prevent the main HTTP request from crashing 
+            // Graceful Degradation: Log failure silently to prevent the main HTTP request from crashing
             // if the external socket server (e.g., Reverb/Pusher) goes offline.
-            Log::warning('RealTimeNotification Broadcast Failed: ' . $e->getMessage());
+            Log::warning('RealTimeNotification Broadcast Failed: '.$e->getMessage());
         }
 
         return $notification;

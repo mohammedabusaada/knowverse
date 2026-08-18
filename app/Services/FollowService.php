@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\Tag;
 use App\Enums\NotificationType;
+use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 
 /**
@@ -21,8 +21,9 @@ class FollowService
     // User ↔ User Subgraph
     // ==========================================================
 
-/**
+    /**
      * Establishes a directional connection between two scholars.
+     *
      * @throws AuthorizationException
      */
     public function followUser(User $actor, User $target): void
@@ -50,7 +51,7 @@ class FollowService
         );
     }
 
-/**
+    /**
      * Severs an existing user-to-user connection.
      */
     public function unfollowUser(User $actor, User $target): void
@@ -62,7 +63,7 @@ class FollowService
     // User ↔ Tag Subgraph
     // ==========================================================
 
-/**
+    /**
      * Subscribes a user to a specific taxonomy/topic stream.
      */
     public function followTag(User $actor, Tag $tag): void

@@ -46,6 +46,7 @@ class BenchmarkWs extends Command
             } catch (\Throwable $e) {
                 $this->error('Broadcast failed: '.$e->getMessage());
                 $this->line('Is Reverb running?  php artisan reverb:start');
+
                 return self::FAILURE;
             }
             $publish[] = (hrtime(true) - $t0) / 1e6; // ms
@@ -72,6 +73,7 @@ class BenchmarkWs extends Command
             return 0.0;
         }
         $i = (int) ceil($p / 100 * count($sorted)) - 1;
+
         return round($sorted[max(0, min($i, count($sorted) - 1))], 2);
     }
 }

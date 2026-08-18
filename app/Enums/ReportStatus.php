@@ -8,7 +8,7 @@ namespace App\Enums;
  */
 enum ReportStatus: string
 {
-    case PENDING   = 'pending';   // In queue, awaiting administrative review
-    case RESOLVED  = 'resolved';  // Reviewed, validated, and penal action applied
+    case PENDING = 'pending';   // In queue, awaiting administrative review
+    case RESOLVED = 'resolved';  // Reviewed, validated, and penal action applied
     case DISMISSED = 'dismissed'; // Reviewed, but found to not violate guidelines
 }

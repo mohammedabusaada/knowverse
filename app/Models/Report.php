@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
-use App\Enums\ReportStatus;
-use App\Enums\ReportReason;
 
 /**
  * Moderation Report Entity
@@ -32,7 +33,7 @@ class Report extends Model
      * Cast attributes to Enums and specific data types to guarantee type safety throughout the application.
      */
     protected $casts = [
-        'status'      => ReportStatus::class,
+        'status' => ReportStatus::class,
         'reason_type' => ReportReason::class,
         'resolved_at' => 'datetime',
     ];
@@ -64,10 +65,10 @@ class Report extends Model
         return $this->belongsTo(User::class, 'resolved_by');
     }
 
-/**
+    /**
      * Polymorphic Target Resolution
-     * CRITICAL: Bypasses visibility filters to ensure moderators can inspect 
-     * deleted or hidden content that has been flagged. 
+     * CRITICAL: Bypasses visibility filters to ensure moderators can inspect
+     * deleted or hidden content that has been flagged.
      */
     public function target(): MorphTo
     {
@@ -105,7 +106,7 @@ class Report extends Model
     public function markAsResolved(User $admin): void
     {
         $this->update([
-            'status'      => ReportStatus::RESOLVED,
+            'status' => ReportStatus::RESOLVED,
             'resolved_by' => $admin->id,
             'resolved_at' => now(),
         ]);
@@ -117,7 +118,7 @@ class Report extends Model
     public function markAsDismissed(User $admin): void
     {
         $this->update([
-            'status'      => ReportStatus::DISMISSED,
+            'status' => ReportStatus::DISMISSED,
             'resolved_by' => $admin->id,
             'resolved_at' => now(),
         ]);

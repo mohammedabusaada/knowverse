@@ -13,9 +13,10 @@ class TagController extends Controller
     {
         // Ensure only real admins can access this controller, not just moderators
         $this->middleware(function ($request, $next) {
-            if (!$request->user()->isAdmin()) {
+            if (! $request->user()->isAdmin()) {
                 abort(403, 'Unauthorized. Admins only.');
             }
+
             return $next($request);
         });
     }
@@ -25,7 +26,7 @@ class TagController extends Controller
         $query = Tag::withCount('posts')->latest();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $tags = $query->paginate(20)->withQueryString();
@@ -41,7 +42,7 @@ class TagController extends Controller
 
         Tag::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name)
+            'slug' => Str::slug($request->name),
         ]);
 
         return back()->with('success', 'Tag created successfully.');
@@ -50,12 +51,12 @@ class TagController extends Controller
     public function update(Request $request, Tag $tag)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:50', 'unique:tags,name,' . $tag->id],
+            'name' => ['required', 'string', 'max:50', 'unique:tags,name,'.$tag->id],
         ]);
 
         $tag->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name)
+            'slug' => Str::slug($request->name),
         ]);
 
         return back()->with('success', 'Tag updated successfully.');
@@ -64,6 +65,7 @@ class TagController extends Controller
     public function destroy(Tag $tag)
     {
         $tag->delete();
+
         return back()->with('success', 'Tag deleted successfully.');
     }
 }

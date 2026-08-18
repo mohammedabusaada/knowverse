@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\TransferStats;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Concurrent HTTP load test over the public read endpoints. Produces response-time
@@ -39,9 +39,9 @@ class BenchmarkHttp extends Command
             ?? DB::table('posts')->value('id');
 
         $paths = [
-            'home'   => '/',
-            'posts'  => '/posts',
-            'show'   => $postId ? "/posts/{$postId}" : null,
+            'home' => '/',
+            'posts' => '/posts',
+            'show' => $postId ? "/posts/{$postId}" : null,
             'search' => '/search?q=benchmark',
         ];
 
@@ -50,6 +50,7 @@ class BenchmarkHttp extends Command
             (new Client(['timeout' => 5]))->get($base.'/', ['http_errors' => false]);
         } catch (\Throwable $e) {
             $this->error("Cannot reach {$base}. Start the app first:  php artisan serve");
+
             return self::FAILURE;
         }
 
@@ -59,6 +60,7 @@ class BenchmarkHttp extends Command
             $path = $paths[$key] ?? null;
             if ($path === null) {
                 $this->warn("Skipping unknown/unavailable endpoint '{$key}'");
+
                 continue;
             }
             foreach ($concLevels as $conc) {
@@ -132,6 +134,7 @@ class BenchmarkHttp extends Command
             return 0.0;
         }
         $i = (int) ceil($p / 100 * count($sorted)) - 1;
+
         return round($sorted[max(0, min($i, count($sorted) - 1))], 1);
     }
 

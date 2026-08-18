@@ -2,26 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Sanctum\HasApiTokens;
-
-use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
-
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    HasMany,
-    BelongsToMany
-};
-
-use App\Models\NotificationPreference;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Core User Entity
@@ -54,9 +47,9 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'last_login_at'     => 'datetime',
-        'banned_at'         => 'datetime',
-        'password'          => 'hashed',
+        'last_login_at' => 'datetime',
+        'banned_at' => 'datetime',
+        'password' => 'hashed',
         'reputation_points' => 'integer',
         'public_follow_lists' => 'boolean',
     ];
@@ -152,8 +145,8 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
     public function getProfilePictureUrlAttribute(): string
     {
         if (
-            !$this->profile_picture ||
-            !Storage::disk('public')->exists($this->profile_picture)
+            ! $this->profile_picture ||
+            ! Storage::disk('public')->exists($this->profile_picture)
         ) {
             return asset('images/default-avatar.png');
         }
@@ -171,7 +164,7 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
      */
     public function getIsBannedAttribute(): bool
     {
-        return !is_null($this->banned_at);
+        return ! is_null($this->banned_at);
     }
 
     // ============================================
@@ -260,11 +253,11 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
 
         return match (true) {
             $points >= 1000 => 'Distinguished Fellow',
-            $points >= 500  => 'Senior Scholar',
-            $points >= 250  => 'Associate Researcher',
-            $points >= 100  => 'Active Contributor',
-            $points >= 50   => 'Junior Researcher',
-            default         => 'Novice Scholar',
+            $points >= 500 => 'Senior Scholar',
+            $points >= 250 => 'Associate Researcher',
+            $points >= 100 => 'Active Contributor',
+            $points >= 50 => 'Junior Researcher',
+            default => 'Novice Scholar',
         };
     }
 
@@ -273,9 +266,9 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         $points = $this->reputation_points;
 
         return match (true) {
-            $points >= 500  => 'text-accent',
-            $points >= 100  => 'text-ink',
-            default         => 'text-muted',
+            $points >= 500 => 'text-accent',
+            $points >= 100 => 'text-ink',
+            default => 'text-muted',
         };
     }
 }

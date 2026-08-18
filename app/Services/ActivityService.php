@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Tag;
 use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Tag;
 
 /**
  * Centralized Activity Logger (Audit Trail).
@@ -13,7 +13,7 @@ use App\Models\Tag;
  */
 class ActivityService
 {
-/**
+    /**
      * Core persistence method for logging activities.
      * Utilizes polymorphic relations to dynamically link actions to diverse entities.
      */
@@ -24,11 +24,11 @@ class ActivityService
         ?string $details = null
     ): UserActivity {
         return UserActivity::create([
-            'user_id'     => $user->id,
-            'action'      => $action,
-            'target_id'   => $target?->id,
+            'user_id' => $user->id,
+            'action' => $action,
+            'target_id' => $target?->id,
             'target_type' => $target ? get_class($target) : null,
-            'details'     => $details,
+            'details' => $details,
         ]);
     }
 
@@ -74,7 +74,7 @@ class ActivityService
         );
     }
 
-public static function authorsPickSelected(User $user, Model $comment): void
+    public static function authorsPickSelected(User $user, Model $comment): void
     {
         self::log(
             $user,
@@ -82,7 +82,6 @@ public static function authorsPickSelected(User $user, Model $comment): void
             $comment
         );
     }
-
 
     // --------------------------------------------------
     // Follow events
@@ -107,7 +106,7 @@ public static function authorsPickSelected(User $user, Model $comment): void
         );
     }
 
-/**
+    /**
      * Hook to log changes in a scholar's academic standing.
      * Invoked automatically by the ReputationService to ensure data consistency.
      */
@@ -125,7 +124,7 @@ public static function authorsPickSelected(User $user, Model $comment): void
             $user,
             'reputation_changed',
             $source,
-            trim(($action ?? 'adjustment') . " ({$delta})")
+            trim(($action ?? 'adjustment')." ({$delta})")
         );
     }
 

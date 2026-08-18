@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Models\Tag;
 use App\Models\Post;
+use App\Models\Tag;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class TagController extends Controller
@@ -14,7 +14,7 @@ class TagController extends Controller
     public function index()
     {
         $tags = Tag::orderBy('name')->withCount('posts')->paginate(24);
-        
+
         // Fetch recommended tags for the sidebar
         $recommendedTags = $this->getRecommendedTags();
 
@@ -33,8 +33,8 @@ class TagController extends Controller
             ->paginate(15);
 
         // If user is logged in, we check if they follow this tag
-        $isFollowing = Auth::check() 
-        ? Auth::user()->followedTags()->where('tag_id', $tag->id)->exists() 
+        $isFollowing = Auth::check()
+        ? Auth::user()->followedTags()->where('tag_id', $tag->id)->exists()
         : false;
 
         // Fetch recommended tags for the sidebar
@@ -49,12 +49,12 @@ class TagController extends Controller
         $this->authorize('admin-only');
 
         $request->validate([
-            'name' => 'required|unique:tags,name'
+            'name' => 'required|unique:tags,name',
         ]);
 
         return Tag::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name)
+            'slug' => Str::slug($request->name),
         ]);
     }
 
@@ -64,12 +64,12 @@ class TagController extends Controller
         $this->authorize('admin-only');
 
         $request->validate([
-            'name' => "required|unique:tags,name,{$tag->id}"
+            'name' => "required|unique:tags,name,{$tag->id}",
         ]);
 
         $tag->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name)
+            'slug' => Str::slug($request->name),
         ]);
 
         return $tag;
@@ -81,6 +81,7 @@ class TagController extends Controller
         $this->authorize('admin-only');
 
         $tag->delete();
+
         return response()->json(['message' => 'Tag deleted']);
     }
 
@@ -88,6 +89,7 @@ class TagController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('q', '');
+
         return Tag::where('name', 'LIKE', "%{$query}%")
             ->orderBy('name')
             ->limit(10)
@@ -99,8 +101,8 @@ class TagController extends Controller
     {
         $this->authorize('update', $post);
         $request->validate([
-            'tag_ids'   => ['required', 'array', 'max:5'],
-            'tag_ids.*' => 'exists:tags,id'
+            'tag_ids' => ['required', 'array', 'max:5'],
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
         $post->tags()->sync($request->tag_ids);
@@ -113,6 +115,7 @@ class TagController extends Controller
     public function followers(Tag $tag)
     {
         $followers = $tag->followers()->paginate(20);
+
         return view('tags.followers', compact('tag', 'followers'));
     }
 
@@ -122,6 +125,7 @@ class TagController extends Controller
     public function follow(Tag $tag)
     {
         Auth::user()->followedTags()->syncWithoutDetaching($tag->id);
+
         return response()->json(['success' => true]);
     }
 
@@ -131,6 +135,7 @@ class TagController extends Controller
     public function unfollow(Tag $tag)
     {
         Auth::user()->followedTags()->detach($tag->id);
+
         return response()->json(['success' => true]);
     }
 

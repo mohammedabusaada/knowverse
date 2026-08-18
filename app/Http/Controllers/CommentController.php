@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
 use App\Models\Comment;
+use App\Rules\CleanContent;
+use App\Services\ActivityService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\{NotificationService, ActivityService};
-use App\Enums\NotificationType;
-use App\Rules\CleanContent;
 
 class CommentController extends Controller
 {
@@ -18,18 +19,19 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'post_id'   => ['required', 'exists:posts,id'],
+            'post_id' => ['required', 'exists:posts,id'],
             'parent_id' => ['nullable', 'exists:comments,id'],
-            'body'      => ['required', 'string', 'max:3000', new CleanContent],
+            'body' => ['required', 'string', 'max:3000', new CleanContent],
         ]);
 
         $validated['user_id'] = Auth::id();
         Comment::create($validated);
 
         if ($request->filled('parent_id')) {
-    return back()->with('status', 'Reply posted successfully.');
-}
-return back()->with('status', 'Comment successfully added to the discussion.');
+            return back()->with('status', 'Reply posted successfully.');
+        }
+
+        return back()->with('status', 'Comment successfully added to the discussion.');
     }
 
     /**
@@ -46,6 +48,7 @@ return back()->with('status', 'Comment successfully added to the discussion.');
         $comment->update($validated);
 
         $message = is_null($comment->parent_id) ? 'Comment refined successfully.' : 'Reply refined successfully.';
+
         return back()->with('status', $message);
     }
 
@@ -58,12 +61,13 @@ return back()->with('status', 'Comment successfully added to the discussion.');
 
         $comment->delete();
         $message = is_null($comment->parent_id) ? 'Comment moved to trash.' : 'Reply moved to trash.';
+
         return back()->with('status', $message);
     }
 
     /**
      * Elevates a comment to "Author's Pick".
-     * Orchestrates a multi-step transaction: updating post state, awarding reputation points, 
+     * Orchestrates a multi-step transaction: updating post state, awarding reputation points,
      * logging activity, and dispatching real-time notifications.
      */
     public function markAsBest(Comment $comment)
@@ -94,7 +98,7 @@ return back()->with('status', 'Comment successfully added to the discussion.');
 
         return back()->with([
             'status' => 'Comment successfully accepted as the Author\'s Pick.',
-            'reputation_delta' => config('reputation.points.authors_pick_awarded', 2), 
+            'reputation_delta' => config('reputation.points.authors_pick_awarded', 2),
         ]);
     }
 

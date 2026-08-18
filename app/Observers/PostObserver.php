@@ -3,7 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Post;
-use App\Services\{ActivityService, ContentModerationService};
+use App\Services\ActivityService;
+use App\Services\ContentModerationService;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -48,7 +49,7 @@ class PostObserver
 
         if ($duplicateExists) {
             throw ValidationException::withMessages([
-                'title' => 'This exact discussion has already been published. Please contribute to the existing thread.'
+                'title' => 'This exact discussion has already been published. Please contribute to the existing thread.',
             ]);
         }
     }
@@ -59,23 +60,23 @@ class PostObserver
     public function created(Post $post): void
     {
         $author = $post->user;
-        
+
         // Log the creation activity in the system
         ActivityService::postCreated($author, $post);
-        
+
         // Award reputation points to the author for their contribution
         $author->addReputation('post_created', null, $post);
-        
+
         // Note: Global notifications are offloaded to background Jobs for performance
     }
 
     /**
-     * Audit Trail Reconcile: Synchronize reputation data upon discussion removal. 
+     * Audit Trail Reconcile: Synchronize reputation data upon discussion removal.
      */
     public function deleting(Post $post): void
     {
         $author = $post->user;
-        
+
         // 1. Revert creation points
         $author->removeReputation('post_created', $post);
 

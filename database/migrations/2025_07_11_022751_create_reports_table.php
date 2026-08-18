@@ -15,10 +15,10 @@ return new class extends Migration
             $table->foreignId('reporter_id')->constrained('users')->cascadeOnDelete();
 
             // Polymorphic Target (Post, Comment, etc.)
-            $table->morphs('target'); 
+            $table->morphs('target');
 
             // Violation categorization based on ReportReason Enum
-            $table->string('reason_type', 50)->index();             
+            $table->string('reason_type', 50)->index();
             $table->text('reason')->nullable();
 
             // Moderation workflow state management

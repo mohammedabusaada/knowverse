@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\{User, Post};
+use App\Models\Post;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +17,7 @@ test('discussions containing blocked words are rejected', function () {
     $this->actingAs($user)
         ->post(route('posts.store'), [
             'title' => 'An idiot guide to academic writing', // contains a blocked term
-            'body'  => 'This body is long enough to satisfy the minimum content length requirement.',
+            'body' => 'This body is long enough to satisfy the minimum content length requirement.',
         ])
         ->assertSessionHasErrors('title');
 
@@ -29,7 +30,7 @@ test('discussions with too many external links are rejected as spam', function (
     $this->actingAs($user)
         ->post(route('posts.store'), [
             'title' => 'A collection of excellent external resources',
-            'body'  => 'See https://a.com https://b.com https://c.com https://d.com https://e.com for details.',
+            'body' => 'See https://a.com https://b.com https://c.com https://d.com https://e.com for details.',
         ])
         ->assertSessionHasErrors('body');
 
@@ -38,10 +39,10 @@ test('discussions with too many external links are rejected as spam', function (
 
 test('reserved system usernames cannot be registered', function () {
     $this->post('/register', [
-        'username'              => 'admin',
-        'full_name'             => 'Imposter Admin',
-        'email'                 => 'imposter@example.com',
-        'password'              => 'Password123',
+        'username' => 'admin',
+        'full_name' => 'Imposter Admin',
+        'email' => 'imposter@example.com',
+        'password' => 'Password123',
         'password_confirmation' => 'Password123',
     ])->assertSessionHasErrors('username');
 
@@ -50,10 +51,10 @@ test('reserved system usernames cannot be registered', function () {
 
 test('weak passwords are rejected at registration', function () {
     $this->post('/register', [
-        'username'              => 'newscholar',
-        'full_name'             => 'New Scholar',
-        'email'                 => 'new@example.com',
-        'password'              => 'weak',
+        'username' => 'newscholar',
+        'full_name' => 'New Scholar',
+        'email' => 'new@example.com',
+        'password' => 'weak',
         'password_confirmation' => 'weak',
     ])->assertSessionHasErrors('password');
 });

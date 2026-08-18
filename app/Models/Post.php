@@ -4,15 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    BelongsToMany,
-    HasMany,
-    MorphMany
-};
 use League\CommonMark\CommonMarkConverter;
 
 /**
@@ -27,7 +25,9 @@ class Post extends Model
     // State Constants for Post Lifecycle
     // ------------------------------------------------------------------
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PUBLISHED = 'published';
+
     public const STATUS_ARCHIVED = 'archived';
 
     /**
@@ -79,7 +79,7 @@ class Post extends Model
 
             if (Auth::check()) {
                 $user = Auth::user();
-                
+
                 // Administrators possess master-view permissions
                 if ($user->isAdmin()) {
                     return;
@@ -87,7 +87,7 @@ class Post extends Model
 
                 $builder->where(function ($query) use ($user) {
                     $query->where('posts.is_hidden', false)
-                          ->orWhere('posts.user_id', $user->id);
+                        ->orWhere('posts.user_id', $user->id);
                 });
             } else {
                 // Anonymous guests are restricted to public records only
@@ -108,7 +108,7 @@ class Post extends Model
                 // Include orphaned posts (where author is hard-deleted -> user_id is null)
                 // OR include posts where the associated author is currently active.
                 $query->whereNull('posts.user_id')
-                      ->orWhereHas('user');
+                    ->orWhereHas('user');
             });
         });
     }
@@ -174,7 +174,7 @@ class Post extends Model
     public function savedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'saved_posts')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     // ------------------------------------------------------------------
@@ -198,7 +198,7 @@ class Post extends Model
 
     public function scopeFilterByTags($query, ?array $tagIds = null)
     {
-        if (!$tagIds) {
+        if (! $tagIds) {
             return $query;
         }
 
@@ -240,7 +240,7 @@ class Post extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image ? asset('storage/'.$this->image) : null;
     }
 
     /**
@@ -265,7 +265,7 @@ class Post extends Model
     public function updateVoteCounts(): void
     {
         $this->update([
-            'upvote_count'   => $this->votes()->where('value', 1)->count(),
+            'upvote_count' => $this->votes()->where('value', 1)->count(),
             'downvote_count' => $this->votes()->where('value', -1)->count(),
         ]);
     }
@@ -275,7 +275,7 @@ class Post extends Model
      */
     public function isSavedBy(?User $user): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 

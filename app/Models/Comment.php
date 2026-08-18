@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    HasMany,
-    MorphMany
-};
 use League\CommonMark\CommonMarkConverter;
 
 class Comment extends Model
@@ -71,7 +69,7 @@ class Comment extends Model
 
                 $builder->where(function ($query) use ($user) {
                     $query->where('comments.is_hidden', false)
-                          ->orWhere('comments.user_id', $user->id);
+                        ->orWhere('comments.user_id', $user->id);
                 });
             } else {
                 // Anonymous guests see public content only
@@ -92,7 +90,7 @@ class Comment extends Model
                 // Include orphaned comments (author is permanently deleted -> user_id is null)
                 // OR include comments where the associated author is currently active.
                 $query->whereNull('comments.user_id')
-                      ->orWhereHas('user');
+                    ->orWhereHas('user');
             });
         });
     }
@@ -172,7 +170,7 @@ class Comment extends Model
      */
     public function isReply(): bool
     {
-        return !is_null($this->parent_id);
+        return ! is_null($this->parent_id);
     }
 
     /**
@@ -197,7 +195,7 @@ class Comment extends Model
     public function updateVoteCounts(): void
     {
         $this->update([
-            'upvote_count'   => $this->votes()->where('value', 1)->count(),
+            'upvote_count' => $this->votes()->where('value', 1)->count(),
             'downvote_count' => $this->votes()->where('value', -1)->count(),
         ]);
     }

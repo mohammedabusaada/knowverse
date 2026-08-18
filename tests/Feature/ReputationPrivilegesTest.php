@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\{User, Post};
+use App\Models\Post;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,7 +53,7 @@ test('non-trusted scholars are blocked by the external-link limit', function () 
 
     $this->actingAs($user)->post(route('posts.store'), [
         'title' => 'A curated set of external research resources',
-        'body'  => 'Refer to https://a.com https://b.com https://c.com https://d.com https://e.com for the full dataset.',
+        'body' => 'Refer to https://a.com https://b.com https://c.com https://d.com https://e.com for the full dataset.',
     ])->assertSessionHasErrors('body');
 });
 
@@ -61,7 +62,7 @@ test('trusted scholars bypass the external-link limit', function () {
 
     $this->actingAs($user)->post(route('posts.store'), [
         'title' => 'A curated set of external research resources',
-        'body'  => 'Refer to https://a.com https://b.com https://c.com https://d.com https://e.com for the full dataset.',
+        'body' => 'Refer to https://a.com https://b.com https://c.com https://d.com https://e.com for the full dataset.',
     ])->assertSessionHasNoErrors();
 
     expect(Post::where('title', 'A curated set of external research resources')->exists())->toBeTrue();

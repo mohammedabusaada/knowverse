@@ -3,6 +3,7 @@
 [![tests](https://github.com/mohammedabusaada/knowverse/actions/workflows/tests.yml/badge.svg)](https://github.com/mohammedabusaada/knowverse/actions/workflows/tests.yml)
 [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 [![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 KnowVerse is a secure, web-based academic discussion platform designed to provide a structured and credible environment for scholarly dialogue. Built to address the shortcomings of general-purpose knowledge-sharing networks, KnowVerse integrates a strict reputation-based governance model, real-time interactivity, and advanced content moderation to ensure academic integrity and meaningful collaboration.
 
@@ -201,6 +202,12 @@ The project was developed over a 16-week period divided into 8 Sprints.
 | Shatha Abu Basheer | 2141091046 |
 | Dema Nasr Abu Zekri | 2141091025 |
 | Reem Marwan Diab | 2141091014 |
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ---
 

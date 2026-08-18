@@ -10,28 +10,28 @@ class ActivityPresenter
     public static function title(UserActivity $activity): string
     {
         return match ($activity->action) {
-            'post_created'           => 'Published a discussion',
-            'comment_created'        => 'Contributed a comment',
-            'vote_up'                => 'Upvoted',
-            'vote_down'              => 'Downvoted',
-            'vote_removed'           => 'Retracted a vote',
-            'authors_pick_selected'   => 'Accepted a comment (Author\'s Pick)',
-            'reputation_changed'     => 'Reputation updated',
-            'user_followed_user'     => 'Followed a scholar',
-            'user_followed_tag'      => 'Followed a topic',
-            'login'                  => 'Logged in',
-            'logout'                 => 'Logged out',
-            default                  => Str::headline($activity->action),
+            'post_created' => 'Published a discussion',
+            'comment_created' => 'Contributed a comment',
+            'vote_up' => 'Upvoted',
+            'vote_down' => 'Downvoted',
+            'vote_removed' => 'Retracted a vote',
+            'authors_pick_selected' => 'Accepted a comment (Author\'s Pick)',
+            'reputation_changed' => 'Reputation updated',
+            'user_followed_user' => 'Followed a scholar',
+            'user_followed_tag' => 'Followed a topic',
+            'login' => 'Logged in',
+            'logout' => 'Logged out',
+            default => Str::headline($activity->action),
         };
     }
 
     public static function color(UserActivity $activity): string
     {
         return match ($activity->action) {
-            'vote_up'            => 'text-green-600',
-            'vote_down'          => 'text-red-600',
+            'vote_up' => 'text-green-600',
+            'vote_down' => 'text-red-600',
             'reputation_changed' => 'text-purple-600',
-            default              => 'text-gray-900 dark:text-gray-100',
+            default => 'text-gray-900 dark:text-gray-100',
         };
     }
 
@@ -39,17 +39,15 @@ class ActivityPresenter
     {
         $target = $activity->target;
 
-        if (!$target) {
+        if (! $target) {
             return null;
         }
 
         return match (true) {
-            $activity->action === 'post_created'
-            => route('posts.show', $target),
+            $activity->action === 'post_created' => route('posts.show', $target),
 
             $activity->action === 'comment_created'
-                && method_exists($target, 'post')
-            => route('posts.show', $target->post) . "#comment-{$target->id}",
+                && method_exists($target, 'post') => route('posts.show', $target->post)."#comment-{$target->id}",
 
             default => null,
         };
@@ -59,13 +57,13 @@ class ActivityPresenter
     {
         $target = $activity->target;
 
-        if (!$target) {
+        if (! $target) {
             return null;
         }
 
         return match (true) {
             property_exists($target, 'title') => Str::limit($target->title, 80),
-            default                           => null,
+            default => null,
         };
     }
 }

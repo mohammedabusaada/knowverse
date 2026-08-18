@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    MorphTo
-};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Vote extends Model
 {
@@ -24,7 +22,7 @@ class Vote extends Model
     ];
 
     protected $casts = [
-        'value'      => 'integer',
+        'value' => 'integer',
         'created_at' => 'datetime',
     ];
 
@@ -54,16 +52,17 @@ class Vote extends Model
 
     /**
      * Cast or update a vote for a specific target.
+     *
      * * @param User $user The voter
-     * @param Model $target The polymorphic target (Post/Comment)
-     * @param int $value The vote weight (1 or -1)
+     * @param  Model  $target  The polymorphic target (Post/Comment)
+     * @param  int  $value  The vote weight (1 or -1)
      */
     public static function castVote(User $user, Model $target, int $value): self
     {
         return static::updateOrCreate(
             [
-                'user_id'     => $user->id,
-                'target_id'   => $target->getKey(),
+                'user_id' => $user->id,
+                'target_id' => $target->getKey(),
                 'target_type' => $target->getMorphClass(),
             ],
             ['value' => $value]

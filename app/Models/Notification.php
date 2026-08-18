@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\NotificationType;
+use App\Presenters\NotificationPresenter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    MorphTo
-};
-use App\Presenters\NotificationPresenter;
-use App\Enums\NotificationType;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Notification extends Model
 {

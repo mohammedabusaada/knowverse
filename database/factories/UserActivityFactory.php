@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\{UserActivity, User, Post, Comment};
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\UserActivity;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserActivityFactory extends Factory
@@ -35,12 +38,12 @@ class UserActivityFactory extends Factory
         }
 
         return [
-            'user_id'     => User::inRandomOrder()->first()->id,
-            'action'      => $action,
-            'target_id'   => $target?->id,
+            'user_id' => User::inRandomOrder()->first()->id,
+            'action' => $action,
+            'target_id' => $target?->id,
             'target_type' => $target ? get_class($target) : null,
-            'details'     => "The user performed a " . str_replace('_', ' ', $action) . " operation on a scholarly entry.",
-            'created_at'  => $this->faker->dateTimeBetween('-30 days'),
+            'details' => 'The user performed a '.str_replace('_', ' ', $action).' operation on a scholarly entry.',
+            'created_at' => $this->faker->dateTimeBetween('-30 days'),
         ];
     }
 }

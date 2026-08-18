@@ -2,9 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Post;
+use App\Models\Reputation;
+use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Models\{User, Post, Vote, Reputation};
 
 /**
  * Measures server-side vote-processing latency across the full cascade of
@@ -35,6 +38,7 @@ class BenchmarkVotes extends Command
 
         if ($users->count() < 2 || $posts->isEmpty()) {
             $this->error('Insufficient data. Seed first:  php artisan knowverse:seed-benchmark');
+
             return self::FAILURE;
         }
 
@@ -97,20 +101,22 @@ class BenchmarkVotes extends Command
         ]);
 
         $csv = "metric,value\n"
-            ."operations,".count($latencies)."\n"
+            .'operations,'.count($latencies)."\n"
             ."mean_ms,{$mean}\n"
-            ."p50_ms,".$this->pct($latencies, 50)."\n"
-            ."p95_ms,".$this->pct($latencies, 95)."\n"
-            ."p99_ms,".$this->pct($latencies, 99)."\n"
-            ."throughput_vps,".($wall > 0 ? round(count($latencies) / $wall, 1) : 0)."\n"
+            .'p50_ms,'.$this->pct($latencies, 50)."\n"
+            .'p95_ms,'.$this->pct($latencies, 95)."\n"
+            .'p99_ms,'.$this->pct($latencies, 99)."\n"
+            .'throughput_vps,'.($wall > 0 ? round(count($latencies) / $wall, 1) : 0)."\n"
             ."ledger_violations,{$violations}\n";
         $this->writeCsv('benchmark-votes.csv', $csv);
 
         if ($violations > 0) {
             $this->error("Ledger invariant VIOLATED for {$violations} user(s).");
+
             return self::FAILURE;
         }
         $this->info('Ledger invariant holds (0 violations).');
+
         return self::SUCCESS;
     }
 
@@ -120,6 +126,7 @@ class BenchmarkVotes extends Command
             return 0.0;
         }
         $i = (int) ceil($p / 100 * count($sorted)) - 1;
+
         return round($sorted[max(0, min($i, count($sorted) - 1))], 2);
     }
 

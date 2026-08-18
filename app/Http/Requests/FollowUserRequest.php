@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -12,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
  */
 class FollowUserRequest extends FormRequest
 {
-  public function authorize(): bool
+    public function authorize(): bool
     {
-         // Governance: User must be authenticated AND cannot initiate a follow relationship with themselves.
+        // Governance: User must be authenticated AND cannot initiate a follow relationship with themselves.
         return Auth::check() && $this->route('user')->id !== Auth::id();
     }
 

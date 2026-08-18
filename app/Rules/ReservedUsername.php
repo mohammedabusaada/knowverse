@@ -7,17 +7,18 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * System Namespace Protection.
- * Prevents users from hijacking critical application routes (e.g., /admin, /posts) 
+ * Prevents users from hijacking critical application routes (e.g., /admin, /posts)
  * via dynamic profile routing /{username}.
  */
 class ReservedUsername implements ValidationRule
 {
     protected array $reserved = [
-        'search', 'admin', 'dashboard', 'settings', 'login', 
-        'register', 'logout', 'api', 'posts', 'comments', 
-        'tags', 'profile', 'reputation', 'test-report', 
-        'knowverse', 'root', 'help', 'support', 'home'
+        'search', 'admin', 'dashboard', 'settings', 'login',
+        'register', 'logout', 'api', 'posts', 'comments',
+        'tags', 'profile', 'reputation', 'test-report',
+        'knowverse', 'root', 'help', 'support', 'home',
     ];
+
     /**
      * Run the validation rule.
      *

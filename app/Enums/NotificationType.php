@@ -13,7 +13,7 @@ enum NotificationType: string
     case POST_COMMENTED = 'post_commented';
     case COMMENT_REPLIED = 'comment_replied';
     case AUTHORS_PICK_RECEIVED = 'authors_pick_received';
-    
+
     // Moderation & Trust
     case REPORT_RESOLVED = 'report_resolved';
     case CONTENT_REMOVED = 'content_removed';
@@ -26,7 +26,7 @@ enum NotificationType: string
 
     // Social Graph
     case USER_FOLLOWED = 'user_followed';
-    case TAG_FOLLOWED  = 'tag_followed';
+    case TAG_FOLLOWED = 'tag_followed';
     case NEW_POST_FOLLOWING = 'new_post_following';
     case NEW_POST_TAG = 'new_post_tag';
 
@@ -38,13 +38,12 @@ enum NotificationType: string
      * Identifies critical system and moderation notifications.
      * Mandatory notifications bypass user opt-out preferences to ensure essential
      * administrative communication always reaches the user.
-     * * @return bool
      */
     public function isMandatory(): bool
     {
         return match ($this) {
-            self::SYSTEM, 
-            self::REPORT_RESOLVED, 
+            self::SYSTEM,
+            self::REPORT_RESOLVED,
             self::CONTENT_REMOVED => true,
             default => false,
         };
@@ -53,6 +52,7 @@ enum NotificationType: string
     /**
      * Categorizes notification types logically for the user preference settings UI.
      * This allows users to toggle entire groups of notifications at once.
+     *
      * * @return array<string, array<NotificationType>>
      */
     public static function grouped(): array

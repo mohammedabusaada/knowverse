@@ -25,8 +25,8 @@ test('profile information can be updated', function () {
 
     $response = $this->actingAs($user)->put(route('profile.update'), [
         'full_name' => 'Updated Scholar',
-        'username'  => 'updated_scholar',
-        'email'     => $user->email, // required by the validator; immutable in the controller
+        'username' => 'updated_scholar',
+        'email' => $user->email, // required by the validator; immutable in the controller
     ]);
 
     $response
@@ -44,8 +44,8 @@ test('email address is immutable and cannot be changed via a profile update', fu
 
     $this->actingAs($user)->put(route('profile.update'), [
         'full_name' => $user->full_name,
-        'username'  => $user->username,
-        'email'     => 'attacker-changed@example.com',
+        'username' => $user->username,
+        'email' => 'attacker-changed@example.com',
     ])->assertSessionHasNoErrors();
 
     $user->refresh();

@@ -9,31 +9,31 @@ return [
     */
     'categories' => [
         'post_commented' => [
-            'label'   => 'New comments on my posts',
+            'label' => 'New comments on my posts',
             'default' => true,
         ],
         'comment_replied' => [
-            'label'   => 'Replies to my comments',
+            'label' => 'Replies to my comments',
             'default' => true,
         ],
         'user_followed' => [
-            'label'   => 'New followers',
+            'label' => 'New followers',
             'default' => true,
         ],
         'post_upvoted' => [
-            'label'   => 'Upvotes on my posts',
+            'label' => 'Upvotes on my posts',
             'default' => true,
         ],
         'authors_pick_received' => [
-            'label'   => 'My Comment is selected as Author\'s Pick',
+            'label' => 'My Comment is selected as Author\'s Pick',
             'default' => true,
         ],
         'report_resolved' => [
-            'label'   => 'Updates on reports I submitted',
+            'label' => 'Updates on reports I submitted',
             'default' => true,
         ],
         'content_removed' => [
-            'label'   => 'Notifications about my content being hidden',
+            'label' => 'Notifications about my content being hidden',
             'default' => true,
         ],
     ],

@@ -87,10 +87,10 @@ class ReportModerationController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => $message,
-                'status' => 'success'
+                'status' => 'success',
             ]);
         }
-        
+
         return redirect()->route('admin.reports.index')->with('success', $message);
     }
 }

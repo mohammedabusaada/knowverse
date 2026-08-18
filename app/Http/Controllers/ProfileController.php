@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Http\Requests\ProfileUpdateRequest;
 use League\CommonMark\CommonMarkConverter;
 
 class ProfileController extends Controller
@@ -22,9 +22,9 @@ class ProfileController extends Controller
     {
         // Eager load relationship counts to prevent N+1 queries in the UI
         $user->loadCount(['posts', 'allComments', 'followers', 'following']);
-        
+
         $parsedBio = null;
-        
+
         // Convert Markdown Biography to safe HTML for scholarly presentation
         if ($user->bio) {
             $converter = new CommonMarkConverter([
@@ -44,18 +44,18 @@ class ProfileController extends Controller
     {
         $user->loadCount(['posts', 'allComments', 'followers', 'following']);
 
-        // Honor Moderator/Admin privileges to bypass privacy restrictions 
+        // Honor Moderator/Admin privileges to bypass privacy restrictions
         // during moderation or investigations.
-        $canView = $user->public_follow_lists || 
+        $canView = $user->public_follow_lists ||
                   (Auth::check() && (Auth::id() === $user->id || Auth::user()->canModerate()));
         $followers = $canView
             ? $user->followers()->paginate(20)
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         return view('profile.followers', [
-            'user'      => $user,
+            'user' => $user,
             'followers' => $followers,
-            'isPrivate' => !$canView,
+            'isPrivate' => ! $canView,
         ]);
     }
 
@@ -67,7 +67,7 @@ class ProfileController extends Controller
         $user->loadCount(['posts', 'allComments', 'followers', 'following']);
 
         // Honor Moderator/Admin privileges
-        $canView = $user->public_follow_lists || 
+        $canView = $user->public_follow_lists ||
                   (Auth::check() && (Auth::id() === $user->id || Auth::user()->canModerate()));
 
         // Separate pagination instances for Scholars and Topics to avoid query conflicts
@@ -80,10 +80,10 @@ class ProfileController extends Controller
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         return view('profile.following', [
-            'user'           => $user,
-            'following'      => $followingUsers,
-            'followingTags'  => $followingTags,
-            'isPrivate'      => !$canView,
+            'user' => $user,
+            'following' => $followingUsers,
+            'followingTags' => $followingTags,
+            'isPrivate' => ! $canView,
         ]);
     }
 
@@ -93,7 +93,7 @@ class ProfileController extends Controller
     public function edit()
     {
         return view('profile.edit', [
-            'user' => Auth::user()
+            'user' => Auth::user(),
         ]);
     }
 
@@ -136,7 +136,7 @@ class ProfileController extends Controller
         // Ensuring policies (Defense in Depth
         $this->authorize('delete', $user);
 
-        Auth::logout();        
+        Auth::logout();
         $user->delete(); // Soft delete serves as the 'deactivated' state
 
         $request->session()->invalidate();
@@ -158,7 +158,7 @@ class ProfileController extends Controller
         $this->authorize('delete', $user);
 
         Auth::logout();
-        
+
         // Permanent eradication from the database
         $user->forceDelete();
 

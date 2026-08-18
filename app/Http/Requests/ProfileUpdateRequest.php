@@ -24,18 +24,18 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name'           => ['required', 'string', 'max:255'],
-            'academic_title'      => ['nullable', 'string', 'max:255'],
-            'bio'                 => ['nullable', 'string', 'max:2000'],
-            'profile_picture'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'public_follow_lists' => ['boolean'], 
-            
+            'full_name' => ['required', 'string', 'max:255'],
+            'academic_title' => ['nullable', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'profile_picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'public_follow_lists' => ['boolean'],
+
             'username' => [
                 'required', 'string', 'max:50', 'alpha_dash:ascii',
                 Rule::unique('users')->ignore($this->user()->id),
-                new ReservedUsername(), // Prevent hijacking system-reserved slugs
+                new ReservedUsername, // Prevent hijacking system-reserved slugs
             ],
-            
+
             'email' => [
                 'required',
                 'string',
@@ -47,7 +47,7 @@ class ProfileUpdateRequest extends FormRequest
         ];
     }
 
-/**
+    /**
      * Data Normalization: Pre-process inputs before they hit the validator.
      */
     protected function prepareForValidation()

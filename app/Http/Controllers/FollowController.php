@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use App\Services\NotificationService;
 use App\Enums\NotificationType;
+use App\Models\User;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
 
 class FollowController extends Controller
 {
@@ -38,11 +38,11 @@ class FollowController extends Controller
                     recipient: $user,
                     type: NotificationType::USER_FOLLOWED,
                     actor: Auth::user(),
-                    message: Auth::user()->display_name . ' started following your academic updates.'
+                    message: Auth::user()->display_name.' started following your academic updates.'
                 );
             } catch (\Exception $e) {
                 // Fail gracefully: Log WebSocket/Queue failures silently to avoid disrupting the UX
-                \Illuminate\Support\Facades\Log::warning('Follow Notification dispatch failed: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('Follow Notification dispatch failed: '.$e->getMessage());
             }
         }
 

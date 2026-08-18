@@ -2,8 +2,6 @@
 
 namespace App\View\Components;
 
-use Closure;
-use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class EmptyState extends Component
@@ -18,4 +16,3 @@ class EmptyState extends Component
         return view('components.empty-state');
     }
 }
-

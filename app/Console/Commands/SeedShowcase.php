@@ -2,9 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\{User, Post, Comment, Tag, Vote};
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
+use App\Models\Vote;
 use App\Services\ReputationService;
+use Illuminate\Console\Command;
 
 /**
  * Seeds a few rich, realistic academic discussions (Markdown + LaTeX + code blocks),
@@ -25,9 +29,9 @@ class SeedShowcase extends Command
         config(['broadcasting.default' => 'null']); // no live WebSocket calls while seeding
         $this->callSilent('db:seed', ['--class' => \Database\Seeders\RoleSeeder::class, '--force' => true]);
 
-// ---- Post bodies (NOWDOC: no PHP interpolation, so the $ LaTeX is preserved) ----
+        // ---- Post bodies (NOWDOC: no PHP interpolation, so the $ LaTeX is preserved) ----
 
-$body1 = <<<'BODY'
+        $body1 = <<<'BODY'
 Divide-and-conquer is one of the most influential paradigms in algorithm design. The strategy is deceptively simple: split a problem into smaller subproblems, solve each recursively, and combine the results.
 
 ## The Recurrence
@@ -63,7 +67,7 @@ def merge_sort(a):
 The elegance of the paradigm lies in turning an intractable problem into a recurrence we can reason about formally — and the Master Theorem turns that recurrence into an answer.
 BODY;
 
-$body2 = <<<'BODY'
+        $body2 = <<<'BODY'
 Audit logs are only trustworthy if they cannot be silently altered. A **tamper-evident log** uses cryptographic hashing so that any modification to a past entry becomes detectable.
 
 ## The Hash Chain
@@ -97,7 +101,7 @@ def verify(entries):
 This is precisely the principle behind an immutable reputation ledger: every change is a verifiable transaction rather than an overwrite.
 BODY;
 
-$body3 = <<<'BODY'
+        $body3 = <<<'BODY'
 Few results capture the surprise of mathematical analysis like the Basel problem — the question of what value is approached by the sum of the reciprocals of the squares.
 
 ## The Statement
@@ -200,16 +204,17 @@ BODY;
         foreach ($posts as $p) {
             if (Post::withoutGlobalScopes()->where('title', $p['title'])->exists()) {
                 $urls[] = route('posts.show', Post::withoutGlobalScopes()->where('title', $p['title'])->first());
-                $this->line('  (exists) ' . $p['title']);
+                $this->line('  (exists) '.$p['title']);
+
                 continue;
             }
 
             $author = $scholars[$p['author']];
             $post = Post::create([
                 'user_id' => $author->id,
-                'title'   => $p['title'],
-                'body'    => $p['body'],
-                'status'  => Post::STATUS_PUBLISHED,
+                'title' => $p['title'],
+                'body' => $p['body'],
+                'status' => Post::STATUS_PUBLISHED,
             ]);
             $post->tags()->sync(collect($p['tags'])->map(fn ($t) => $tagIds[$t])->all());
 
@@ -221,7 +226,7 @@ BODY;
                 Comment::create([
                     'post_id' => $post->id,
                     'user_id' => $scholars[($p['author'] + $i + 1) % $scholars->count()]->id,
-                    'body'    => $body,
+                    'body' => $body,
                 ]);
             }
 
@@ -232,7 +237,7 @@ BODY;
             }
 
             $urls[] = route('posts.show', $post);
-            $this->info('  created: ' . $p['title']);
+            $this->info('  created: '.$p['title']);
         }
 
         // ---- Build a consistent, ledger-backed reputation history per scholar ----
@@ -241,8 +246,8 @@ BODY;
         $allPosts = Post::withoutGlobalScopes()->whereIn('title', array_column($posts, 'title'))->get();
         // Weighted action pool (mostly received upvotes, some comments, occasional pick / downvote)
         $pool = ['post_upvoted', 'post_upvoted', 'post_upvoted', 'post_upvoted',
-                 'comment_upvoted', 'comment_upvoted', 'comment_created',
-                 'authors_pick_received', 'post_downvoted'];
+            'comment_upvoted', 'comment_upvoted', 'comment_created',
+            'authors_pick_received', 'post_downvoted'];
 
         foreach ($scholars as $idx => $scholar) {
             $scholar->refresh(); // include reputation already earned from posts/comments/votes
@@ -261,9 +266,9 @@ BODY;
         $this->newLine();
         $this->info('Showcase discussions ready. Open these for your screenshots:');
         foreach ($urls as $u) {
-            $this->line('  ' . $u);
+            $this->line('  '.$u);
         }
-        $this->line('Top Scholars: ' . $scholars->map(fn ($s) => $s->display_name . ' (' . $s->reputation_points . ')')->implode(', '));
+        $this->line('Top Scholars: '.$scholars->map(fn ($s) => $s->display_name.' ('.$s->reputation_points.')')->implode(', '));
         $this->warn('Showcase scholars use the password "password".');
 
         return self::SUCCESS;
