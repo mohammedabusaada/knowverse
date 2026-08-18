@@ -30,7 +30,13 @@ class PostController extends Controller
                     $q->whereIn('name', $selectedTags);
                 });
             })
-            ->latest()
+            // Deterministic order matching: is_pinned DESC, pinned_at DESC, created_at DESC.
+            //   1) pinned discussions first  (the flag — NULL-safe across databases)
+            //   2) among pinned: most-recently-PINNED first  (X pinned after Y => X first)
+            //   3) then newest-created  (orders the unpinned posts; final tiebreaker)
+            ->orderByRaw('(pinned_at IS NOT NULL) DESC')
+            ->orderByDesc('pinned_at')
+            ->latest() // created_at DESC
             ->paginate(9)
             ->withQueryString();
 
@@ -65,19 +71,22 @@ class PostController extends Controller
             'body.min'  => 'The discussion body must be at least 30 characters to maintain scholarly depth.',
         ]);
 
-        // 2. Anti-Spam Check: Prevent exact duplicates from the same user within the last hour
-        $duplicatePost = Post::where('user_id', Auth::id())
-            ->where('created_at', '>=', now()->subHour())
-            ->where(function ($query) use ($request) {
-                $query->where('title', $request->title)
-                      ->orWhere('body', $request->body);
-            })
-            ->exists();
+        // 2. Anti-Spam Check: Prevent exact duplicates from the same user within the last
+        //    hour. Trusted (high-reputation) scholars are exempt from this friction.
+        if (! $request->user()->hasPrivilege('trusted')) {
+            $duplicatePost = Post::where('user_id', Auth::id())
+                ->where('created_at', '>=', now()->subHour())
+                ->where(function ($query) use ($request) {
+                    $query->where('title', $request->title)
+                          ->orWhere('body', $request->body);
+                })
+                ->exists();
 
-        if ($duplicatePost) {
-            return back()->withInput()->withErrors([
-                'title' => 'You have already posted a discussion with the same title or content within the last hour. Please wait before posting again.',
-            ]);
+            if ($duplicatePost) {
+                return back()->withInput()->withErrors([
+                    'title' => 'You have already posted a discussion with the same title or content within the last hour. Please wait before posting again.',
+                ]);
+            }
         }
 
         $validated['user_id'] = Auth::id();
@@ -201,5 +210,28 @@ class PostController extends Controller
         return redirect()
             ->route('posts.index')
             ->with('status', 'Discussion moved to trash/archives.');
+    }
+
+    /**
+     * Pin one of the author's own discussions to the top of the feed.
+     * Reputation-gated participation privilege; never affects others' content.
+     */
+    public function pin(Post $post)
+    {
+        $this->authorize('pin', $post);
+        $post->update(['pinned_at' => now()]);
+
+        return back()->with('status', 'Discussion pinned to the top of the feed.');
+    }
+
+    /**
+     * Remove the pin from the author's own discussion.
+     */
+    public function unpin(Post $post)
+    {
+        $this->authorize('pin', $post);
+        $post->update(['pinned_at' => null]);
+
+        return back()->with('status', 'Discussion unpinned.');
     }
 }

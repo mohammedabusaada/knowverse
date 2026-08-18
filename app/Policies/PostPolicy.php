@@ -41,4 +41,13 @@ class PostPolicy
     {
         return $user->id === $post->user_id || $user->canModerate();
     }
+
+    /**
+     * Pin Access: the author may pin/unpin their OWN discussion, provided they have
+     * earned the reputation privilege. A participation privilege, not RBAC authority.
+     */
+    public function pin(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id && $user->hasPrivilege('pin_post');
+    }
 }

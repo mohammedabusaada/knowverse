@@ -137,6 +137,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckBanned::class])->group(func
         Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
         Route::post('/posts/{post}/save', [SavedPostController::class, 'toggle'])->name('posts.save.toggle');
 
+        // Reputation-gated: pin / unpin own discussions
+        Route::post('/posts/{post}/pin', [PostController::class, 'pin'])->name('posts.pin');
+        Route::delete('/posts/{post}/pin', [PostController::class, 'unpin'])->name('posts.unpin');
+
         // Network Expansion
         Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('users.follow');
         
