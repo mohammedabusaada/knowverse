@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\UserActivity;
+use Illuminate\Database\Seeder;
 
 class UserActivitySeeder extends Seeder
 {

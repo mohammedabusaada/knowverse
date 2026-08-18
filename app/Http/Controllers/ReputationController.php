@@ -23,9 +23,9 @@ class ReputationController extends Controller
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         return view('reputation.index', [
-            'user'      => $user,
-            'history'   => $history,
-            'isPrivate' => !$canView, // Pass the state to the view
+            'user' => $user,
+            'history' => $history,
+            'isPrivate' => ! $canView, // Pass the state to the view
         ]);
     }
 }

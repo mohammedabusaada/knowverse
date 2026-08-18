@@ -1,26 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\VoteController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReputationController;
-use App\Http\Controllers\UserActivityController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportModerationController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
-use App\Http\Controllers\TagFollowController;
-use App\Http\Controllers\SavedPostController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReputationController;
+use App\Http\Controllers\SavedPostController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TagFollowController;
+use App\Http\Controllers\UserActivityController;
+use App\Http\Controllers\VoteController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +46,7 @@ Route::get('/tags/{tag}/followers', [TagController::class, 'followers'])->name('
 | 2. Authentication
 |--------------------------------------------------------------------------
 */
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +61,7 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
 
         // User Management
         Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
-        
+
         Route::patch('/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggle-ban');
 
         // Manual RBAC role assignment (reputation never changes roles automatically)
@@ -111,9 +110,11 @@ Route::middleware(['auth', \App\Http\Middleware\CheckBanned::class])->group(func
         // Notification Preferences - FIXED: Changed to PUT to match the form @method('PUT')
         Route::get('/notifications', [NotificationPreferenceController::class, 'edit'])->name('settings.notifications');
         Route::put('/notifications', [NotificationPreferenceController::class, 'update'])->name('settings.notifications.update');
-        
+
         // Security & Standing
-        Route::get('/security', function () { return view('settings.security'); })->name('settings.security');
+        Route::get('/security', function () {
+            return view('settings.security');
+        })->name('settings.security');
         Route::patch('/profile/deactivate', [ProfileController::class, 'deactivate'])->name('profile.deactivate');
     });
 
@@ -127,7 +128,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckBanned::class])->group(func
         // Discussion & Comment Management
         Route::resource('posts', PostController::class)->except(['show', 'index']);
         Route::resource('comments', CommentController::class)->only(['store', 'update', 'destroy']);
-        
+
         // Content Curation: Author's Pick (Consensus)
         Route::post('/comments/{comment}/highlight', [CommentController::class, 'markAsBest'])->name('comments.best');
         Route::post('/comments/{comment}/unhighlight', [CommentController::class, 'unmarkBest'])->name('comments.unbest');
@@ -143,7 +144,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckBanned::class])->group(func
 
         // Network Expansion
         Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->name('users.follow');
-        
+
         // Topic Subscription - FIXED: unified route naming
         Route::post('/tags/{tag}/follow', [TagFollowController::class, 'follow'])->name('tags.follow');
         Route::delete('/tags/{tag}/follow', [TagFollowController::class, 'unfollow'])->name('tags.unfollow');

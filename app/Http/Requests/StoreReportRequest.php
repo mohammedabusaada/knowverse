@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\ReportReason;
 use App\Rules\NoDuplicateReport;
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 /**
  * Orchestrates the reporting system logic.
@@ -25,37 +25,37 @@ class StoreReportRequest extends FormRequest
 
         return [
             'target_type' => ['required', 'in:post,comment,user'],
-            'target_id'   => [
-                'required', 
+            'target_id' => [
+                'required',
                 'integer',
                 new NoDuplicateReport($modelClass, (int) $this->target_id),
-                
+
                 function ($attribute, $value, $fail) use ($modelClass) {
                     $user = $this->user();
 
                     // Self-Reporting Constraint for Users
                     if ($modelClass === \App\Models\User::class) {
-                        if ((int)$value === (int)$user->id) {
+                        if ((int) $value === (int) $user->id) {
                             $fail('You cannot report your own profile.');
                         }
-                        
+
                         $targetUser = \App\Models\User::find($value);
                         if ($targetUser && $targetUser->is_banned) {
                             $fail('This account is already suspended and under review.');
                         }
-                    } 
+                    }
                     // Self-Reporting Constraint for Posts and Comments
                     elseif (in_array($modelClass, [\App\Models\Post::class, \App\Models\Comment::class])) {
                         $target = $modelClass::find($value);
-                        if ($target && (int)$target->user_id === (int)$user->id) {
+                        if ($target && (int) $target->user_id === (int) $user->id) {
                             // Automatically adapt message (e.g., "You cannot report your own post.")
-                            $fail("You cannot report your own " . strtolower(class_basename($modelClass)) . ".");
+                            $fail('You cannot report your own '.strtolower(class_basename($modelClass)).'.');
                         }
                     }
-                }
+                },
             ],
             'reason_type' => ['required', new Enum(ReportReason::class)],
-            'reason'      => ['nullable', 'string', 'max:1000'],
+            'reason' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
-use App\Models\{User, Post, Comment};
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +16,7 @@ use App\Models\{User, Post, Comment};
 test('stored discussion markdown strips raw HTML and script tags (XSS defense)', function () {
     $post = Post::factory()->create([
         'body' => "Legitimate scholarly analysis. <script>alert('xss')</script> and "
-            . "<img src=x onerror=alert(document.cookie)>. Further methodology is discussed here.",
+            .'<img src=x onerror=alert(document.cookie)>. Further methodology is discussed here.',
     ]);
 
     $html = $post->formatted_body;
@@ -27,7 +29,7 @@ test('stored comment markdown strips raw HTML (XSS defense)', function () {
     $post = Post::factory()->create();
     $comment = Comment::factory()->create([
         'post_id' => $post->id,
-        'body'    => "Interesting point <script>document.cookie</script> indeed, thank you.",
+        'body' => 'Interesting point <script>document.cookie</script> indeed, thank you.',
     ]);
 
     expect($comment->body_html)->not->toContain('<script>');

@@ -2,27 +2,22 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
-
-// Authentication Notifications
-use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Notifications\Messages\MailMessage;
-
-use App\Models\Vote;
-use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
-use App\Observers\VoteObserver;
+use App\Models\Vote;
+use App\Observers\CommentObserver;
+// Authentication Notifications
 use App\Observers\PostObserver;
 use App\Observers\UserObserver;
-use App\Observers\CommentObserver;
+use App\Observers\VoteObserver;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,12 +60,12 @@ class AppServiceProvider extends ServiceProvider
         // Customize the Verification Email Notification
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             return (new MailMessage)
-                ->subject('Verify Email Address - ' . config('app.name'))
-                ->greeting('Hello ' . $notifiable->username . '!')
+                ->subject('Verify Email Address - '.config('app.name'))
+                ->greeting('Hello '.$notifiable->username.'!')
                 ->line('Please click the button below to verify your email address.')
                 ->action('Verify Email Address', $url)
                 ->line('If you did not create an account, no further action is required.')
-                ->salutation("Regards,\n" . config('app.name') . ' Academic Community');
+                ->salutation("Regards,\n".config('app.name').' Academic Community');
         });
 
         // Register custom Blade directives

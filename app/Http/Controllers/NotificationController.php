@@ -59,7 +59,6 @@ class NotificationController extends Controller
         return back();
     }
 
-
     /**
      * Visit a notification:
      * - authorize
@@ -80,7 +79,6 @@ class NotificationController extends Controller
             ? redirect($url)
             : redirect()->route('notifications.index');
     }
-
 
     /**
      * Delete all notifications for the user.

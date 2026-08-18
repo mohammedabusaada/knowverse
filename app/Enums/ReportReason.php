@@ -4,7 +4,7 @@ namespace App\Enums;
 
 /**
  * Defines the standard set of violation reasons across the platform.
- * Backed Enums guarantee data integrity at the application layer before interacting 
+ * Backed Enums guarantee data integrity at the application layer before interacting
  * with the database, preventing injection of invalid report categories.
  */
 enum ReportReason: string
@@ -21,7 +21,6 @@ enum ReportReason: string
 
     /**
      * Provides a human-readable, presentation-ready label for the frontend UI.
-     * * @return string
      */
     public function label(): string
     {
@@ -39,9 +38,8 @@ enum ReportReason: string
     }
 
     /**
-     * Provides detailed contextual descriptions for moderation guidelines 
+     * Provides detailed contextual descriptions for moderation guidelines
      * and user tooltips during the reporting process.
-     * * @return string
      */
     public function description(): string
     {
@@ -55,8 +53,9 @@ enum ReportReason: string
 
     /**
      * Dynamically filters available report reasons based on the target entity context.
-     * This prevents illogical reports (e.g., reporting a User Profile for 'Copyright violation'), 
+     * This prevents illogical reports (e.g., reporting a User Profile for 'Copyright violation'),
      * maintaining a coherent User Experience (UX).
+     *
      * * @param string $targetType The fully qualified class name or morph map alias.
      * @return array<ReportReason>
      */

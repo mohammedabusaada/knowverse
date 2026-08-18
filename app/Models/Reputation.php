@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{
-    BelongsTo,
-    MorphTo
-};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Reputation Audit Ledger
- * Implements an "Append-Only Ledger" pattern. Records are immutable and 
+ * Implements an "Append-Only Ledger" pattern. Records are immutable and
  * serve as a verifiable history of a user's academic standing. [cite: 117, 118]
  */
 class Reputation extends Model
@@ -31,7 +29,7 @@ class Reputation extends Model
     ];
 
     protected $casts = [
-        'delta'      => 'integer',
+        'delta' => 'integer',
         'created_at' => 'datetime',
     ];
 
@@ -77,12 +75,12 @@ class Reputation extends Model
     public static function record(int $userId, string $action, int $delta, ?Model $source = null, ?string $note = null): self
     {
         return self::create([
-            'user_id'     => $userId,
-            'action'      => $action,
-            'delta'       => $delta,
-            'source_id'   => $source?->getKey(),
+            'user_id' => $userId,
+            'action' => $action,
+            'delta' => $delta,
+            'source_id' => $source?->getKey(),
             'source_type' => $source ? $source->getMorphClass() : null,
-            'note'        => $note,
+            'note' => $note,
         ]);
     }
 }

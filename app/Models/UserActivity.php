@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class UserActivity extends Model
 {
@@ -61,18 +62,18 @@ class UserActivity extends Model
                     \App\Models\Post::class => ['user', 'tags'],
                     \App\Models\Comment::class => ['user', 'post'],
                 ]);
-            }
+            },
         ]);
     }
 
     public static function log(User $user, string $action, ?Model $target = null, ?string $details = null): self
     {
         return self::create([
-            'user_id'     => $user->id,
-            'action'      => $action,
-            'target_id'   => $target?->getKey(),
+            'user_id' => $user->id,
+            'action' => $action,
+            'target_id' => $target?->getKey(),
             'target_type' => $target ? $target->getMorphClass() : null,
-            'details'     => $details,
+            'details' => $details,
         ]);
     }
 

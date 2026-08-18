@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\NotificationPreference;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class NotificationPreferenceSeeder extends Seeder
 {
@@ -14,7 +13,7 @@ class NotificationPreferenceSeeder extends Seeder
      */
     public function run(): void
     {
-              $categories = config('notification-preferences.categories');
+        $categories = config('notification-preferences.categories');
 
         User::chunk(100, function ($users) use ($categories) {
             foreach ($users as $user) {
@@ -22,7 +21,7 @@ class NotificationPreferenceSeeder extends Seeder
                     NotificationPreference::firstOrCreate(
                         [
                             'user_id' => $user->id,
-                            'type'    => $type,
+                            'type' => $type,
                         ],
                         [
                             'enabled' => $meta['default'] ?? true,

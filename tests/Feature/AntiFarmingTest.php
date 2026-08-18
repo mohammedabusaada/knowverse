@@ -1,6 +1,10 @@
 <?php
 
-use App\Models\{User, Post, Comment, Vote, Reputation};
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Reputation;
+use App\Models\User;
+use App\Models\Vote;
 
 /*
 |--------------------------------------------------------------------------

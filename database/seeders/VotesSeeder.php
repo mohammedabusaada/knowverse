@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Vote;
-use App\Models\User;
-use App\Models\Post;
-use App\Models\Comment;
 
 class VotesSeeder extends Seeder
 {
@@ -18,7 +18,7 @@ class VotesSeeder extends Seeder
         $comments = Comment::all();
 
         Vote::withoutEvents(function () use ($userIds, $posts, $comments) {
-            
+
             // Generate votes for Posts
             foreach ($posts as $post) {
                 $voterCount = rand(min(1, $userIds->count()), intval($userIds->count() * 0.8));
@@ -27,13 +27,13 @@ class VotesSeeder extends Seeder
                 foreach ($voters as $userId) {
                     Vote::updateOrCreate(
                         [
-                            'user_id'     => $userId,
-                            'target_type' => $post->getMorphClass(), 
-                            'target_id'   => $post->id,
+                            'user_id' => $userId,
+                            'target_type' => $post->getMorphClass(),
+                            'target_id' => $post->id,
                         ],
                         [
-                            'value'       => rand(1, 10) > 2 ? 1 : -1,
-                            'created_at'  => now(),
+                            'value' => rand(1, 10) > 2 ? 1 : -1,
+                            'created_at' => now(),
                         ]
                     );
                 }
@@ -42,26 +42,28 @@ class VotesSeeder extends Seeder
             // Generate votes for Comments
             foreach ($comments as $comment) {
                 $voterCount = rand(0, intval($userIds->count() * 0.5));
-                if ($voterCount === 0) continue;
+                if ($voterCount === 0) {
+                    continue;
+                }
 
                 $voters = $userIds->random($voterCount);
 
                 foreach ($voters as $userId) {
                     Vote::updateOrCreate(
                         [
-                            'user_id'     => $userId,
-                            'target_type' => $comment->getMorphClass(), 
-                            'target_id'   => $comment->id,
+                            'user_id' => $userId,
+                            'target_type' => $comment->getMorphClass(),
+                            'target_id' => $comment->id,
                         ],
                         [
-                            'value'       => rand(1, 10) > 2 ? 1 : -1,
-                            'created_at'  => now(),
+                            'value' => rand(1, 10) > 2 ? 1 : -1,
+                            'created_at' => now(),
                         ]
                     );
                 }
             }
         });
-        
+
         $postMorph = (new Post)->getMorphClass();
         $commentMorph = (new Comment)->getMorphClass();
 

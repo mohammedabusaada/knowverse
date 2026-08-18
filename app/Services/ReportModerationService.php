@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationType;
+use App\Enums\ReportReason;
 use App\Models\Report;
 use App\Models\User;
-use App\Enums\ReportReason;
-use App\Enums\NotificationType;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Moderation Execution Engine.
- * Processes verified reports and applies administrative penalties strictly within 
+ * Processes verified reports and applies administrative penalties strictly within
  * atomic Database Transactions to guarantee system-wide data integrity.
  */
 class ReportModerationService
@@ -29,7 +29,7 @@ class ReportModerationService
     {
         // Execute inside an Atomic Transaction (All operations succeed, or none do)
         DB::transaction(function () use ($report) {
-            // Extract the polymorphic target, bypassing global visibility scopes 
+            // Extract the polymorphic target, bypassing global visibility scopes
             // to allow administration of already hidden or deleted items.
             $target = $report->target_type::withoutGlobalScopes()
                 ->when(in_array(SoftDeletes::class, class_uses($report->target_type)), function ($query) {
@@ -37,14 +37,16 @@ class ReportModerationService
                 })
                 ->find($report->target_id);
 
-            if (!$target) return;
+            if (! $target) {
+                return;
+            }
 
             $wasActionTaken = false;
 
             // Phase 1: Identity Penalties (Suspend user accounts)
             if ($target instanceof User) {
-                $target->update(['banned_at' => now()]); 
-                $wasActionTaken = true; 
+                $target->update(['banned_at' => now()]);
+                $wasActionTaken = true;
             } else {
                 // Phase 2: Content Penalties (Hide discussions or comments)
                 $wasActionTaken = match ($report->reason_type) {
@@ -92,7 +94,7 @@ class ReportModerationService
                     message: $message
                 );
             } catch (\Exception $e) {
-                Log::warning('Moderation Notification Failed (Reverb/Pusher is likely offline): ' . $e->getMessage());
+                Log::warning('Moderation Notification Failed (Reverb/Pusher is likely offline): '.$e->getMessage());
             }
         }
 
@@ -108,29 +110,31 @@ class ReportModerationService
                     message: "Your report was resolved. We've taken action and rewarded you {$reward} reputation points."
                 );
             } catch (\Exception $e) {
-                Log::warning('Moderation Reward Notification Failed: ' . $e->getMessage());
+                Log::warning('Moderation Reward Notification Failed: '.$e->getMessage());
             }
         }
     }
 
-/**
+    /**
      * Conceals content from the public feed while preserving database records for audit purposes.
      */
     protected function hideContent($model): bool
     {
-        if (!$model || $model instanceof User) return false;
+        if (! $model || $model instanceof User) {
+            return false;
+        }
 
         // Referential Integrity: Nullify 'Author Pick' status if the hidden item was a selected comment
         if ($model instanceof \App\Models\Comment) {
             $model->post()->where('best_comment_id', $model->id)
-                  ->update(['best_comment_id' => null]);
+                ->update(['best_comment_id' => null]);
         }
 
         // Forcefully update state while bypassing eloquent Observers/Scopes
         return $model->forceFill(['is_hidden' => true])->save();
     }
 
-/**
+    /**
      * Moderation logic tailored for spam thresholds.
      */
     protected function handleSpam($target): bool
@@ -138,14 +142,15 @@ class ReportModerationService
         if (method_exists($target, 'increaseSpamScore')) {
             $target->increaseSpamScore();
             $threshold = config('moderation.spam_threshold', 5);
-            
+
             // Auto-conceal content only if it repeatedly exceeds algorithmic limits
             if ($target->spam_score >= $threshold) {
                 return $this->hideContent($target);
             }
+
             return true;
-        } 
-        
+        }
+
         // Fallback for models without spam tracking
         return $this->hideContent($target);
     }

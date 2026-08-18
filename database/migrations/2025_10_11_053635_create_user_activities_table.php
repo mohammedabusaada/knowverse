@@ -32,7 +32,6 @@ return new class extends Migration
             // Timestamp
             $table->timestamp('created_at')->useCurrent();
 
-            
             // Optimization 1: User-centric feed retrieval (Latest actions first)
             $table->index(['user_id', 'created_at']);
 

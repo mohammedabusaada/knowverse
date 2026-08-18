@@ -2,7 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\{Comment, User};
+use App\Models\Comment;
+use App\Models\User;
 
 /**
  * Enforces authorization logic for scholarly comments.
@@ -10,7 +11,7 @@ use App\Models\{Comment, User};
  */
 class CommentPolicy
 {
-/**
+    /**
      * Determines whether a user can modify a specific comments.
      * Grants access exclusively to the original author or the moderation team.
      */
@@ -19,7 +20,7 @@ class CommentPolicy
         return $user->id === $comment->user_id || $user->canModerate();
     }
 
-/**
+    /**
      * Determines whether a user can delete a specific comment.
      * Restricts destructive actions to the owner or administrative personnel.
      */
@@ -28,7 +29,7 @@ class CommentPolicy
         return $user->id === $comment->user_id || $user->canModerate();
     }
 
-/**
+    /**
      * GOVERNANCE & ANTI-FARMING SECURITY:
      * 1. Grants the discussion owner the authority to highlight a comment as the 'Author's Pick'.
      * 2. Strictly prohibits self-awarding to prevent reputation point manipulation.

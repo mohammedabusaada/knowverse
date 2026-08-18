@@ -1,7 +1,13 @@
 <?php
 
-use App\Models\{User, Post, Comment, Vote, Reputation, Report};
-use App\Enums\{ReportStatus, ReportReason};
+use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Report;
+use App\Models\Reputation;
+use App\Models\User;
+use App\Models\Vote;
 use App\Services\ReportModerationService;
 
 /*
@@ -55,9 +61,9 @@ test('moderation penalties preserve the invariant (routed through the ledger)', 
     $report = Report::create([
         'reporter_id' => $reporter->id,
         'target_type' => Post::class,
-        'target_id'   => $post->id,
+        'target_id' => $post->id,
         'reason_type' => ReportReason::SPAM,
-        'status'      => ReportStatus::PENDING,
+        'status' => ReportStatus::PENDING,
     ]);
 
     $report->markAsResolved($moderator);

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
+use App\Models\NotificationPreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\NotificationPreference;
-use App\Enums\NotificationType;
 
 class NotificationPreferenceController extends Controller
 {
@@ -33,7 +33,7 @@ class NotificationPreferenceController extends Controller
 
         // Iterate strictly through defined Enum cases to prevent invalid type injection
         foreach (NotificationType::cases() as $typeCase) {
-            
+
             // Architectural constraint: Mandatory system alerts cannot be opted-out of
             if ($typeCase->isMandatory()) {
                 continue;
@@ -45,7 +45,7 @@ class NotificationPreferenceController extends Controller
             NotificationPreference::updateOrCreate(
                 [
                     'user_id' => $user->id,
-                    'type'    => $typeValue,
+                    'type' => $typeValue,
                 ],
                 [
                     // Boolean casting based on HTML checkbox payload presence

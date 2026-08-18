@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class CommentSeeder extends Seeder
 {
@@ -19,11 +19,11 @@ class CommentSeeder extends Seeder
         $users = User::all();
         $posts = Post::all();
 
-        // Mute Model Events (Observers) to bypass heavy logic 
+        // Mute Model Events (Observers) to bypass heavy logic
         // like Reputation, Activities, and Notifications during database seeding.
         Comment::withoutEvents(function () use ($users, $posts) {
             Post::withoutEvents(function () use ($users, $posts) {
-                
+
                 foreach ($posts as $post) {
                     // 1. Create top-level comments
                     $topComments = Comment::factory(rand(2, 6))->create([
@@ -46,12 +46,12 @@ class CommentSeeder extends Seeder
                                 'post_id' => $post->id,
                                 'user_id' => $users->random()->id,
                                 'parent_id' => $comment->id,
-                                'is_hidden'  => false,
+                                'is_hidden' => false,
                                 'spam_score' => 0,
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ]);
-                            
+
                             $allCommentsForPost = $allCommentsForPost->merge($replies);
                         }
                     }

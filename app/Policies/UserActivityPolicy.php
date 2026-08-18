@@ -28,7 +28,7 @@ class UserActivityPolicy
 
         // Space reserved for future 'followers-only' logic
         if ($visibility === 'followers') {
-            return false; 
+            return false;
         }
 
         // Default Deny: Failsafe for private actions (e.g., voting dynamics)

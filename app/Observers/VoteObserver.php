@@ -2,9 +2,12 @@
 
 namespace App\Observers;
 
-use App\Models\{Vote, Post, Comment};
-use App\Services\{ActivityService, NotificationService};
 use App\Enums\NotificationType;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Vote;
+use App\Services\ActivityService;
+use App\Services\NotificationService;
 
 /**
  * Manages the platform's "Voting System".
@@ -20,7 +23,7 @@ class VoteObserver
         $this->applyVote($vote);
     }
 
-/**
+    /**
      * Intercepts state transitions (e.g., Upvote to Downvote).
      * Strictly reverts previous state before applying new economic impact. [cite: 48, 49, 50]
      */
@@ -47,11 +50,11 @@ class VoteObserver
     private function applyVote(Vote $vote): void
     {
         $target = $vote->target;
-        
+
         // 1. Synchronize Cache: Update aggregate counts for UI consistency
         $target->updateVoteCounts();
 
-        $owner  = $target->user;
+        $owner = $target->user;
 
         // 2. Anti-Gaming Guard: Prevent reputation manipulation via self-voting
         if ($vote->user_id === $owner->id) {
@@ -68,7 +71,7 @@ class VoteObserver
         // 5. Dispatch Targeted Real-time Notification
         $notificationService = app(NotificationService::class);
         $type = $this->determineNotificationType($target, $vote->value);
-        
+
         $notificationService->notify(
             recipient: $owner,
             type: $type,
@@ -80,11 +83,11 @@ class VoteObserver
     private function undoVote(Vote $vote, int $previousValue): void
     {
         $target = $vote->target;
-        
+
         // 1. ALWAYS Recalculate cache to maintain data integrity
         $target->updateVoteCounts();
 
-        $owner  = $target->user;
+        $owner = $target->user;
 
         // 2. Anti-Gaming Guard
         if ($vote->user_id === $owner->id) {
@@ -99,13 +102,13 @@ class VoteObserver
         ActivityService::voteRemoved($vote->user, $target);
     }
 
-/**
+    /**
      * Generates the configuration key for the reputation engine.
      * Consistently uses morph aliases ('post', 'comment').
      */
     private function actionName(string $direction, $target): string
     {
-        return $target->getMorphClass() . "_{$direction}voted";
+        return $target->getMorphClass()."_{$direction}voted";
     }
 
     /**
@@ -116,7 +119,7 @@ class VoteObserver
         if ($target instanceof Post) {
             return $value === 1 ? NotificationType::POST_UPVOTED : NotificationType::POST_DOWNVOTED;
         }
-        
+
         return $value === 1 ? NotificationType::COMMENT_UPVOTED : NotificationType::COMMENT_DOWNVOTED;
     }
 }

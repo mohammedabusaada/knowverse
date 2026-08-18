@@ -13,6 +13,7 @@ use Illuminate\View\Component;
 class NotificationDropdown extends Component
 {
     public $notifications;
+
     public $unreadCount;
 
     public function __construct()
@@ -20,6 +21,7 @@ class NotificationDropdown extends Component
         if (! Auth::check()) {
             $this->notifications = collect();
             $this->unreadCount = 0;
+
             return;
         }
 

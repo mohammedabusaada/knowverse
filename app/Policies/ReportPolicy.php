@@ -38,21 +38,21 @@ class ReportPolicy
     /**
      * Any authenticated user can create a report.
      */
-    public function create(User $user): bool 
-    { 
-        return true; 
+    public function create(User $user): bool
+    {
+        return true;
     }
 
     /**
      * Only admins and moderators can update or delete report records.
      */
-    public function update(User $user, Report $report): bool 
-    { 
-        return $user->canModerate(); 
+    public function update(User $user, Report $report): bool
+    {
+        return $user->canModerate();
     }
 
-    public function delete(User $user, Report $report): bool 
-    { 
-        return $user->canModerate(); 
+    public function delete(User $user, Report $report): bool
+    {
+        return $user->canModerate();
     }
 }

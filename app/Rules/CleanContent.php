@@ -2,10 +2,10 @@
 
 namespace App\Rules;
 
+use App\Services\ContentModerationService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Auth;
-use App\Services\ContentModerationService;
 
 /**
  * Data Integrity Guard: Lexical Analysis Rule.
@@ -18,7 +18,7 @@ class CleanContent implements ValidationRule
 
     public function __construct()
     {
-        $this->moderationService = new ContentModerationService();
+        $this->moderationService = new ContentModerationService;
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -28,6 +28,7 @@ class CleanContent implements ValidationRule
         // 1. Profanity / hate / spam wording is rejected for every user.
         if ($this->moderationService->containsBlockedWords($text)) {
             $fail("The {$attribute} contains prohibited or inappropriate language.");
+
             return;
         }
 

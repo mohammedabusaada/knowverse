@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SavedPostController extends Controller
@@ -16,7 +15,7 @@ class SavedPostController extends Controller
         $user = Auth::user();
 
         // Toggle the attachment
-        $attaching = !$post->isSavedBy($user);
+        $attaching = ! $post->isSavedBy($user);
 
         if ($attaching) {
             $user->savedPosts()->attach($post->id);
@@ -32,14 +31,16 @@ class SavedPostController extends Controller
             'message' => $message,
         ]);
     }
-    public function index(){
-    $user = Auth::user();
 
-    $savedPosts = $user->savedPosts()
-        ->with(['user', 'tags', 'bestComment'])
-        ->latest()
-        ->paginate(10);
+    public function index()
+    {
+        $user = Auth::user();
 
-    return view('posts.saved', compact('savedPosts'));
-}
+        $savedPosts = $user->savedPosts()
+            ->with(['user', 'tags', 'bestComment'])
+            ->latest()
+            ->paginate(10);
+
+        return view('posts.saved', compact('savedPosts'));
+    }
 }

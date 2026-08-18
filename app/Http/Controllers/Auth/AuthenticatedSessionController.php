@@ -21,10 +21,10 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-/**
- * Manages the lifecycle of an authenticated session.
- * Features automated reactivation for returning scholars and strict ingress filtering for banned accounts.
- */
+    /**
+     * Manages the lifecycle of an authenticated session.
+     * Features automated reactivation for returning scholars and strict ingress filtering for banned accounts.
+     */
     public function store(LoginRequest $request): RedirectResponse
     {
         // 1. Ingress Check: Intercept deactivated accounts (soft-deleted) for restoration

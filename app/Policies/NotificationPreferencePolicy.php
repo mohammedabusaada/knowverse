@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\NotificationPreference;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 /**
  * Secures user configuration states.
@@ -12,7 +11,7 @@ use Illuminate\Auth\Access\Response;
  */
 class NotificationPreferencePolicy
 {
-        public function update(User $user, NotificationPreference $preference): bool
+    public function update(User $user, NotificationPreference $preference): bool
     {
         return $user->id === $preference->user_id;
     }

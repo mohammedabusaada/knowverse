@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class UserActivityController extends Controller
 {
@@ -24,15 +24,15 @@ class UserActivityController extends Controller
             ->feed();
 
         match ($type) {
-            'posts'    => $query->where('action', 'post_created'),
+            'posts' => $query->where('action', 'post_created'),
             'comments' => $query->where('action', 'comment_created'),
-            default    => null,
+            default => null,
         };
 
         // Secure Item-Level Filtering
         $activities = $query->get()->filter(function ($activity) use ($viewer) {
-            return $viewer 
-                ? $viewer->can('view', $activity) 
+            return $viewer
+                ? $viewer->can('view', $activity)
                 : $activity->isPublic();
         });
 
@@ -46,15 +46,15 @@ class UserActivityController extends Controller
             $perPage,
             $page,
             [
-                'path'  => $request->url(),
+                'path' => $request->url(),
                 'query' => $request->query(),
             ]
         );
 
         return view('activity.index', [
-            'user'       => $user,
+            'user' => $user,
             'activities' => $paginated,
-            'type'       => $type,
+            'type' => $type,
         ]);
     }
 }

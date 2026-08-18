@@ -1,6 +1,9 @@
 <?php
 
-use App\Models\{User, Post, Vote, Reputation};
+use App\Models\Post;
+use App\Models\Reputation;
+use App\Models\User;
+use App\Models\Vote;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +20,7 @@ use App\Models\{User, Post, Vote, Reputation};
 it('keeps reputation_points exactly equal to the ledger sum, even after a vote is retracted', function () {
     // Author starts from a clean, ledger-backed zero.
     $author = User::factory()->create(['role_id' => 1, 'reputation_points' => 0]);
-    $post   = Post::factory()->create(['user_id' => $author->id]);
+    $post = Post::factory()->create(['user_id' => $author->id]);
 
     // Three different scholars upvote the post.
     $voters = User::factory()->count(3)->create(['role_id' => 1]);
@@ -48,7 +51,7 @@ it('keeps reputation_points exactly equal to the ledger sum, even after a vote i
 
 it('reverses reputation with a compensating entry instead of deleting ledger rows (append-only)', function () {
     $author = User::factory()->create(['role_id' => 1, 'reputation_points' => 0]);
-    $post   = Post::factory()->create(['user_id' => $author->id]);
+    $post = Post::factory()->create(['user_id' => $author->id]);
 
     $voters = User::factory()->count(3)->create(['role_id' => 1]);
     foreach ($voters as $voter) {

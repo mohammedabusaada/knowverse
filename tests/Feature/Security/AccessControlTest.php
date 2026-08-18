@@ -1,7 +1,10 @@
 <?php
 
-use App\Models\{User, Post, Comment, Notification};
 use App\Enums\NotificationType;
+use App\Models\Comment;
+use App\Models\Notification;
+use App\Models\Post;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +46,7 @@ test('a scholar cannot edit another scholar\'s discussion', function () {
     $this->actingAs($attacker)
         ->put(route('posts.update', $post), [
             'title' => 'A hijacked title that is long enough',
-            'body'  => 'This body is sufficiently long to satisfy the minimum length validation rule.',
+            'body' => 'This body is sufficiently long to satisfy the minimum length validation rule.',
         ])
         ->assertForbidden();
 });
@@ -56,7 +59,7 @@ test('a moderator may edit any discussion (delegated moderation authority)', fun
     $this->actingAs($moderator)
         ->put(route('posts.update', $post), [
             'title' => 'A moderator-corrected scholarly title',
-            'body'  => 'A sufficiently long and clean discussion body edited by a moderator for compliance.',
+            'body' => 'A sufficiently long and clean discussion body edited by a moderator for compliance.',
         ])
         ->assertRedirect(route('posts.show', $post));
 });
@@ -74,7 +77,7 @@ test('a user cannot mark another user\'s notification as read (IDOR)', function 
     $victim = User::factory()->create();
     $notification = Notification::create([
         'user_id' => $victim->id,
-        'type'    => NotificationType::SYSTEM,
+        'type' => NotificationType::SYSTEM,
         'is_read' => false,
     ]);
     $attacker = User::factory()->create();

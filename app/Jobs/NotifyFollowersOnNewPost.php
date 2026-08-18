@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 use App\Models\User;
-use App\Enums\NotificationType;
 use App\Services\NotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,6 +22,7 @@ class NotifyFollowersOnNewPost implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $post;
+
     public $tagIds;
 
     public function __construct(Post $post, array $tagIds = [])
@@ -36,7 +37,7 @@ class NotifyFollowersOnNewPost implements ShouldQueue
      */
     public function handle(NotificationService $notificationService): void
     {
-        $post = $this->post; 
+        $post = $this->post;
         $author = $post->user;
 
         // ------------------------------------------------------------------
@@ -57,10 +58,10 @@ class NotifyFollowersOnNewPost implements ShouldQueue
         // ------------------------------------------------------------------
         // Phase 2: Notify Topic (Tag) Subscribers
         // ------------------------------------------------------------------
-        if (!empty($this->tagIds)) {
+        if (! empty($this->tagIds)) {
             $usersToNotify = User::whereHas('followedTags', function ($query) {
-                    $query->whereIn('tags.id', $this->tagIds);
-                })
+                $query->whereIn('tags.id', $this->tagIds);
+            })
                 ->where('id', '!=', $author->id)
                 ->whereDoesntHave('following', function ($query) use ($author) {
                     $query->where('users.id', $author->id);

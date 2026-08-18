@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Comment;
 
 class HomeController extends Controller
 {
@@ -31,8 +31,8 @@ class HomeController extends Controller
 
             'stats' => [
                 'discussions' => Post::count(),
-                'scholars'    => User::whereNull('banned_at')->count(),
-                'comments'    => Comment::count(),
+                'scholars' => User::whereNull('banned_at')->count(),
+                'comments' => Comment::count(),
             ],
         ]);
     }

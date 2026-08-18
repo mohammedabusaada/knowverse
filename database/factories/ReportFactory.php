@@ -2,8 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\{Report, User, Post, Comment};
-use App\Enums\{ReportReason, ReportStatus};
+use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Report;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReportFactory extends Factory
@@ -15,7 +19,7 @@ class ReportFactory extends Factory
         // Dynamically resolve the polymorphic target entity
         $targetType = $this->faker->randomElement([Post::class, Comment::class, User::class]);
         $target = $targetType::inRandomOrder()->first() ?? $targetType::factory();
-        
+
         // Simulate the moderation lifecycle state machine
         $status = $this->faker->randomElement(ReportStatus::cases());
 
@@ -28,16 +32,16 @@ class ReportFactory extends Factory
 
         return [
             'reporter_id' => User::inRandomOrder()->value('id') ?? User::factory(),
-            'target_id'   => $target->id,
+            'target_id' => $target->id,
             'target_type' => $targetType,
             'reason_type' => $reasonType,
-            'reason'      => $this->faker->sentence(),
-            'status'      => $status,
-            
+            'reason' => $this->faker->sentence(),
+            'status' => $status,
+
             // Record the administrative audit trail only if the ticket is no longer pending
             'resolved_by' => $status !== ReportStatus::PENDING ? User::factory() : null,
             'resolved_at' => $status !== ReportStatus::PENDING ? now() : null,
-            'created_at'  => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }
 }

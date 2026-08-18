@@ -2,32 +2,32 @@
 
 namespace App\Observers;
 
-use App\Models\User;
 use App\Models\NotificationPreference;
+use App\Models\User;
 
 /**
  * Oversees User lifecycle and default configuration provisioning. [cite: 37]
  */
 class UserObserver
 {
-/**
+    /**
      * Initializes default Notification Preferences upon account provisioning. [cite: 38]
      * Ensures every new scholar has a standard experience from the first login. [cite: 39, 40]
      */
-   public function created(User $user): void
-{
-    foreach (config('notification-preferences.categories') as $type => $data) {
-        NotificationPreference::firstOrCreate(
-            [
-                'user_id' => $user->id,
-                'type'    => $type,
-            ],
-            [
-                'enabled' => $data['default'] ?? true,
-            ]
-        );
+    public function created(User $user): void
+    {
+        foreach (config('notification-preferences.categories') as $type => $data) {
+            NotificationPreference::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'type' => $type,
+                ],
+                [
+                    'enabled' => $data['default'] ?? true,
+                ]
+            );
+        }
     }
-}
 
     /**
      * Handle the User "updated" event.
@@ -60,5 +60,4 @@ class UserObserver
     {
         //
     }
-
 }

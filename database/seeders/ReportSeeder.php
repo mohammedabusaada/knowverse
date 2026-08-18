@@ -2,9 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Report;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use App\Models\{Report, User, Post, Comment};
-use App\Enums\{ReportReason, ReportStatus};
 
 class ReportSeeder extends Seeder
 {
@@ -23,11 +27,11 @@ class ReportSeeder extends Seeder
         foreach ($posts->random(3) as $post) {
             Report::create([
                 'reporter_id' => $reporters->random()->id,
-                'target_id'   => $post->id,
+                'target_id' => $post->id,
                 'target_type' => Post::class,
-                'reason'      => 'This contribution lacks proper academic citations and includes unverified claims.',
+                'reason' => 'This contribution lacks proper academic citations and includes unverified claims.',
                 'reason_type' => ReportReason::MISINFORMATION,
-                'status'      => ReportStatus::PENDING,
+                'status' => ReportStatus::PENDING,
             ]);
         }
 
@@ -35,11 +39,11 @@ class ReportSeeder extends Seeder
         foreach ($comments->random(3) as $comment) {
             Report::create([
                 'reporter_id' => $reporters->random()->id,
-                'target_id'   => $comment->id,
+                'target_id' => $comment->id,
                 'target_type' => Comment::class,
-                'reason'      => 'The user is utilizing non-scholarly language and violating the community discourse guidelines.',
+                'reason' => 'The user is utilizing non-scholarly language and violating the community discourse guidelines.',
                 'reason_type' => ReportReason::HATE_SPEECH,
-                'status'      => ReportStatus::RESOLVED,
+                'status' => ReportStatus::RESOLVED,
                 'resolved_by' => $moderators->random()->id ?? null,
                 'resolved_at' => now(),
             ]);
@@ -49,11 +53,11 @@ class ReportSeeder extends Seeder
         foreach ($reportedUsers as $reportedUser) {
             Report::create([
                 'reporter_id' => $reporters->random()->id,
-                'target_id'   => $reportedUser->id,
+                'target_id' => $reportedUser->id,
                 'target_type' => User::class,
-                'reason'      => 'This account is engaged in systematic spamming and artificial reputation farming.',
+                'reason' => 'This account is engaged in systematic spamming and artificial reputation farming.',
                 'reason_type' => ReportReason::HARASSMENT,
-                'status'      => ReportStatus::PENDING,
+                'status' => ReportStatus::PENDING,
             ]);
         }
     }

@@ -6,7 +6,6 @@ use App\Models\Reputation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Services\ActivityService;
 
 /**
  * Gamification and Reputation Economy Manager.
@@ -27,18 +26,18 @@ class ReputationService
         ?string $note = null
     ): Reputation {
         return DB::transaction(function () use ($user, $action, $customDelta, $source, $note) {
-            
+
             // Resolve dynamic point configurations from the central settings file
             $delta = $customDelta ?? config("reputation.points.$action", 0);
 
             // 1. Immutable Audit: Append entry to the append-only ledger
             $record = Reputation::create([
-                'user_id'     => $user->id,
-                'action'      => $action,
-                'delta'       => $delta,
-                'source_id'   => $source?->getKey(),
+                'user_id' => $user->id,
+                'action' => $action,
+                'delta' => $delta,
+                'source_id' => $source?->getKey(),
                 'source_type' => $source ? $source->getMorphClass() : null,
-                'note'        => $note,
+                'note' => $note,
             ]);
 
             // 2. Cache Synchronization: Update the aggregated column on the User entity for fast querying
@@ -53,7 +52,7 @@ class ReputationService
         });
     }
 
-/**
+    /**
      * Retracts reputation points previously distributed.
      * Crucial for restoring economic equilibrium when content is soft-deleted or downvoted.
      */
@@ -71,12 +70,12 @@ class ReputationService
 
             if ($source) {
                 $query->where('source_id', $source->getKey())
-                      ->where('source_type', $source->getMorphClass());
+                    ->where('source_type', $source->getMorphClass());
             }
 
             $record = $query->latest('id')->first();
 
-            if (!$record) {
+            if (! $record) {
                 return;
             }
 
@@ -104,9 +103,9 @@ class ReputationService
         });
     }
 
-/**
+    /**
      * Diagnostic and Recovery Tool.
-     * Rehydrates (recalculates) the user's aggregate reputation score from the ground up 
+     * Rehydrates (recalculates) the user's aggregate reputation score from the ground up
      * by summarizing all historical ledger transactions.
      */
     public function recalc(User $user): void

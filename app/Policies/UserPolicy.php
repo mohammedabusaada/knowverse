@@ -19,7 +19,7 @@ class UserPolicy
     }
 
     /**
-     * Modification Access: Prevents Cross-Site Request Forgery (CSRF) and IDOR attacks 
+     * Modification Access: Prevents Cross-Site Request Forgery (CSRF) and IDOR attacks
      * by ensuring scholars can only update their own identity parameters.
      */
     public function update(User $auth, User $model): bool
@@ -49,4 +49,3 @@ class UserPolicy
         return $auth->canModerate();
     }
 }
-
