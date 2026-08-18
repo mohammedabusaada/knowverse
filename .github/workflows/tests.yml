@@ -61,3 +61,26 @@ jobs:
       # broadcast driver, so no external services are required.
       - name: Run the test suite
         run: php artisan test
+
+  lint:
+    name: Code style
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Create the environment file
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check code style with Laravel Pint
+        run: ./vendor/bin/pint --test
