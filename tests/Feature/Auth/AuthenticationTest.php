@@ -38,5 +38,6 @@ test('users can logout', function () {
     $response = $this->actingAs($user)->post('/logout');
 
     $this->assertGuest();
-    $response->assertRedirect('/');
+    // KnowVerse redirects to a dedicated "logged out" confirmation page.
+    $response->assertRedirect(route('logout.view'));
 });

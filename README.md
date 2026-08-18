@@ -1,5 +1,9 @@
 # KnowVerse: Academic Discussion Platform
 
+[![tests](https://github.com/mohammedabusaada/knowverse/actions/workflows/tests.yml/badge.svg)](https://github.com/mohammedabusaada/knowverse/actions/workflows/tests.yml)
+[![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net)
+
 KnowVerse is a secure, web-based academic discussion platform designed to provide a structured and credible environment for scholarly dialogue. Built to address the shortcomings of general-purpose knowledge-sharing networks, KnowVerse integrates a strict reputation-based governance model, real-time interactivity, and advanced content moderation to ensure academic integrity and meaningful collaboration.
 
 This project was developed as a Bachelor's Graduation Project for the Web Technology & Information Security (WIS) program.
@@ -124,6 +128,51 @@ Follow these instructions to set up the KnowVerse platform in a local developmen
    php artisan queue:work
    npm run dev
    ```
+
+---
+
+## Quality Assurance
+
+The platform is covered by an automated regression suite built with **Pest**, executed on
+every push and pull request by GitHub Actions across PHP 8.2 and 8.3.
+
+```bash
+php artisan test                        # full suite
+php artisan test --testsuite=Feature    # HTTP, authorization and governance behaviour
+php artisan test --testsuite=Unit       # pure logic, no database
+php artisan test --filter=Security      # security regression tests only
+```
+
+The suite runs against an in-memory SQLite database and the `null` broadcast driver
+(configured in `phpunit.xml`), so it requires no external services.
+
+**Coverage focus**
+
+| Area | What is verified |
+|------|------------------|
+| Reputation ledger | Append-only delta integrity; `reputation_points` always equals the sum of a user's ledger entries. |
+| Anti-farming | Self-voting, vote reversal and repeat-vote manipulation cannot inflate reputation. |
+| Reputation privileges | Downvoting, anti-spam exemption and post pinning unlock strictly at their configured thresholds. |
+| Role-based access control | Guests, unverified users, scholars, moderators and administrators are each held to their own boundary. |
+| Access control (IDOR) | Users cannot read or mutate records belonging to other users. |
+| Content governance | Lexical filtering, spam-link limits, reserved usernames, password strength and login rate limiting. |
+| Injection defence | Markdown/HTML sanitisation (XSS) and parameterised search queries (SQL injection). |
+
+---
+
+## Performance Benchmarks
+
+Reproducible measurement harnesses for HTTP throughput, the vote → reputation-ledger
+cascade, and real-time WebSocket delivery live in [`benchmarks/`](benchmarks/README.md):
+
+```bash
+php artisan knowverse:seed-benchmark --fresh   # generate a synthetic dataset
+php artisan knowverse:benchmark-http           # response-time percentiles and throughput
+php artisan knowverse:benchmark-votes          # vote-cascade latency + ledger integrity
+php artisan knowverse:benchmark-ws             # broadcast publish latency
+```
+
+Result sets are written to `storage/benchmarks/` and are not tracked in version control.
 
 ---
 
