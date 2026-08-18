@@ -226,6 +226,19 @@ class User extends Authenticatable implements AuthorizableContract, MustVerifyEm
         return $this->reputation_points;
     }
 
+    /**
+     * Determine whether the scholar has earned a reputation-gated participation
+     * privilege (e.g. 'downvote', 'trusted', 'pin_post'). These privileges concern
+     * the user's OWN participation only and never confer administrative authority
+     * over others — that remains RBAC, assigned manually by an administrator.
+     */
+    public function hasPrivilege(string $key): bool
+    {
+        $threshold = config("reputation.privileges.$key");
+
+        return $threshold !== null && $this->reputation_points >= $threshold;
+    }
+
     public function isFollowedBy(User $user): bool
     {
         return $this->followers()

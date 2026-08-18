@@ -12,8 +12,10 @@ class ReputationController extends Controller
      */
     public function index(User $user)
     {
-        // Soft Gating: Check permissions without throwing an exception
-        $canView = Auth::check() && Auth::id() === $user->id;
+        // Soft Gating: the owner may always view their own ledger; moderators and
+        // administrators may audit ANY scholar's ledger (oversight / transparency).
+        // Everyone else is restricted.
+        $canView = Auth::check() && (Auth::id() === $user->id || Auth::user()->canModerate());
 
         // Fetch data only if authorized, otherwise return an empty paginator
         $history = $canView

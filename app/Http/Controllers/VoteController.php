@@ -37,6 +37,15 @@ class VoteController extends Controller
             ], 403);
         }
 
+        // 4b. Privilege Gate: downvoting is a reputation-gated participation privilege.
+        //     Low-standing scholars may only upvote. (This is NOT RBAC authority.)
+        if ($value === -1 && ! Auth::user()->hasPrivilege('downvote')) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'You need at least ' . config('reputation.privileges.downvote') . ' reputation points to downvote.',
+            ], 403);
+        }
+
         // 5. State Management: Remove vote (0) or upsert new value (1 / -1)
         if ($value === 0) {
             $vote = Vote::where([
@@ -60,8 +69,10 @@ class VoteController extends Controller
             );
         }
 
-        // 6. Force recalculation of aggregate metrics to avoid cache staleness
-        $target->updateVoteCounts();
+        // 6. The Vote observer has already recalculated and persisted the aggregate
+        //    counts as a side effect of the create/update/delete above. We only refresh
+        //    to pull those committed values into this instance for the JSON response,
+        //    avoiding a redundant second recount on the request path.
         $target->refresh();
 
         // 7. Return synchronous UI state to update Alpine.js bindings
