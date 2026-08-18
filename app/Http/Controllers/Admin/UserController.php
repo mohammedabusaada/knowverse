@@ -90,6 +90,26 @@ class UserController extends Controller
     }
 
     /**
+     * Manually assign a user's RBAC role. Administrative authority is NEVER granted
+     * automatically by reputation — only by an administrator through this action.
+     */
+    public function updateRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role_id' => ['required', 'integer', 'in:1,2,3'],
+        ]);
+
+        // Fail-safe: an admin cannot change their own role (e.g., self-demotion lockout).
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'Operation aborted: You cannot change your own role.');
+        }
+
+        $user->update(['role_id' => $validated['role_id']]);
+
+        return back()->with('success', 'User role updated successfully.');
+    }
+
+    /**
      * Permanently delete a user record from the infrastructure.
      * Executes a Hard Delete to comply with data privacy regulations (GDPR).
      */

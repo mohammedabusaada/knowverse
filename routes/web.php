@@ -65,6 +65,9 @@ Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])
         
         Route::patch('/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggle-ban');
 
+        // Manual RBAC role assignment (reputation never changes roles automatically)
+        Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
+
         // Tags Management
         Route::get('/tags', [\App\Http\Controllers\Admin\TagController::class, 'index'])->name('tags.index');
         Route::post('/tags', [\App\Http\Controllers\Admin\TagController::class, 'store'])->name('tags.store');
