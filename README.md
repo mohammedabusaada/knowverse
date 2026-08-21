@@ -157,6 +157,7 @@ The suite runs against an in-memory SQLite database and the `null` broadcast dri
 | Role-based access control | Guests, unverified users, scholars, moderators and administrators are each held to their own boundary. |
 | Access control (IDOR) | Users cannot read or mutate records belonging to other users. |
 | Content governance | Lexical filtering, spam-link limits, reserved usernames, password strength and login rate limiting. |
+| Moderation precision | Blocked-term matching catches inflected forms ("idiots", "fucking") without rejecting legitimate academic vocabulary that merely contains a blocked substring, such as "oxymoron" or the surname "Nazir". |
 | Injection defence | Markdown/HTML sanitisation (XSS) and parameterised search queries (SQL injection). |
 
 ---
