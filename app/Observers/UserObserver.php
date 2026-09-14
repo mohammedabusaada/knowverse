@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Models\NotificationPreference;
 use App\Models\User;
+use App\Models\Vote;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
  * Oversees User lifecycle and default configuration provisioning. [cite: 37]
@@ -54,10 +56,49 @@ class UserObserver
     }
 
     /**
-     * Handle the User "force deleted" event.
+     * Permanent erasure (right to be forgotten), before the row is deleted.
+     *
+     * The database cascade removes this user's own ledger entries, votes, activity and
+     * notifications; discussions and comments they authored are kept with user_id set to
+     * null. Reputation that other users earned from this user's votes is deliberately
+     * retained: those ledger entries reference only the recipient and the voted content,
+     * never the voter, so they hold no personal data about the erased user, and reversing
+     * them would penalise people for someone else's deletion.
+     *
+     * The cascade bypasses VoteObserver, which would leave the vote counters on the
+     * affected content stale, so the voted targets are captured here and recalculated
+     * once the votes are gone.
+     */
+    public function forceDeleting(User $user): void
+    {
+        static::$pendingVoteTargets[$user->id] = Vote::where('user_id', $user->id)
+            ->get(['target_type', 'target_id'])
+            ->map(fn (Vote $vote) => [$vote->target_type, (int) $vote->target_id])
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Permanent erasure, after the row and its cascaded records are gone.
      */
     public function forceDeleted(User $user): void
     {
-        //
+        $targets = static::$pendingVoteTargets[$user->id] ?? [];
+        unset(static::$pendingVoteTargets[$user->id]);
+
+        foreach ($targets as [$type, $id]) {
+            $model = Relation::getMorphedModel($type) ?? $type;
+            $model::withoutGlobalScopes()->find($id)?->updateVoteCounts();
+        }
     }
+
+    /**
+     * Vote targets of users being erased, captured before the cascade removes their
+     * votes. Keyed by user id: observers are resolved per event, so this cannot be an
+     * instance property.
+     *
+     * @var array<int, array<int, array{0: string, 1: int}>>
+     */
+    private static array $pendingVoteTargets = [];
 }
