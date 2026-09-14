@@ -27,13 +27,37 @@ class PostFactory extends Factory
             'body' => 'This scholarly discussion explores '.$this->faker->sentence().
                 ' Our methodology focuses on '.$this->faker->paragraph(3).
                 ' Preliminary results indicate a significant correlation between peer validation and content credibility.',
-            'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
-            'is_hidden' => $this->faker->boolean(10),
+            'status' => 'published',
+            'is_hidden' => false,
             'view_count' => $this->faker->numberBetween(100, 5000),
             'upvote_count' => 0,
             'downvote_count' => 0,
             'created_at' => $this->faker->dateTimeThisYear(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * A discussion that has not been published yet.
+     */
+    public function draft(): static
+    {
+        return $this->state(fn () => ['status' => 'draft']);
+    }
+
+    /**
+     * A discussion moved to the archive.
+     */
+    public function archived(): static
+    {
+        return $this->state(fn () => ['status' => 'archived']);
+    }
+
+    /**
+     * A discussion hidden by moderation.
+     */
+    public function hidden(): static
+    {
+        return $this->state(fn () => ['is_hidden' => true]);
     }
 }

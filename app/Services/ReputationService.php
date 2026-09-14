@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Reputation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -55,52 +56,71 @@ class ReputationService
     /**
      * Retracts reputation points previously distributed.
      * Crucial for restoring economic equilibrium when content is soft-deleted or downvoted.
+     *
+     * Reversal is idempotent per ledger entry: each call reverses the most recent entry for
+     * (user, action, source) that has not already been reversed, and does nothing when none
+     * remains. A unique index on reputations.reverses_id enforces this in the database
+     * itself, so the same entry can never be reversed twice, even by concurrent requests.
      */
     public function remove(User $user, string $action, ?Model $source = null): void
     {
-        DB::transaction(function () use ($user, $action, $source) {
+        // If a concurrent request reverses the same entry first, the unique index rejects
+        // this insert. Retry so the call moves on to the next outstanding entry, if any.
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                DB::transaction(fn () => $this->reverseLatestOutstanding($user, $action, $source), 3);
 
-            // Locate the most recent ORIGINAL award for this (user, action, source).
-            // Reversal rows are stored under "{action}_reverted", so they are never
-            // matched here — guaranteeing each call neutralises exactly ONE prior
-            // contribution (e.g. one retracted upvote), even when several scholars
-            // have voted on the same target and produced multiple identical entries.
-            $query = Reputation::where('user_id', $user->id)
-                ->where('action', $action);
-
-            if ($source) {
-                $query->where('source_id', $source->getKey())
-                    ->where('source_type', $source->getMorphClass());
-            }
-
-            $record = $query->latest('id')->first();
-
-            if (! $record) {
                 return;
+            } catch (UniqueConstraintViolationException $e) {
+                if ($attempt === 3) {
+                    throw $e;
+                }
             }
+        }
+    }
 
-            $delta = (int) $record->delta;
+    /**
+     * Appends a compensating entry for the latest ledger entry that has not been reversed.
+     */
+    private function reverseLatestOutstanding(User $user, string $action, ?Model $source): void
+    {
+        $query = Reputation::where('user_id', $user->id)
+            ->where('action', $action)
+            ->whereDoesntHave('reversal');
 
-            // APPEND-ONLY INTEGRITY: a ledger entry is never deleted. Instead we append
-            // a compensating (negative) transaction, so the ledger remains a complete,
-            // immutable audit trail and the system invariant is preserved exactly:
-            //     user.reputation_points === SUM(reputations.delta WHERE user_id = user)
-            Reputation::record(
-                $user->id,
-                "{$action}_reverted",
-                -$delta,
-                $source,
-                "Reversal of ledger entry #{$record->id}"
-            );
+        if ($source) {
+            $query->where('source_id', $source->getKey())
+                ->where('source_type', $source->getMorphClass());
+        }
 
-            // Cache reconcile: move the denormalised aggregate by the same magnitude.
-            if ($delta !== 0) {
-                $user->decrement('reputation_points', $delta);
-            }
+        // Lock the candidate so a concurrent reversal waits instead of selecting it too.
+        $record = $query->latest('id')->lockForUpdate()->first();
 
-            // Transparency audit.
-            ActivityService::reputationChanged($user, -$delta, $source, "{$action}_reverted");
-        });
+        if (! $record) {
+            return; // Nothing outstanding: a repeated reversal is a no-op.
+        }
+
+        $delta = (int) $record->delta;
+
+        // APPEND-ONLY INTEGRITY: the original entry is never modified or deleted. The
+        // compensating entry references it, and the system invariant is preserved exactly:
+        //     user.reputation_points === SUM(reputations.delta WHERE user_id = user)
+        Reputation::record(
+            $user->id,
+            "{$action}_reverted",
+            -$delta,
+            $source,
+            "Reversal of ledger entry #{$record->id}",
+            $record->id
+        );
+
+        // Cache reconcile: move the denormalised aggregate by the same magnitude.
+        if ($delta !== 0) {
+            $user->decrement('reputation_points', $delta);
+        }
+
+        // Transparency audit.
+        ActivityService::reputationChanged($user, -$delta, $source, "{$action}_reverted");
     }
 
     /**

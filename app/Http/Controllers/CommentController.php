@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\NotificationType;
 use App\Models\Comment;
+use App\Models\User;
 use App\Rules\CleanContent;
 use App\Services\ActivityService;
 use App\Services\NotificationService;
@@ -79,6 +80,17 @@ class CommentController extends Controller
         // Idempotency check: prevent duplicate awards if already marked as Author's Pick
         if ($post->best_comment_id === $comment->id) {
             return back();
+        }
+
+        // Switching Author's Pick: reverse the previous pick's rewards before awarding the new
+        // one, so moving the pick between comments can never accumulate reputation.
+        if ($post->best_comment_id) {
+            $previous = Comment::withoutGlobalScopes()->find($post->best_comment_id);
+
+            if ($previous) {
+                User::withTrashed()->find($previous->user_id)?->removeReputation('authors_pick_received', $previous);
+                $post->user->removeReputation('authors_pick_awarded', $previous);
+            }
         }
 
         $post->update(['best_comment_id' => $comment->id]);
