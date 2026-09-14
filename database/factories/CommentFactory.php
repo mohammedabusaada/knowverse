@@ -26,12 +26,20 @@ class CommentFactory extends Factory
             'user_id' => User::inRandomOrder()->value('id') ?? User::factory(),
             'parent_id' => null,
             'body' => $this->faker->randomElement($scholarlyComments),
-            'is_hidden' => $this->faker->boolean(5),
+            'is_hidden' => false,
             'spam_score' => $this->faker->numberBetween(0, 1),
             'upvote_count' => 0,
             'downvote_count' => 0,
             'created_at' => $this->faker->dateTimeThisYear(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * A comment hidden by moderation.
+     */
+    public function hidden(): static
+    {
+        return $this->state(fn () => ['is_hidden' => true]);
     }
 }
