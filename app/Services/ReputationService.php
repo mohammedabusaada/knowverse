@@ -27,6 +27,7 @@ class ReputationService
         ?string $note = null
     ): Reputation {
         return DB::transaction(function () use ($user, $action, $customDelta, $source, $note) {
+            $this->lockLedger($user);
 
             // Resolve dynamic point configurations from the central settings file
             $delta = $customDelta ?? config("reputation.points.$action", 0);
@@ -84,6 +85,8 @@ class ReputationService
      */
     private function reverseLatestOutstanding(User $user, string $action, ?Model $source): void
     {
+        $this->lockLedger($user);
+
         $query = Reputation::where('user_id', $user->id)
             ->where('action', $action)
             ->whereDoesntHave('reversal');
@@ -124,6 +127,16 @@ class ReputationService
     }
 
     /**
+     * Serialises ledger writes per user. Every award, reversal and recalculation first
+     * takes a row lock on the user, so concurrent ledger writes for the same user run one
+     * after another instead of deadlocking on the ledger's index gaps.
+     */
+    private function lockLedger(User $user): void
+    {
+        DB::table('users')->where('id', $user->id)->lockForUpdate()->value('id');
+    }
+
+    /**
      * Diagnostic and Recovery Tool.
      * Rehydrates (recalculates) the user's aggregate reputation score from the ground up
      * by summarizing all historical ledger transactions.
@@ -131,6 +144,7 @@ class ReputationService
     public function recalc(User $user): void
     {
         DB::transaction(function () use ($user) {
+            $this->lockLedger($user);
             $total = (int) Reputation::where('user_id', $user->id)->sum('delta');
             $user->update(['reputation_points' => $total]);
         });
