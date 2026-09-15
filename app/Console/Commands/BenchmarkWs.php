@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\SummarisesRuns;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -16,9 +17,12 @@ use Illuminate\Support\Facades\Broadcast;
  */
 class BenchmarkWs extends Command
 {
+    use SummarisesRuns;
+
     protected $signature = 'knowverse:benchmark-ws
         {--count=100 : Number of broadcast events}
-        {--interval=50 : Milliseconds between events}';
+        {--interval=50 : Milliseconds between events}
+        {--runs=1 : Repeat the broadcast batch this many times and report mean ± SD}';
 
     protected $description = 'Broadcast timestamped pings; measure app→Reverb publish latency and feed the end-to-end probe.';
 
@@ -35,32 +39,44 @@ class BenchmarkWs extends Command
         $this->info("Broadcasting {$count} pings on public channel 'benchmark'...");
         $this->line('  (run `node benchmarks/ws-latency.mjs` in another terminal for end-to-end latency)');
 
-        $publish = [];
-        for ($i = 0; $i < $count; $i++) {
-            $t0 = hrtime(true);
-            try {
-                Broadcast::on('benchmark')
-                    ->as('ping')
-                    ->with(['seq' => $i, 't' => microtime(true)])
-                    ->sendNow();
-            } catch (\Throwable $e) {
-                $this->error('Broadcast failed: '.$e->getMessage());
-                $this->line('Is Reverb running?  php artisan reverb:start');
+        $runs = max(1, (int) $this->option('runs'));
+        $perRun = [];
+        $seq = 0;
 
-                return self::FAILURE;
+        for ($run = 1; $run <= $runs; $run++) {
+            if ($runs > 1) {
+                $this->line("  run {$run}/{$runs}");
             }
-            $publish[] = (hrtime(true) - $t0) / 1e6; // ms
-            if ($interval > 0) {
-                usleep($interval * 1000);
+
+            $publish = [];
+            for ($i = 0; $i < $count; $i++) {
+                $t0 = hrtime(true);
+                try {
+                    Broadcast::on('benchmark')
+                        ->as('ping')
+                        ->with(['seq' => $seq++, 't' => microtime(true)])
+                        ->sendNow();
+                } catch (\Throwable $e) {
+                    $this->error('Broadcast failed: '.$e->getMessage());
+                    $this->line('Is Reverb running?  php artisan reverb:start');
+
+                    return self::FAILURE;
+                }
+                $publish[] = (hrtime(true) - $t0) / 1e6; // ms
+                if ($interval > 0) {
+                    usleep($interval * 1000);
+                }
             }
+
+            sort($publish);
+            $perRun[] = ['p50' => $this->pct($publish, 50), 'p95' => $this->pct($publish, 95), 'p99' => $this->pct($publish, 99)];
         }
 
-        sort($publish);
         $this->newLine();
-        $this->table(['Metric (app → Reverb publish)', 'Value (ms)'], [
-            ['p50', $this->pct($publish, 50)],
-            ['p95', $this->pct($publish, 95)],
-            ['p99', $this->pct($publish, 99)],
+        $this->table(['Metric (app → Reverb publish)', $runs > 1 ? "Value (ms, mean ± SD, {$runs} runs)" : 'Value (ms)'], [
+            ['p50', $this->formatSummary($this->summarise(array_column($perRun, 'p50')), 2)],
+            ['p95', $this->formatSummary($this->summarise(array_column($perRun, 'p95')), 2)],
+            ['p99', $this->formatSummary($this->summarise(array_column($perRun, 'p99')), 2)],
         ]);
         $this->info('Read the Node probe output for end-to-end (event → client) delivery latency.');
 
