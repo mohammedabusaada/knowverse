@@ -26,6 +26,32 @@ php artisan queue:work       # background notifications
 Record the host specification (CPU / RAM / OS / PHP / MySQL versions) alongside any
 results you report — the absolute numbers are only meaningful with it.
 
+### Measure a production configuration
+
+Development defaults dominate latency, so configure the server as for production
+before measuring, and state the configuration next to the results:
+
+```bash
+# php.ini: zend_extension=opcache and opcache.enable=1 for the web server's PHP
+# .env:    APP_ENV=production, APP_DEBUG=false
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Without a cached configuration, a multithreaded web server (for example Apache
+`mpm_winnt` with thread-safe PHP) can load `.env` concurrently and fail a fraction of
+requests. Run `php artisan config:clear` afterwards: while the configuration is cached,
+`php artisan test` does not read `phpunit.xml`.
+
+### Repeated runs
+
+The HTTP, vote, WebSocket and concurrency commands accept `--runs=N`. Each run repeats
+the complete measurement; results are reported as **mean ± sample standard deviation**,
+and the CSV files add the 95% confidence interval (Student's t). The HTTP command sweeps
+the whole endpoint × concurrency grid once per run, so slow changes in machine state are
+spread across all cells. Per-run values are written to a separate `*-runs.csv` file.
+
 ---
 
 ## 1. HTTP response time, throughput and concurrency
@@ -35,12 +61,15 @@ results you report — the absolute numbers are only meaningful with it.
 ```bash
 php artisan knowverse:benchmark-http
 # or customise:
-php artisan knowverse:benchmark-http \
-    --requests=1000 --concurrency=10,50,100,200 --endpoints=home,posts,show,search
+php artisan knowverse:benchmark-http --base=http://127.0.0.1:8001 \
+    --requests=400 --concurrency=10,50,100,200 --endpoints=home,posts,show,search \
+    --runs=5 --warmup=5
 ```
 
 Prints a per-endpoint × per-concurrency table (p50 / p95 / p99 ms, req/s, error %)
-and writes `storage/benchmarks/benchmark-http.csv`.
+and writes `storage/benchmarks/benchmark-http.csv` (summary) and
+`benchmark-http-runs.csv` (one row per run). Use at least as many requests per cell as
+the highest concurrency level, otherwise that level is never reached.
 
 ### Option B — k6 (recommended where available)
 
@@ -63,13 +92,14 @@ Ramps virtual users 10 → 50 → 100 → 200; the end-of-run summary reports
 ## 2. Vote-processing latency and ledger integrity
 
 ```bash
-php artisan knowverse:benchmark-votes --samples=1000
+php artisan knowverse:benchmark-votes --samples=1000 --runs=5
 ```
 
 Times the full server-side cascade — **vote → reputation ledger → activity log →
 notification** — and reports mean / p50 / p95 / p99 latency plus single-process
 throughput. It then runs the ledger consistency oracle and reports the number of
-**invariant violations (expected: 0)**. Writes `storage/benchmarks/benchmark-votes.csv`.
+**invariant violations (expected: 0)** after every run. Writes
+`storage/benchmarks/benchmark-votes.csv` and `benchmark-votes-runs.csv`.
 
 Broadcasting is forced to the `null` driver for this run, so the figure isolates the
 database cascade from network delivery.
@@ -107,14 +137,36 @@ Reverb's console output and resource usage against its `max_connections` setting
 
 ---
 
+## 4. Consistency under concurrent writes (MySQL/MariaDB only)
+
+```bash
+php artisan knowverse:benchmark-concurrency --workers=8 --runs=5
+php artisan knowverse:benchmark-concurrency --workers=8 --runs=5 --baseline
+```
+
+Starts parallel PHP processes that begin at the same instant. Phase A has every
+process reverse the same user's awards for the same discussion; exactly one reversal
+per award must result. Phase B has every process cast, flip and retract votes on a
+shared set of discussions. After each run the command checks the ledger invariant, for
+entries reversed more than once or over-reversed, vote counters against the votes table,
+and each author's vote reputation against the votes that remain. It exits non-zero on
+any violation. `--baseline` runs phase B through the earlier, non-atomic vote write path
+for comparison. Add `-v` to print the first message of each worker error type. Writes
+`storage/benchmarks/benchmark-concurrency.csv` (or `-baseline.csv`).
+
+The command writes synthetic discussions and votes: run it against a benchmark database.
+
+---
+
 ## Summary
 
 | Command / tool | Output | Measures |
 |---|---|---|
 | `knowverse:seed-benchmark` | — | Synthetic dataset generation |
-| `knowverse:benchmark-http` / k6 | `benchmark-http.csv` | HTTP latency, throughput, error rate |
-| `knowverse:benchmark-votes` | `benchmark-votes.csv` | Vote cascade latency + ledger integrity |
+| `knowverse:benchmark-http` / k6 | `benchmark-http.csv`, `benchmark-http-runs.csv` | HTTP latency, throughput, error rate |
+| `knowverse:benchmark-votes` | `benchmark-votes.csv`, `benchmark-votes-runs.csv` | Vote cascade latency + ledger integrity |
 | `knowverse:benchmark-ws` + `ws-latency.mjs` | console summary | Publish and end-to-end delivery latency |
+| `knowverse:benchmark-concurrency` | `benchmark-concurrency.csv` | Ledger and vote consistency under parallel writes |
 
 Re-seed with `knowverse:seed-benchmark --fresh` between runs so that results stay
 comparable.
