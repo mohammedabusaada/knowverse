@@ -6,6 +6,7 @@ use App\Enums\NotificationType;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -72,14 +73,18 @@ class NotificationService
             'is_read' => false,
         ]);
 
-        // 5. Real-Time Delivery: Broadcast to connected WebSocket clients
-        try {
-            event(new \App\Events\RealTimeNotification($notification));
-        } catch (\Exception $e) {
-            // Graceful Degradation: Log failure silently to prevent the main HTTP request from crashing
-            // if the external socket server (e.g., Reverb/Pusher) goes offline.
-            Log::warning('RealTimeNotification Broadcast Failed: '.$e->getMessage());
-        }
+        // 5. Real-Time Delivery: Broadcast to connected WebSocket clients, once the enclosing
+        //    transaction (if any) has committed, so a rolled-back or retried write never
+        //    pushes a notification that does not exist.
+        DB::afterCommit(function () use ($notification) {
+            try {
+                event(new \App\Events\RealTimeNotification($notification));
+            } catch (\Exception $e) {
+                // Graceful Degradation: Log failure silently to prevent the main HTTP request from crashing
+                // if the external socket server (e.g., Reverb/Pusher) goes offline.
+                Log::warning('RealTimeNotification Broadcast Failed: '.$e->getMessage());
+            }
+        });
 
         return $notification;
     }
