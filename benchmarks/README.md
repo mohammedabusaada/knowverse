@@ -158,6 +158,24 @@ The command writes synthetic discussions and votes: run it against a benchmark d
 
 ---
 
+## 5. Ledger versus a plain counter (ablation)
+
+```bash
+php artisan knowverse:benchmark-ablation --samples=1000 --runs=5 --corrupt=50 --backfill
+```
+
+Part A times the same vote workload with reputation recorded in the ledger and with
+reputation kept only as a counter column, alternating the modes run by run. Part B
+corrupts the counters of randomly chosen users, then checks that a scan against the
+ledger finds exactly those users and that recalculation restores their exact values.
+`--backfill` first derives the ledger entries implied by the seeded posts, comments and
+votes (the bulk seeder writes none), so both parts run against a ledger of realistic
+size. Writes `benchmark-ablation-cost.csv`, `benchmark-ablation-cost-runs.csv` and
+`benchmark-ablation-recovery.csv`. Run it against a benchmark database only: it rewrites
+every user's reputation counter.
+
+---
+
 ## Summary
 
 | Command / tool | Output | Measures |
@@ -167,6 +185,7 @@ The command writes synthetic discussions and votes: run it against a benchmark d
 | `knowverse:benchmark-votes` | `benchmark-votes.csv`, `benchmark-votes-runs.csv` | Vote cascade latency + ledger integrity |
 | `knowverse:benchmark-ws` + `ws-latency.mjs` | console summary | Publish and end-to-end delivery latency |
 | `knowverse:benchmark-concurrency` | `benchmark-concurrency.csv` | Ledger and vote consistency under parallel writes |
+| `knowverse:benchmark-ablation` | `benchmark-ablation-*.csv` | Ledger cost versus a counter; corruption detection and recovery |
 
 Re-seed with `knowverse:seed-benchmark --fresh` between runs so that results stay
 comparable.
