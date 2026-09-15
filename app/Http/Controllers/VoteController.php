@@ -28,10 +28,7 @@ class VoteController extends Controller
         $target = $model::findOrFail($request->id);
         $value = (int) $request->value;
 
-        // 3. Extract the morph alias (e.g., 'post')
-        $targetType = $target->getMorphClass();
-
-        // 4. Governance Rule: Scholars cannot evaluate their own contributions
+        // 3. Governance Rule: Scholars cannot evaluate their own contributions
         if ($target->user_id === Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -39,7 +36,7 @@ class VoteController extends Controller
             ], 403);
         }
 
-        // 4b. Privilege Gate: downvoting is a reputation-gated participation privilege.
+        // 3b. Privilege Gate: downvoting is a reputation-gated participation privilege.
         //     Low-standing scholars may only upvote. (This is NOT RBAC authority.)
         if ($value === -1 && ! Auth::user()->hasPrivilege('downvote')) {
             return response()->json([
@@ -48,35 +45,21 @@ class VoteController extends Controller
             ], 403);
         }
 
-        // 5. State Management: Remove vote (0) or upsert new value (1 / -1)
+        // 4. State Management: Remove vote (0) or upsert new value (1 / -1).
+        //    Both run atomically with their side effects (see Vote::castVote).
         if ($value === 0) {
-            $vote = Vote::where([
-                'user_id' => Auth::id(),
-                'target_id' => $target->id,
-                'target_type' => $targetType,
-            ])->first();
-
-            if ($vote) {
-                $vote->delete();
-            }
+            Vote::retract(Auth::user(), $target);
         } else {
-            Vote::updateOrCreate(
-                [
-                    'user_id' => Auth::id(),
-                    'target_id' => $target->id,
-                    'target_type' => $targetType,
-                ],
-                ['value' => $value]
-            );
+            Vote::castVote(Auth::user(), $target, $value);
         }
 
-        // 6. The Vote observer has already recalculated and persisted the aggregate
+        // 5. The Vote observer has already recalculated and persisted the aggregate
         //    counts as a side effect of the create/update/delete above. We only refresh
         //    to pull those committed values into this instance for the JSON response,
         //    avoiding a redundant second recount on the request path.
         $target->refresh();
 
-        // 7. Return synchronous UI state to update Alpine.js bindings
+        // 6. Return synchronous UI state to update Alpine.js bindings
         return response()->json([
             'success' => true,
             'upvotes' => $target->upvote_count,
