@@ -1,0 +1,5 @@
+label: C1-caches
+time: 2026-09-14 17:15:37
+opcache (inside Apache): {"opcache_loaded":false,"opcache_enabled":false,"php":"8.2.12"}
+APP_ENV=local APP_DEBUG=true LOG_LEVEL=debug DB_DATABASE=knowverse_bench SESSION_DRIVER=database CACHE_STORE=file 
+laravel caches: config.php packages.php routes-v7.php services.php 

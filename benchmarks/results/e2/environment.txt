@@ -1,0 +1,20 @@
+E2 start: 2026-09-14 20:25:25
+opcache (inside Apache): {"opcache_loaded":true,"opcache_enabled":true,"php":"8.2.12"}
+APP_ENV=production APP_DEBUG=false LOG_LEVEL=error DB_DATABASE=knowverse_bench SESSION_DRIVER=database CACHE_STORE=file 
+laravel caches: config.php packages.php routes-v7.php services.php 
+dataset: 1000 users, 10000 posts, 20000 comments, 99841 votes
+command: knowverse:benchmark-http --base=http://127.0.0.1:8001 --requests=400 --concurrency=10,50,100,200 --endpoints=home,posts,show,search --runs=5 --warmup=5
+E2 end: 2026-09-14 21:01:42
+--- Laravel errors during E2 ---
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = ZWFXAphqymHzY
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = ZUCMZPC2kqwwu
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = zPCXAP3VbZhJH
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = ZgWy2PfzdUMit
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = ZaKapZUAPoX5G
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = Z630W8ZWUVRGN
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = z5Du0pVX6tATE
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = YZjzSqkOgbOtU
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = yYrN8gMkiYRE9
+      1 production.ERROR: SQLSTATE[08004] [1040] Too many connections (Connection: mysql, SQL: select * from `sessions` where `id` = YxLpukQYCFmlH
+--- Apache error-log lines during E2 (excluding the known OPcache VirtualProtect warning) ---
+      1 [Mon Sep 14 20:27:51.439928 2026] [mpm_winnt:error]  AH00326: Server ran out of threads to serve requests. Consider raising the ThreadsPerChild setting

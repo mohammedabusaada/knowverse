@@ -1,0 +1,6 @@
+run,users,corrupted,detected,false_positives,missed,scan_ms,repaired_exactly,repair_ms,violations_after
+1,1000,50,50,0,0,198.64,50,575.95,0
+2,1000,50,50,0,0,110.67,50,470.39,0
+3,1000,50,50,0,0,88.54,50,528.56,0
+4,1000,50,50,0,0,90.24,50,487.17,0
+5,1000,50,50,0,0,130.52,50,341.53,0

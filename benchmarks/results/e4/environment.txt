@@ -1,0 +1,5 @@
+E4 start: 2026-09-14 21:30:39
+server: 10.4.32-MariaDB / isolation REPEATABLE-READ / max_connections 151 / innodb_lock_wait_timeout 50
+database: DB_DATABASE=knowverse_bench
+cpu: 
+E4 end: 2026-09-14 21:43:45

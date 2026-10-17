@@ -1,0 +1,5 @@
+endpoint,concurrency,p50_ms,p95_ms,p99_ms,throughput_rps,error_pct
+home,10,1319,1846.3,1904.1,7.1,1.67
+posts,10,984.5,1294.6,6840,7.8,4.17
+show,10,1049.3,1603.2,2281.1,8.6,5
+search,10,1353.1,1893.1,2024.8,6.8,2.5
