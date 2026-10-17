@@ -1,0 +1,92 @@
+=== baseline-8: --workers=8 --ops=250 --awards=20 --repeat=5 --posts=10 --voters=50 --runs=5 --baseline ===
+Concurrency experiment on 'knowverse_bench': 8 workers, 5 run(s)
+  phase A: 20 awards, 8 workers × 5 reversal attempts
+  phase B: 8 workers × 250 vote operations on 10 discussions by 50 voters (baseline: non-atomic vote path)
+  run 1/5 ...
+  SQLSTATE 40001/1213: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction (Connection: mysql, SQL: update `users` set `reputation_points` = `reputation_points` + -2, `users`.`updated_at` = 2026-09-14 21:17:39 where `id` = 20)
+  run 2/5 ...
+  run 3/5 ...
+  run 4/5 ...
+  run 5/5 ...
+
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| Run | A: reversals | B: ops | B: ops/s | Worker errors          | Invariant | Dup. reversals | Over-reversed | Counters | Vote reputation |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| 1   | 20/20 ok     | 1966   | 250.1    | SQLSTATE 40001/1213×34 | 0         | 0              | 0             | 0        | 10              |
+| 2   | 20/20 ok     | 1961   | 260.1    | SQLSTATE 40001/1213×39 | 0         | 0              | 0             | 0        | 10              |
+| 3   | 20/20 ok     | 1955   | 241      | SQLSTATE 40001/1213×51 | 0         | 0              | 0             | 0        | 10              |
+| 4   | 20/20 ok     | 1965   | 167.1    | SQLSTATE 40001/1213×41 | 0         | 0              | 0             | 0        | 9               |
+| 5   | 20/20 ok     | 1969   | 242.4    | SQLSTATE 40001/1213×36 | 0         | 0              | 0             | 0        | 10              |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+Phase B throughput: 232.1 ± 37.1 ops/s (mean ± SD).
+CSV → storage/benchmarks/benchmark-concurrency-baseline.csv
+Consistency violations detected: 49.
+=== atomic-8: --workers=8 --ops=250 --awards=20 --repeat=5 --posts=10 --voters=50 --runs=5 ===
+Concurrency experiment on 'knowverse_bench': 8 workers, 5 run(s)
+  phase A: 20 awards, 8 workers × 5 reversal attempts
+  phase B: 8 workers × 250 vote operations on 10 discussions by 50 voters
+  run 1/5 ...
+  run 2/5 ...
+  SQLSTATE 40001/1213: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction (Connection: mysql, SQL: select * from `reputations` where `user_id` = 890 and `action` = post_upvoted and not exists (select * from `reputations` as `laravel_reserved_2` where `reputations`.`id` = `laravel_reserved_2`.`reverses_id`) and `source_id` = 10081 and `source_type` = post order
+  run 3/5 ...
+  run 4/5 ...
+  run 5/5 ...
+
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| Run | A: reversals | B: ops | B: ops/s | Worker errors          | Invariant | Dup. reversals | Over-reversed | Counters | Vote reputation |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| 1   | 20/20 ok     | 2000   | 243.2    | 0                      | 0         | 0              | 0             | 0        | 0               |
+| 2   | 20/20 ok     | 2000   | 179.7    | SQLSTATE 40001/1213×11 | 0         | 0              | 0             | 0        | 0               |
+| 3   | 20/20 ok     | 2000   | 169.5    | 0                      | 0         | 0              | 0             | 0        | 0               |
+| 4   | 20/20 ok     | 2000   | 171.5    | 0                      | 0         | 0              | 0             | 0        | 0               |
+| 5   | 20/20 ok     | 2000   | 179.1    | 0                      | 0         | 0              | 0             | 0        | 0               |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+Phase B throughput: 188.6 ± 30.9 ops/s (mean ± SD).
+CSV → storage/benchmarks/benchmark-concurrency.csv
+No consistency violations in any run.
+=== baseline-16: --workers=16 --ops=150 --awards=20 --repeat=5 --posts=5 --voters=20 --runs=5 --baseline ===
+Concurrency experiment on 'knowverse_bench': 16 workers, 5 run(s)
+  phase A: 20 awards, 16 workers × 5 reversal attempts
+  phase B: 16 workers × 150 vote operations on 5 discussions by 20 voters (baseline: non-atomic vote path)
+  run 1/5 ...
+  SQLSTATE 40001/1213: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction (Connection: mysql, SQL: update `users` set `reputation_points` = `reputation_points` + 5, `users`.`updated_at` = 2026-09-14 21:21:01 where `id` = 738)
+  run 2/5 ...
+  run 3/5 ...
+  run 4/5 ...
+  run 5/5 ...
+
++-----+--------------+--------+----------+-------------------------+-----------+----------------+---------------+----------+-----------------+
+| Run | A: reversals | B: ops | B: ops/s | Worker errors           | Invariant | Dup. reversals | Over-reversed | Counters | Vote reputation |
++-----+--------------+--------+----------+-------------------------+-----------+----------------+---------------+----------+-----------------+
+| 1   | 20/20 ok     | 2302   | 84.2     | SQLSTATE 40001/1213×98  | 0         | 0              | 0             | 0        | 5               |
+| 2   | 20/20 ok     | 2324   | 102.7    | SQLSTATE 40001/1213×76  | 0         | 0              | 0             | 0        | 5               |
+| 3   | 9/20 FAIL    | 2330   | 128.7    | SQLSTATE 40001/1213×141 | 0         | 0              | 0             | 0        | 5               |
+| 4   | 20/20 ok     | 2255   | 43.2     | SQLSTATE 40001/1213×145 | 0         | 0              | 0             | 0        | 5               |
+| 5   | 6/20 FAIL    | 2333   | 129.4    | SQLSTATE 40001/1213×141 | 0         | 0              | 0             | 0        | 5               |
++-----+--------------+--------+----------+-------------------------+-----------+----------------+---------------+----------+-----------------+
+Phase B throughput: 97.6 ± 35.9 ops/s (mean ± SD).
+CSV → storage/benchmarks/benchmark-concurrency-baseline.csv
+Consistency violations detected: 27.
+=== atomic-16: --workers=16 --ops=150 --awards=20 --repeat=5 --posts=5 --voters=20 --runs=5 ===
+Concurrency experiment on 'knowverse_bench': 16 workers, 5 run(s)
+  phase A: 20 awards, 16 workers × 5 reversal attempts
+  phase B: 16 workers × 150 vote operations on 5 discussions by 20 voters
+  run 1/5 ...
+  run 2/5 ...
+  run 3/5 ...
+  SQLSTATE 40001/1213: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction (Connection: mysql, SQL: select * from `reputations` where `user_id` = 422 and `action` = post_upvoted and not exists (select * from `reputations` as `laravel_reserved_2` where `reputations`.`id` = `laravel_reserved_2`.`reverses_id`) and `source_id` = 10156 and `source_type` = post order
+  run 4/5 ...
+  run 5/5 ...
+
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| Run | A: reversals | B: ops | B: ops/s | Worker errors          | Invariant | Dup. reversals | Over-reversed | Counters | Vote reputation |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+| 1   | 20/20 ok     | 2400   | 200.6    | 0                      | 0         | 0              | 0             | 0        | 0               |
+| 2   | 20/20 ok     | 2400   | 207.8    | 0                      | 0         | 0              | 0             | 0        | 0               |
+| 3   | 14/20 FAIL   | 2400   | 173.6    | SQLSTATE 40001/1213×66 | 0         | 0              | 0             | 0        | 1               |
+| 4   | 11/20 FAIL   | 2400   | 161.5    | SQLSTATE 40001/1213×69 | 0         | 0              | 0             | 0        | 1               |
+| 5   | 20/20 ok     | 2400   | 178.7    | 0                      | 0         | 0              | 0             | 0        | 0               |
++-----+--------------+--------+----------+------------------------+-----------+----------------+---------------+----------+-----------------+
+Phase B throughput: 184.4 ± 19.3 ops/s (mean ± SD).
+CSV → storage/benchmarks/benchmark-concurrency.csv
+Consistency violations detected: 4.

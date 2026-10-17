@@ -1,0 +1,6 @@
+mode,workers,run,phase_a_awards,phase_a_reversals,phase_a_ok,phase_b_ops,phase_b_seconds,phase_b_ops_per_s,worker_errors,invariant_violations,duplicate_reversals,over_reversed,counter_mismatches,vote_reputation_mismatches
+atomic,8,1,20,20,1,2000,8.22,243.2,"0",0,0,0,0,0
+atomic,8,2,20,20,1,2000,11.13,179.7,"SQLSTATE 40001/1213×11",0,0,0,0,0
+atomic,8,3,20,20,1,2000,11.8,169.5,"0",0,0,0,0,0
+atomic,8,4,20,20,1,2000,11.66,171.5,"0",0,0,0,0,0
+atomic,8,5,20,20,1,2000,11.16,179.1,"0",0,0,0,0,0

@@ -1,0 +1,6 @@
+mode,workers,run,phase_a_awards,phase_a_reversals,phase_a_ok,phase_b_ops,phase_b_seconds,phase_b_ops_per_s,worker_errors,invariant_violations,duplicate_reversals,over_reversed,counter_mismatches,vote_reputation_mismatches
+baseline,16,1,20,20,1,2302,27.33,84.2,"SQLSTATE 40001/1213×98",0,0,0,0,5
+baseline,16,2,20,20,1,2324,22.63,102.7,"SQLSTATE 40001/1213×76",0,0,0,0,5
+baseline,16,3,20,9,0,2330,18.1,128.7,"SQLSTATE 40001/1213×141",0,0,0,0,5
+baseline,16,4,20,20,1,2255,52.25,43.2,"SQLSTATE 40001/1213×145",0,0,0,0,5
+baseline,16,5,20,6,0,2333,18.03,129.4,"SQLSTATE 40001/1213×141",0,0,0,0,5

@@ -14,7 +14,7 @@ This project was developed as a Bachelor's Graduation Project for the Web Techno
 ## Project Objectives
 
 - Provide a secure environment for students, researchers, and academics to publish and debate scholarly content.
-- Ensure academic accountability through an immutable reputation ledger.
+- Ensure academic accountability through an append-only, auditable reputation ledger.
 - Foster real-time collaboration and knowledge discovery using modern web technologies.
 - Maintain high content quality via multi-layered Role-Based Access Control (RBAC) and automated filtering.
 
@@ -47,9 +47,10 @@ KnowVerse follows a layered monolithic architecture based on the Model-View-Cont
 - Adjacency List Model implementation for infinitely threaded, structured comments and replies.
 - Advanced search and topic-based tagging (Taxonomy) with filtering capabilities.
 
-### 2. Immutable Reputation Ledger
-- A transaction-tracking ledger that securely logs all reputation changes (deltas).
-- Dynamic assignment of Academic Titles based on earned reputation points.
+### 2. Append-Only Reputation Ledger
+- Every reputation change is recorded as a ledger entry; a retraction is a new compensating entry, never an edit or deletion.
+- A database constraint prevents any ledger entry from being reversed twice, even under concurrent requests.
+- Academic standing (e.g. Novice Scholar, Senior Scholar) is derived from the reputation total.
 - Built-in anti-farming logic and composite database indexing to prevent vote manipulation.
 - "Author's Pick" consensus mechanism for highlighting exceptional responses.
 
@@ -63,10 +64,11 @@ KnowVerse follows a layered monolithic architecture based on the Model-View-Cont
 - Dedicated Moderator Dashboard for reviewing user-reported content.
 - Comprehensive Activity Logging (Audit Trail) for administrative oversight.
 
-### 5. Privacy & Data Protection (GDPR Compliant)
+### 5. Privacy & Data Protection
 - Strict requirement for email verification prior to platform interaction.
-- Support for "Right to be Forgotten" allowing users to permanently delete or deactivate their accounts.
-- Soft-delete implementation for critical entities to preserve academic discourse integrity when users depart.
+- Users can deactivate their account (reversible) or permanently delete it after confirming their password.
+- Permanent deletion removes the profile, votes, own ledger entries, notifications, follows, saved discussions and activity log. Discussions the user wrote are kept and shown as written by a "Deleted Scholar"; their text is not altered.
+- This describes the platform's technical behaviour; it is not a claim of compliance with the GDPR or any other regulation.
 
 ---
 
@@ -168,13 +170,18 @@ Reproducible measurement harnesses for HTTP throughput, the vote → reputation-
 cascade, and real-time WebSocket delivery live in [`benchmarks/`](benchmarks/README.md):
 
 ```bash
-php artisan knowverse:seed-benchmark --fresh   # generate a synthetic dataset
-php artisan knowverse:benchmark-http           # response-time percentiles and throughput
-php artisan knowverse:benchmark-votes          # vote-cascade latency + ledger integrity
-php artisan knowverse:benchmark-ws             # broadcast publish latency
+php artisan knowverse:seed-benchmark --fresh     # generate a synthetic dataset
+php artisan knowverse:benchmark-http             # response-time percentiles and throughput
+php artisan knowverse:benchmark-votes            # vote-cascade latency + ledger integrity
+php artisan knowverse:benchmark-ws               # broadcast publish latency
+php artisan knowverse:benchmark-concurrency      # ledger consistency under parallel writes (MySQL/MariaDB)
+php artisan knowverse:benchmark-ablation         # ledger versus a counter-only design
 ```
 
-Result sets are written to `storage/benchmarks/` and are not tracked in version control.
+New runs write their output to `storage/benchmarks/`. The raw results reported in the research paper are
+archived in [`benchmarks/results/`](benchmarks/results), and
+[`benchmarks/REPRODUCING.md`](benchmarks/REPRODUCING.md) maps every table of the paper to the command
+that produced it.
 
 ---
 

@@ -8,8 +8,8 @@ use App\Models\User;
 |--------------------------------------------------------------------------
 | These replace the Breeze boilerplate to match the actual implementation:
 | settings live under /settings/profile, the update route is PUT, the field
-| is full_name (not name), email is IMMUTABLE, and account deletion is a GDPR
-| hard delete guarded by the current password.
+| is full_name (not name), email is IMMUTABLE, and account deletion is a permanent
+| (hard) delete guarded by the current password.
 */
 
 test('profile settings page is displayed', function () {

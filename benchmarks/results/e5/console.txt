@@ -1,0 +1,48 @@
+E5 start: 2026-09-15 21:40:56
+Ablation on 'knowverse_bench_e5'
+  Backfilled 130,014 ledger entries in 10.9 s.
+
+Part A: write-path cost, 5 runs × 1000 vote operations per mode (modes alternate)
+  run 1 ledger  mean 21.83 ms  p95 45.38 ms  45.8 ops/s  (836 ledger rows)
+  run 1 counter mean 18.75 ms  p95 35.12 ms  53.3 ops/s  (0 ledger rows)
+  run 2 counter mean 17.58 ms  p95 30.75 ms  56.9 ops/s  (0 ledger rows)
+  run 2 ledger  mean 22.85 ms  p95 51.11 ms  43.7 ops/s  (811 ledger rows)
+  run 3 ledger  mean 22.67 ms  p95 53.52 ms  44.1 ops/s  (836 ledger rows)
+  run 3 counter mean 17.82 ms  p95 32.13 ms  56.1 ops/s  (0 ledger rows)
+  run 4 counter mean 17.88 ms  p95 33.26 ms  55.9 ops/s  (0 ledger rows)
+  run 4 ledger  mean 23.29 ms  p95 54.36 ms  42.9 ops/s  (830 ledger rows)
+  run 5 ledger  mean 23.32 ms  p95 53.68 ms  42.9 ops/s  (843 ledger rows)
+  run 5 counter mean 17.66 ms  p95 35.58 ms  56.6 ops/s  (0 ledger rows)
++------------------------------------------------+--------------------+--------------------------+-----------------+
+| Metric                                         | Ledger (mean ± SD) | Counter only (mean ± SD) | Ledger overhead |
++------------------------------------------------+--------------------+--------------------------+-----------------+
+| mean latency (ms)                              | 22.79 ± 0.61       | 17.94 ± 0.47             | +27.1%          |
+| p50 latency (ms)                               | 22.15 ± 0.24       | 19.13 ± 0.33             | +15.8%          |
+| p95 latency (ms)                               | 51.61 ± 3.70       | 33.37 ± 2.02             | +54.7%          |
+| p99 latency (ms)                               | 80.62 ± 9.38       | 55.71 ± 5.29             | +44.7%          |
+| throughput (ops/s)                             | 43.89 ± 1.19       | 55.75 ± 1.42             | -21.3%          |
+| ledger rows per vote operation                 | 0.83               | 0                        |                 |
+| ledger storage per row (bytes, data + indexes) | 204                | 0                        | 134250 rows     |
++------------------------------------------------+--------------------+--------------------------+-----------------+
+CSV → storage/benchmarks/benchmark-ablation-cost.csv
+CSV → storage/benchmarks/benchmark-ablation-cost-runs.csv
+  (ledger rows before part A: 130014)
+
+Part B: detection and recovery, 5 repetitions × 50 corrupted users
+  run 1: detected 50/50, false positives 0, restored exactly 50/50, violations after 0  (scan 198.6 ms, repair 576.0 ms)
+  run 2: detected 50/50, false positives 0, restored exactly 50/50, violations after 0  (scan 110.7 ms, repair 470.4 ms)
+  run 3: detected 50/50, false positives 0, restored exactly 50/50, violations after 0  (scan 88.5 ms, repair 528.6 ms)
+  run 4: detected 50/50, false positives 0, restored exactly 50/50, violations after 0  (scan 90.2 ms, repair 487.2 ms)
+  run 5: detected 50/50, false positives 0, restored exactly 50/50, violations after 0  (scan 130.5 ms, repair 341.5 ms)
++------------------------------------------------------------------+-----------------------+
+| Metric                                                           | Value (5 repetitions) |
++------------------------------------------------------------------+-----------------------+
+| users scanned per repetition                                     | 1000                  |
+| ledger rows                                                      | 134250                |
+| full consistency scan (ms)                                       | 123.72 ± 45.24        |
+| recalculation of 50 users (ms)                                   | 480.72 ± 87.87        |
+| all corrupted users detected, none falsely, all restored exactly | yes, every repetition |
++------------------------------------------------------------------+-----------------------+
+CSV → storage/benchmarks/benchmark-ablation-recovery.csv
+exit: 0
+E5 end: 2026-09-15 21:44:46

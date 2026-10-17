@@ -1,0 +1,5 @@
+label: C4-caches-production-opcache-filesession
+time: 2026-09-14 17:25:50
+opcache (inside Apache): {"opcache_loaded":true,"opcache_enabled":true,"php":"8.2.12"}
+APP_ENV=production APP_DEBUG=false LOG_LEVEL=error DB_DATABASE=knowverse_bench SESSION_DRIVER=file CACHE_STORE=file 
+laravel caches: config.php packages.php routes-v7.php services.php 

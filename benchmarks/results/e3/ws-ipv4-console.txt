@@ -1,0 +1,16 @@
+Broadcasting 100 pings on public channel 'benchmark'...
+  (run `node benchmarks/ws-latency.mjs` in another terminal for end-to-end latency)
+  run 1/5
+  run 2/5
+  run 3/5
+  run 4/5
+  run 5/5
+
++-------------------------------+-------------------------------+
+| Metric (app → Reverb publish) | Value (ms, mean ± SD, 5 runs) |
++-------------------------------+-------------------------------+
+| p50                           | 4.41 ± 1.30                   |
+| p95                           | 18.59 ± 1.74                  |
+| p99                           | 21.25 ± 5.37                  |
++-------------------------------+-------------------------------+
+Read the Node probe output for end-to-end (event → client) delivery latency.

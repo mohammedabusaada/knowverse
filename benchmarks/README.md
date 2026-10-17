@@ -6,7 +6,9 @@ real-time WebSocket delivery via Laravel Reverb.
 
 Run these against a **real MySQL database** with a synthetic dataset — never the
 SQLite test database. All CSV output is written to `storage/benchmarks/`, which is
-excluded from version control.
+excluded from version control. The results reported in the research paper are archived in
+[`results/`](results), and [`REPRODUCING.md`](REPRODUCING.md) maps each table of the paper to the
+command and raw files it came from.
 
 ---
 

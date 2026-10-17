@@ -1,0 +1,7 @@
+metric,runs,mean,sd,ci95
+mean_ms,5,34.76,1.5,1.87
+p50_ms,5,31.32,0.61,0.75
+p95_ms,5,56.12,3.6,4.47
+p99_ms,5,89.72,5.31,6.59
+throughput_vps,5,28.74,1.21,1.5
+ledger_violations_total,5,0,,
