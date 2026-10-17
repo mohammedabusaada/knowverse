@@ -61,7 +61,7 @@ it('reverses reputation with a compensating entry instead of deleting ledger row
     // Retract one upvote.
     Vote::where('user_id', $voters->first()->id)->first()->delete();
 
-    // The three ORIGINAL award entries are preserved — the ledger is immutable.
+    // The three ORIGINAL award entries are preserved — the ledger is append-only.
     expect(Reputation::where('user_id', $author->id)->where('action', 'post_upvoted')->count())
         ->toBe(3);
 

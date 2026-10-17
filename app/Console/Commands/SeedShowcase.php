@@ -98,7 +98,7 @@ def verify(entries):
     return True
 ```
 
-This is precisely the principle behind an immutable reputation ledger: every change is a verifiable transaction rather than an overwrite.
+This is precisely the principle behind an append-only reputation ledger: every change is a verifiable transaction rather than an overwrite.
 BODY;
 
         $body3 = <<<'BODY'

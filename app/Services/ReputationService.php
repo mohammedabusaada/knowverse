@@ -32,7 +32,7 @@ class ReputationService
             // Resolve dynamic point configurations from the central settings file
             $delta = $customDelta ?? config("reputation.points.$action", 0);
 
-            // 1. Immutable Audit: Append entry to the append-only ledger
+            // 1. Audit trail: append the entry to the append-only ledger
             $record = Reputation::create([
                 'user_id' => $user->id,
                 'action' => $action,
