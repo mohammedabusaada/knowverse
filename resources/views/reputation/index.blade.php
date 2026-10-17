@@ -4,17 +4,17 @@
     Academic Reputation Ledger
     ---------------------------
     This view serves as the formal record of a scholar's influence within KnowVerse.
-    It functions as an immutable audit trail of peer-evaluated contributions.
+    It functions as an append-only audit trail of peer-evaluated contributions.
 --}}
 
 @section('profile-content')
     <div class="max-w-4xl py-6 animate-[fadeUp_0.8s_ease_both]">
         <div class="flex flex-col gap-8">
             
-            {{-- Section Header: Core Scholarly Standing --}}
+            {{-- Section Header: Core Academic Standing --}}
             <header class="border-b border-rule pb-4">
                 <h1 class="font-heading text-3xl font-bold text-ink mb-2">
-                    Scholarly Standing
+                    Academic Standing
                 </h1>
                 <p class="font-serif text-[15px] text-muted italic">
                     A comprehensive ledger of academic influence and peer-evaluated contributions within the KnowVerse community.
