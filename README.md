@@ -50,6 +50,7 @@ KnowVerse follows a layered monolithic architecture based on the Model-View-Cont
 ### 2. Append-Only Reputation Ledger
 - Every reputation change is recorded as a ledger entry; a retraction is a new compensating entry, never an edit or deletion.
 - A database constraint prevents any ledger entry from being reversed twice, even under concurrent requests.
+- Database triggers reject any direct `UPDATE` or `DELETE` of a ledger entry; entries are removed only when their owner's account is permanently deleted.
 - Academic standing (e.g. Novice Scholar, Senior Scholar) is derived from the reputation total.
 - Built-in anti-farming logic and composite database indexing to prevent vote manipulation.
 - "Author's Pick" consensus mechanism for highlighting exceptional responses.
