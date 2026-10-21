@@ -4,6 +4,8 @@ use App\Models\Post;
 use App\Models\Reputation;
 use App\Models\User;
 use App\Models\Vote;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,4 +70,34 @@ it('reverses reputation with a compensating entry instead of deleting ledger row
     // A single compensating (negative) reversal entry was appended.
     expect(Reputation::where('user_id', $author->id)->where('action', 'post_upvoted_reverted')->count())
         ->toBe(1);
+});
+
+it('rejects a direct UPDATE or DELETE of ledger entries at the database level', function () {
+    $author = User::factory()->create(['role_id' => 1, 'reputation_points' => 0]);
+    $post = Post::factory()->create(['user_id' => $author->id]);
+    Vote::castVote(User::factory()->create(['role_id' => 1]), $post, 1);
+
+    $entry = Reputation::where('user_id', $author->id)->firstOrFail();
+
+    // Raw queries bypass the application entirely; the database trigger must still refuse them.
+    expect(fn () => DB::table('reputations')->where('id', $entry->id)->update(['delta' => 1000]))
+        ->toThrow(QueryException::class, 'append-only');
+    expect(fn () => DB::table('reputations')->where('id', $entry->id)->delete())
+        ->toThrow(QueryException::class, 'append-only');
+
+    expect(Reputation::find($entry->id)->delta)->toBe($entry->delta);
+});
+
+it('still removes ledger entries when the account itself is permanently deleted', function () {
+    $author = User::factory()->create(['role_id' => 1, 'reputation_points' => 0]);
+    $post = Post::factory()->create(['user_id' => $author->id]);
+    $voter = User::factory()->create(['role_id' => 1]);
+    Vote::castVote($voter, $post, 1);
+    Vote::where('user_id', $voter->id)->first()->delete();
+
+    expect(Reputation::where('user_id', $author->id)->count())->toBeGreaterThan(0);
+
+    $author->forceDelete();
+
+    expect(Reputation::where('user_id', $author->id)->count())->toBe(0);
 });
