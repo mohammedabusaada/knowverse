@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Reputation;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -96,8 +97,7 @@ class ReputationService
                 ->where('source_type', $source->getMorphClass());
         }
 
-        // Lock the candidate so a concurrent reversal waits instead of selecting it too.
-        $record = $query->latest('id')->lockForUpdate()->first();
+        $record = $this->latestOutstanding($query);
 
         if (! $record) {
             return; // Nothing outstanding: a repeated reversal is a no-op.
@@ -127,11 +127,19 @@ class ReputationService
     }
 
     /**
+     * Locks the candidate so a concurrent reversal waits instead of selecting it too.
+     */
+    protected function latestOutstanding(Builder $query): ?Reputation
+    {
+        return $query->latest('id')->lockForUpdate()->first();
+    }
+
+    /**
      * Serialises ledger writes per user. Every award, reversal and recalculation first
      * takes a row lock on the user, so concurrent ledger writes for the same user run one
      * after another instead of deadlocking on the ledger's index gaps.
      */
-    private function lockLedger(User $user): void
+    protected function lockLedger(User $user): void
     {
         DB::table('users')->where('id', $user->id)->lockForUpdate()->value('id');
     }

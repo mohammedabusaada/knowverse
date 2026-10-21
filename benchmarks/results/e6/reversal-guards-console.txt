@@ -1,0 +1,26 @@
+[32mReversal guards on 'knowverse_guards': 20 awards, 5 attempts per worker, 5 run(s) per configuration[39m
+  locks + unique, 8 workers ...
+  locks + unique, 16 workers ...
+  locks only, 8 workers ...
+  locks only, 16 workers ...
+  unique only, 8 workers ...
+  [33mSQLSTATE 23000/1062[39m: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1169' for key 'reputations_reverses_id_unique' (Connection: mysql, SQL: insert into `reputations` (`user_id`, `action`, `delta`, `reverses_id`, `source_id`, `source_type`, `note`) values (25, post_upvoted_reverted, -5, 1169, 25, post, Reversal of ledger entry #1169))
+  [33mSQLSTATE 40001/1213[39m: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction (Connection: mysql, SQL: insert into `reputations` (`user_id`, `action`, `delta`, `reverses_id`, `source_id`, `source_type`, `note`) values (25, post_upvoted_reverted, -5, 1158, 25, post, Reversal of ledger entry #1158))
+  unique only, 16 workers ...
+  neither, 8 workers ...
+  neither, 16 workers ...
+
++----------------+---------+----------------------+------------------------+-----------------+----------------------+------------------------------------------------+
+|[32m Configuration  [39m|[32m Workers [39m|[32m Attempts → reversals [39m|[32m Entries reversed twice [39m|[32m Extra reversals [39m|[32m Invariant violations [39m|[32m Worker errors                                  [39m|
++----------------+---------+----------------------+------------------------+-----------------+----------------------+------------------------------------------------+
+| locks + unique | 8       | 200 → 100 (of 100)   | 0                      | 0               | 0                    | 0                                              |
+| locks + unique | 16      | 400 → 100 (of 100)   | 0                      | 0               | 0                    | 0                                              |
+| locks only     | 8       | 200 → 100 (of 100)   | 0                      | 0               | 0                    | 0                                              |
+| locks only     | 16      | 400 → 100 (of 100)   | 0                      | 0               | 0                    | 0                                              |
+| unique only    | 8       | 200 → 94 (of 100)    | 0                      | 0               | 0                    | SQLSTATE 23000/1062×80; SQLSTATE 40001/1213×26 |
+| unique only    | 16      | 400 → 100 (of 100)   | 0                      | 0               | 0                    | SQLSTATE 40001/1213×2; SQLSTATE 23000/1062×46  |
+| neither        | 8       | 200 → 124 (of 100)   | 51                     | 24              | 0                    | SQLSTATE 40001/1213×76                         |
+| neither        | 16      | 400 → 186 (of 100)   | 77                     | 86              | 0                    | SQLSTATE 40001/1213×55                         |
++----------------+---------+----------------------+------------------------+-----------------+----------------------+------------------------------------------------+
+[32mCSV → storage/benchmarks/benchmark-reversal-guards.csv[39m
+[32mThe complete system produced no double reversal; the unique constraint is restored.[39m

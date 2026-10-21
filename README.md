@@ -176,6 +176,7 @@ php artisan knowverse:benchmark-http             # response-time percentiles and
 php artisan knowverse:benchmark-votes            # vote-cascade latency + ledger integrity
 php artisan knowverse:benchmark-ws               # broadcast publish latency
 php artisan knowverse:benchmark-concurrency      # ledger consistency under parallel writes (MySQL/MariaDB)
+php artisan knowverse:benchmark-reversal-guards  # which guard prevents a double reversal (MySQL/MariaDB)
 php artisan knowverse:benchmark-ablation         # ledger versus a counter-only design
 ```
 

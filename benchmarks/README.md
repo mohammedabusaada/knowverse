@@ -158,6 +158,21 @@ for comparison. Add `-v` to print the first message of each worker error type. W
 
 The command writes synthetic discussions and votes: run it against a benchmark database.
 
+### Which guard prevents a double reversal?
+
+```bash
+php artisan knowverse:benchmark-reversal-guards --workers=8,16 --awards=20 --repeat=5 --runs=5
+```
+
+Repeats the reversal race of phase A with each combination of the two guards switched
+on or off: the row locks of the ledger service (the per-user lock and the lock on the
+selected entry) and the unique constraint on `reputations.reverses_id`. For each
+configuration it reports the reversals made, the entries reversed more than once and the
+worker errors. Each run uses a user and a discussion created for it and permanently
+deletes them afterwards, and the unique constraint is restored when the command ends.
+Writes `storage/benchmarks/benchmark-reversal-guards.csv`. The command drops and recreates
+an index, so run it against a benchmark database only.
+
 ---
 
 ## 5. Ledger versus a plain counter (ablation)
@@ -187,6 +202,7 @@ every user's reputation counter.
 | `knowverse:benchmark-votes` | `benchmark-votes.csv`, `benchmark-votes-runs.csv` | Vote cascade latency + ledger integrity |
 | `knowverse:benchmark-ws` + `ws-latency.mjs` | console summary | Publish and end-to-end delivery latency |
 | `knowverse:benchmark-concurrency` | `benchmark-concurrency.csv` | Ledger and vote consistency under parallel writes |
+| `knowverse:benchmark-reversal-guards` | `benchmark-reversal-guards.csv` | Effect of the row locks and the unique constraint on double reversals |
 | `knowverse:benchmark-ablation` | `benchmark-ablation-*.csv` | Ledger cost versus a counter; corruption detection and recovery |
 
 Re-seed with `knowverse:seed-benchmark --fresh` between runs so that results stay

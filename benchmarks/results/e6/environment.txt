@@ -1,0 +1,6 @@
+E6 date: 2026-10-21 21:42:23
+server: 10.4.32-MariaDB / isolation REPEATABLE-READ / max_connections 151 / innodb_lock_wait_timeout 50
+
+php: 8.2.12
+database: DB_DATABASE=knowverse_guards (created for this experiment, migrated, roles seeded)
+command: php artisan knowverse:benchmark-reversal-guards --workers=8,16 --awards=20 --repeat=5 --runs=5 -v
