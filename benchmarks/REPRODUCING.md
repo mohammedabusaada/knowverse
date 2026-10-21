@@ -59,13 +59,14 @@ The performance measurements used a production configuration: PHP OPcache enable
 | 12 — Concurrent writes (8 processes) | `php artisan knowverse:benchmark-concurrency --workers=8 --ops=250 --awards=20 --repeat=5 --posts=10 --voters=50 --runs=5` (add `--baseline` for the original vote code) | `benchmarks/results/e4/atomic-8.csv`, `benchmarks/results/e4/baseline-8.csv` |
 | 12 — Concurrent writes (16 processes) | `php artisan knowverse:benchmark-concurrency --workers=16 --ops=150 --awards=20 --repeat=5 --posts=5 --voters=20 --runs=5` (add `--baseline` for the original vote code) | `benchmarks/results/e4/atomic-16.csv`, `benchmarks/results/e4/baseline-16.csv` |
 | 13 — Ledger versus counter-only | `php artisan knowverse:benchmark-ablation --samples=1000 --runs=5 --corrupt=50 --warmup=100 --backfill` | `benchmarks/results/e5/` |
+| Section 6.5 — Which guard prevents a double reversal | `php artisan knowverse:benchmark-reversal-guards --workers=8,16 --awards=20 --repeat=5 --runs=5` | `benchmarks/results/e6/` |
 
-Additional raw data referred to in the text:
+Additional raw data:
 
 | Folder | Content |
 |---|---|
 | `benchmarks/results/e1/` | One-factor-at-a-time diagnosis of the original latency (Section 7): development baseline, caches, production mode, OPcache, file sessions |
-| `benchmarks/results/e4-before-ledger-lock/` | The first concurrency run, before ledger writes were serialized per user (Section 6.5) |
+| `benchmarks/results/e4-before-ledger-lock/` | An early concurrency run, made before ledger writes were serialized per user |
 | `benchmarks/results/*.csv` | Output of the most recent run of each command |
 
 Each `environment.txt` and console log records the configuration that was active when the data was produced.

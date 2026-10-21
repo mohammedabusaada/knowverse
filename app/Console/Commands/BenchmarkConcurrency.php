@@ -200,7 +200,7 @@ class BenchmarkConcurrency extends Command
     /**
      * Start the workers together and collect their JSON reports.
      */
-    private function launch(int $workers, array $args): array
+    protected function launch(int $workers, array $args): array
     {
         $startAt = microtime(true) + 3.0; // common barrier after every process has booted
         $processes = [];
@@ -312,7 +312,7 @@ class BenchmarkConcurrency extends Command
         ];
     }
 
-    private function writeCsv(string $name, string $content): void
+    protected function writeCsv(string $name, string $content): void
     {
         $dir = storage_path('benchmarks');
         if (! is_dir($dir)) {

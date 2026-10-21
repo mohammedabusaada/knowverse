@@ -3,10 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\Post;
+use App\Models\Reputation;
 use App\Models\User;
 use App\Models\Vote;
 use App\Services\ReputationService;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 
 /**
@@ -25,7 +27,8 @@ class ConcurrencyWorker extends Command
         {--ops=100 : Phase B: vote operations}
         {--voters= : Phase B: comma-separated voter ids}
         {--posts= : Phase B: comma-separated discussion ids}
-        {--baseline : Phase B: use the non-atomic vote write path}';
+        {--baseline : Phase B: use the non-atomic vote write path}
+        {--locks=1 : Phase A: 0 disables the row locks of the ledger service}';
 
     protected $description = 'Internal worker for knowverse:benchmark-concurrency.';
 
@@ -50,7 +53,7 @@ class ConcurrencyWorker extends Command
         if ($this->option('mode') === 'reverse') {
             $user = User::findOrFail((int) $this->option('user'));
             $post = Post::withoutGlobalScopes()->findOrFail((int) $this->option('post'));
-            $service = app(ReputationService::class);
+            $service = $this->option('locks') ? app(ReputationService::class) : $this->unlockedService();
             $this->waitForBarrier();
 
             for ($i = 0; $i < max(1, (int) $this->option('repeat')); $i++) {
@@ -106,6 +109,23 @@ class ConcurrencyWorker extends Command
         } else {
             Vote::updateOrCreate($keys, ['value' => $value]);
         }
+    }
+
+    /**
+     * The ledger service without its row locks (neither the per-user lock nor the lock on
+     * the selected entry), used to measure what the unique constraint achieves on its own.
+     */
+    private function unlockedService(): ReputationService
+    {
+        return new class extends ReputationService
+        {
+            protected function lockLedger(User $user): void {}
+
+            protected function latestOutstanding(Builder $query): ?Reputation
+            {
+                return $query->latest('id')->first();
+            }
+        };
     }
 
     private function waitForBarrier(): void
