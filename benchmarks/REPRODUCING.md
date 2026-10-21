@@ -23,7 +23,7 @@ php artisan key:generate
 php artisan test
 ```
 
-The suite (124 tests, 288 assertions) runs against an in-memory SQLite database and needs no other setup.
+The suite (126 tests, 295 assertions) runs against an in-memory SQLite database and needs no other setup.
 
 | Table | What it reports | Test files (`tests/Feature/`) |
 |---|---|---|
