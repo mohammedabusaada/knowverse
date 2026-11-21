@@ -8,11 +8,8 @@
 
     <title>{{ config('app.name', 'KnowVerse') }}</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.includes.theme-init')
 </head>
 
 <body class="font-serif text-ink bg-aged/30 antialiased min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">

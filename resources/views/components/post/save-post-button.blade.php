@@ -11,6 +11,8 @@
         
         :disabled="loading"
         type="button"
+        :aria-label="isSaved ? 'Remove bookmark' : 'Bookmark discussion'"
+        :aria-pressed="isSaved"
         :title="isSaved ? 'Unsave Post' : 'Save Post'"
         class="mt-3 inline-flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all"
         :class="isSaved 

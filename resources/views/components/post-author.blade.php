@@ -10,7 +10,7 @@
                 {{ $user->display_name }}
             </a>
             @if($user->academic_title)
-                <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
+                <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
                     {{ $user->academic_title }}
                 </span>
             @endif

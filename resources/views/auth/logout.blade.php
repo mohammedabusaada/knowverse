@@ -19,10 +19,10 @@
             <p class="text-muted italic mb-10 leading-relaxed">Your account is secure. You have been successfully logged out of the system.</p>
 
             <div class="space-y-4">
-                <a href="{{ route('login') }}" class="block text-center w-full bg-ink text-paper font-mono uppercase tracking-widest text-xs py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
+                <a href="{{ route('login') }}" class="block text-center w-full bg-ink text-paper font-mono uppercase tracking-wide text-sm py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
                     Log In Again
                 </a>
-                <a href="/" class="block text-center w-full bg-transparent border border-rule text-muted font-mono uppercase tracking-widest text-xs py-4 hover:border-ink hover:text-ink transition-all">
+                <a href="/" class="block text-center w-full bg-transparent border border-rule text-muted font-mono uppercase tracking-wide text-sm py-4 hover:border-ink hover:text-ink transition-all">
                     Return to Homepage
                 </a>
             </div>

@@ -50,7 +50,7 @@
                     <div class="space-y-5">
                         {{-- Reason Select --}}
                         <div>
-                            <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Primary Reason</label>
+                            <label class="block font-mono text-xs uppercase tracking-widest text-muted mb-2 font-bold">Primary Reason</label>
                             <select name="reason_type" required
                                 class="w-full px-3 py-2 border border-rule bg-transparent text-ink font-serif text-sm focus:ring-0 focus:border-ink transition-colors appearance-none rounded-none cursor-pointer">
                                 <option value="" disabled selected>-- Select a violation --</option>
@@ -64,7 +64,7 @@
 
                         {{-- Additional Details --}}
                         <div>
-                            <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Additional Context (Optional)</label>
+                            <label class="block font-mono text-xs uppercase tracking-widest text-muted mb-2 font-bold">Additional Context (Optional)</label>
                             <textarea
                                 name="reason"
                                 rows="3"
@@ -79,12 +79,12 @@
                         <button
                             type="button"
                             @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: 'report-{{ $type }}-{{ $id }}' }))"
-                            class="px-6 py-2 font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors"
+                            class="px-6 py-2 font-mono text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors"
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" class="px-6 py-2 bg-accent-warm text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
+                        <button type="submit" class="px-6 py-2 bg-accent-warm text-paper font-mono text-xs uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
                             Submit Report
                         </button>
                     </div>

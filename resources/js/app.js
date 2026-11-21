@@ -1,19 +1,20 @@
+import { searchSuggestions } from './search-suggestions';
 import './bootstrap';
 import Alpine from 'alpinejs';
-import EasyMDE from "easymde";
 import './vote.js';
 import './save-post.js';
 import './echo';
 
-import hljs from 'highlight.js';
-import { marked } from 'marked';
-import renderMathInElement from 'katex/dist/contrib/auto-render.js';
-
-window.hljs = hljs;
-window.marked = marked;
-window.EasyMDE = EasyMDE;
-window.renderMathInElement = renderMathInElement;
-
+// Cache each loading promise so multiple comment editors share one download.
+let contentTools;
+let editorTools;
+window.loadContentTools = () => contentTools ??= import('./content-tools').then((tools) => {
+    Object.assign(window, tools);
+});
+window.loadEditorTools = () => editorTools ??= Promise.all([
+    window.loadContentTools(),
+    import('./editor-tools').then(({ EasyMDE }) => { window.EasyMDE = EasyMDE; }),
+]);
 
 window.Alpine = Alpine;
 
@@ -42,6 +43,7 @@ document.addEventListener('alpine:init', () => {
             this.tab = tab;
             const url = new URL(window.location);
             url.searchParams.set('type', tab);
+            url.searchParams.delete('page');
             window.location.href = url.toString(); 
         },
 
@@ -70,29 +72,7 @@ document.addEventListener('alpine:init', () => {
     }));
 
     // Live Search Suggestions Component
-    Alpine.data('searchSuggestions', (initialValue) => ({
-        q: initialValue ?? '',
-        open: false,
-        loading: false,
-        results: { posts: [], users: [], tags: [] },
-
-        fetch() {
-            if (this.q.length < 2) {
-                this.open = false;
-                return;
-            }
-
-            this.loading = true;
-            fetch(`/search/suggestions?q=${encodeURIComponent(this.q)}`)
-                .then(res => res.json())
-                .then(data => {
-                    this.results = data;
-                    this.open = true;
-                })
-                .catch(err => console.error("Search error:", err))
-                .finally(() => this.loading = false);
-        }
-    }));
+    Alpine.data('searchSuggestions', searchSuggestions);
 });
 
 Alpine.start();

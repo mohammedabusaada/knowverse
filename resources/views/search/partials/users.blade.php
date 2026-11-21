@@ -20,7 +20,7 @@
                     <p class="font-heading font-bold text-ink truncate text-base group-hover:text-accent transition-colors">
                         {{ $user->display_name }}
                     </p>
-                    <p class="font-mono text-[10px] uppercase tracking-widest text-muted truncate mt-0.5">
+                    <p class="font-mono text-xs uppercase tracking-widest text-muted truncate mt-0.5">
                         {{ '@' . $user->username }}
                     </p>
                 </div>
@@ -29,6 +29,6 @@
     </div>
 
     <div class="mt-8 pt-4 border-t border-rule">
-        {{ $users->links() }}
+        {{ $users->onEachSide(1)->links('pagination.academic') }}
     </div>
 @endif

@@ -11,7 +11,7 @@
     </div>
 
     <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        <p class="px-4 text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Menu</p>
+        <p class="px-4 text-sm font-black uppercase tracking-wide text-gray-500 mb-2">Menu</p>
         
         <a href="{{ route('admin.dashboard') }}" 
            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-white text-black shadow-md' : 'hover:bg-gray-900 hover:text-white' }}">
@@ -30,7 +30,7 @@
             <a href="{{ route('admin.tags.index') }}" 
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all {{ request()->routeIs('admin.tags.*') ? 'bg-white text-black shadow-md' : 'hover:bg-gray-900 hover:text-white' }}">
                 <x-icons.tag class="w-5 h-5" />
-                <span>Tags</span>
+                <span>Topics</span>
             </a>
         @endif
 
@@ -42,7 +42,7 @@
             
             @php $pendingCount = \App\Models\Report::pending()->count(); @endphp
             @if($pendingCount > 0)
-                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">{{ $pendingCount }}</span>
+                <span class="ml-auto bg-neutral-700 text-white text-sm font-bold px-2 py-0.5 rounded-full shadow-sm">{{ $pendingCount }}</span>
             @endif
         </a>
     </nav>

@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KnowVerse - Login</title>
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.includes.theme-init')
 </head>
 
 <body class="min-h-screen flex bg-paper text-ink font-serif antialiased selection:bg-accent selection:text-paper">
@@ -56,7 +54,7 @@
                 @csrf
 
                 <div>
-                    <label for="login" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">
+                    <label for="login" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">
                         Email or Username
                     </label>
                     <input
@@ -72,7 +70,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Password</label>
+                    <label for="password" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Password</label>
                     <input
                         type="password"
                         id="password"
@@ -89,12 +87,12 @@
                         <input type="checkbox" name="remember" class="h-4 w-4 text-ink border-rule rounded-sm bg-transparent focus:ring-ink" />
                         <span class="ml-2 text-sm italic font-serif group-hover:text-ink">Remember me</span>
                     </label>
-                    <a href="{{ route('password.request') }}" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors">
+                    <a href="{{ route('password.request') }}" class="font-mono text-sm uppercase tracking-wide text-muted hover:text-ink transition-colors">
                         Forgot password?
                     </a>
                 </div>
 
-                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-xs py-4 transition-colors mt-4">
+                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-sm py-4 transition-colors mt-4">
                     Sign In
                 </button>
             </form>

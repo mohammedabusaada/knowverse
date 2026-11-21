@@ -1,17 +1,7 @@
 <nav 
-    x-data="{ 
-        mobileOpen: false, 
-        darkMode: localStorage.getItem('theme') === 'dark' 
-    }" 
-    x-init="
-        $watch('darkMode', val => {
-            localStorage.setItem('theme', val ? 'dark' : 'light');
-            document.documentElement.classList.toggle('dark', val);
-        })
-    "
-    class="sticky top-0 z-50 bg-paper/95 backdrop-blur-md border-b border-rule transition-all duration-300 flex items-center min-h-[56px]"
+    x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false" class="sticky top-0 z-50 bg-paper/95 backdrop-blur-md border-b border-rule transition-all duration-300 flex items-center min-h-[56px]"
 >
-    <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         
         {{-- Wordmark (Logo) --}}
         <a href="/" class="font-heading font-bold text-base tracking-[0.08em] uppercase text-ink hover:opacity-70 transition-opacity shrink-0">
@@ -39,7 +29,7 @@
                 <x-notification-dropdown />
 
                 <div x-data="{ open: false }" class="relative ml-2">
-                    <button @click="open = !open" class="flex items-center focus:outline-none group">
+                    <button @click="open = !open" aria-label="Account menu" :aria-expanded="open" class="flex items-center focus:outline-none group">
                         <x-user-avatar :user="auth()->user()" size="sm" class="border border-rule group-hover:border-ink transition-colors" />
                     </button>
 
@@ -57,7 +47,7 @@
                         x-cloak
                     >
                         <div class="px-4 py-2 border-b border-rule mb-1">
-                            <p class="font-mono text-[10px] text-muted uppercase tracking-[0.15em]">Signed in as</p>
+                            <p class="font-mono text-xs text-muted uppercase tracking-wide">Signed in as</p>
                             <p class="text-sm font-bold text-ink truncate font-heading">{{ auth()->user()->username }}</p>
                         </div>
 
@@ -86,7 +76,7 @@
 
         {{-- Mobile Menu Toggle --}}
         <div class="md:hidden flex items-center">
-            <button @click="mobileOpen = !mobileOpen" class="text-muted hover:text-ink transition-colors focus:outline-none">
+            <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen" aria-controls="mobile-navigation" class="text-muted hover:text-ink transition-colors focus:outline-none">
                 <span class="font-mono text-xs uppercase tracking-widest" x-show="!mobileOpen">Menu</span>
                 <span class="font-mono text-xs uppercase tracking-widest" x-show="mobileOpen" x-cloak>Close</span>
             </button>
@@ -94,14 +84,14 @@
     </div>
 
     {{-- Mobile Menu Panel --}}
-    <div x-show="mobileOpen" x-transition x-cloak class="absolute top-full left-0 w-full md:hidden bg-paper border-b border-rule px-6 py-8 shadow-xl">
+    <div id="mobile-navigation" x-show="mobileOpen" x-transition x-cloak class="absolute top-full left-0 w-full md:hidden bg-paper border-b border-rule px-6 py-8 shadow-xl">
         <div class="mb-6">
             <x-search-bar placeholder="Search discussions..." />
         </div>
 
         @auth
             <div class="mb-6 pb-6 border-b border-rule">
-                <p class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-2">Signed in as</p>
+                <p class="font-mono text-xs text-muted uppercase tracking-wide mb-2">Signed in as</p>
                 <div class="flex items-center gap-3">
                     <x-user-avatar :user="auth()->user()" size="md" />
                     <div class="min-w-0">

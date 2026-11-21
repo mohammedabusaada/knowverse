@@ -18,17 +18,17 @@
             <form method="POST" action="{{ route('password.confirm') }}" class="space-y-6">
                 @csrf
                 <div class="text-left">
-                    <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Password</label>
+                    <label for="password" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Password</label>
                     <input id="password" type="password" name="password" required
                            class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
 
-                <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-widest text-xs py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
+                <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-wide text-sm py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
                     Confirm Access
                 </button>
             </form>
             
-            <a href="{{ url()->previous() }}" class="inline-block mt-8 font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors">
+            <a href="{{ url()->previous() }}" class="inline-block mt-8 font-mono text-sm uppercase tracking-wide text-muted hover:text-ink transition-colors">
                 &larr; Go Back
             </a>
         </div>

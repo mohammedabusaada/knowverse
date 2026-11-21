@@ -20,14 +20,14 @@
                 
                 {{-- Academic Title Display --}}
                 @if($user->academic_title)
-                    <span class="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 bg-accent/10 border border-accent/20 text-accent rounded-sm">
+                    <span class="font-mono text-sm uppercase tracking-wide px-2 py-0.5 bg-accent/10 border border-accent/20 text-accent rounded-sm">
                         {{ $user->academic_title }}
                     </span>
                 @endif
                 
                 {{-- Banned Badge --}}
                 @if($user->is_banned)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-black bg-accent-warm text-paper uppercase tracking-widest shadow-sm">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-sm font-black bg-accent-warm text-paper uppercase tracking-wide shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         Suspended
                     </span>
@@ -43,11 +43,11 @@
             <div class="mt-4 flex gap-6 text-sm font-black font-mono">
                 <div class="flex items-center gap-1.5">
                     <span class="text-ink text-base">{{ number_format($user->reputation_points) }}</span>
-                    <span class="text-muted uppercase tracking-widest text-[10px]">reputation</span>
+                    <span class="text-muted uppercase tracking-wide text-sm">reputation</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="text-ink text-base">{{ $user->posts_count ?? $user->posts()->count() }}</span>
-                    <span class="text-muted uppercase tracking-widest text-[10px]">posts</span>
+                    <span class="text-muted uppercase tracking-wide text-sm">posts</span>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="self-start sm:self-center mt-4 sm:mt-0 flex items-center gap-2 shrink-0">
             @auth
                 @if(auth()->id() === $user->id)
-                    <x-button href="{{ route('profile.edit') }}" secondary class="font-mono text-xs uppercase tracking-widest">Edit Profile</x-button>
+                    <x-button href="{{ route('profile.edit') }}" secondary class="font-mono text-sm uppercase tracking-wide">Edit Profile</x-button>
                 @else
                     <x-follow-button :user="$user" />
                     

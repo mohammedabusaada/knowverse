@@ -25,13 +25,13 @@
                 
                 {{-- Contextual Badge --}}
                 @if($badge)
-                    <span class="font-mono text-[9px] tracking-[0.15em] uppercase text-muted bg-paper px-2 py-0.5 rounded-sm border border-rule shadow-sm">
+                    <span class="font-mono text-xs tracking-wide uppercase text-muted bg-paper px-2 py-0.5 rounded-sm border border-rule shadow-sm">
                         {{ $badge }}
                     </span>
                 @endif
             </div>
             {{-- Username --}}
-            <p class="font-mono text-[10px] uppercase tracking-widest text-muted truncate mt-0.5">
+            <p class="font-mono text-xs uppercase tracking-widest text-muted truncate mt-0.5">
                 {{ '@' . $user->username }}
             </p>
         </div>

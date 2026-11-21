@@ -13,6 +13,6 @@
     </div>
 
     <div class="mt-8 pt-4 border-t border-rule">
-        {{ $tags->links() }}
+        {{ $tags->onEachSide(1)->links('pagination.academic') }}
     </div>
 @endif

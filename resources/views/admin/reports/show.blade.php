@@ -7,7 +7,7 @@
 
     {{-- Back Link --}}
     <div>
-        <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted hover:text-accent transition-colors border-b border-transparent hover:border-accent pb-1">
+        <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-muted hover:text-accent transition-colors border-b border-transparent hover:border-accent pb-1">
             &larr; Back to Queue
         </a>
     </div>
@@ -18,7 +18,7 @@
             Report Details #{{ $report->id }}
         </h1>
         
-        <span class="inline-flex items-center px-3 py-1 rounded-sm font-mono text-[10px] font-bold uppercase tracking-widest border
+        <span class="inline-flex items-center px-3 py-1 rounded-sm font-mono text-sm font-bold uppercase tracking-wide border
             @if($report->status === \App\Enums\ReportStatus::PENDING)
                 bg-accent-warm/10 text-accent-warm border-accent-warm/30
             @elseif($report->status === \App\Enums\ReportStatus::RESOLVED)
@@ -35,21 +35,21 @@
 
         {{-- Reporter Info --}}
         <div>
-            <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2">Reported By</h3>
+            <h3 class="font-mono text-sm text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2">Reported By</h3>
             <div class="flex items-center gap-4">
                 <x-user-avatar :user="$report->reporter" size="sm" class="grayscale" />
                 <p class="font-serif text-base font-bold text-ink">
                     <a href="{{ route('admin.users.show', $report->reporter) }}" class="hover:text-accent transition-colors">
                         {{ $report->reporter?->username ?? 'Unknown User' }} 
                     </a>
-                    <span class="text-muted font-mono text-[10px] tracking-widest ml-2">(ID: {{ $report->reporter_id }})</span>
+                    <span class="text-muted font-mono text-sm tracking-wide ml-2">(ID: {{ $report->reporter_id }})</span>
                 </p>
             </div>
         </div>
 
         {{-- Target Content Preview --}}
         <div>
-            <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2">Target Subject</h3>
+            <h3 class="font-mono text-sm text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2">Target Subject</h3>
 
             @if($report->target)
                 <div class="border border-rule p-6 bg-aged/30 rounded-sm">
@@ -58,7 +58,7 @@
                         <div class="font-serif text-[15px] text-muted line-clamp-4 prose dark:prose-invert">
                             {{ strip_tags($report->target->body) }}
                         </div>
-                        <div class="mt-5 pt-4 border-t border-rule font-mono text-[9px] uppercase tracking-widest text-muted">
+                        <div class="mt-5 pt-4 border-t border-rule font-mono text-sm uppercase tracking-wide text-muted">
                             <strong>Type:</strong> Discussion &bull; <a href="{{ route('admin.users.show', $report->target->user_id) }}" class="hover:text-accent">Author ID: {{ $report->target->user_id }}</a>
                         </div>
 
@@ -67,7 +67,7 @@
                         <div class="font-serif text-[15px] text-muted line-clamp-4 prose dark:prose-invert border-l-2 border-rule pl-4 italic">
                             {{ strip_tags($report->target->body) }}
                         </div>
-                        <div class="mt-5 pt-4 border-t border-rule font-mono text-[9px] uppercase tracking-widest text-muted">
+                        <div class="mt-5 pt-4 border-t border-rule font-mono text-sm uppercase tracking-wide text-muted">
                             <strong>Type:</strong> Comment &bull; <a href="{{ route('admin.users.show', $report->target->user_id) }}" class="hover:text-accent">Author ID: {{ $report->target->user_id }}</a>
                         </div>
 
@@ -76,10 +76,10 @@
                             <x-user-avatar :user="$report->target" size="lg" />
                             <div>
                                 <a href="{{ route('admin.users.show', $report->target) }}" class="font-heading font-bold text-ink hover:text-accent transition-colors text-xl block">{{ $report->target->display_name }}</a>
-                                <p class="font-mono text-xs text-muted mt-1">{{ '@' . $report->target->username }}</p>
+                                <p class="font-mono text-sm text-muted mt-1">{{ '@' . $report->target->username }}</p>
                             </div>
                         </div>
-                        <div class="mt-5 pt-4 border-t border-rule font-mono text-[9px] uppercase tracking-widest text-muted">
+                        <div class="mt-5 pt-4 border-t border-rule font-mono text-sm uppercase tracking-wide text-muted">
                             <strong>Type:</strong> Scholar Profile
                         </div>
                     @endif
@@ -94,10 +94,10 @@
 
         {{-- Reason for reporting --}}
         <div>
-            <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2">Violation Reason</h3>
+            <h3 class="font-mono text-sm text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2">Violation Reason</h3>
             
             <div class="mb-4">
-                <span class="px-3 py-1 bg-ink text-paper rounded-sm font-mono text-[10px] font-bold uppercase tracking-widest">
+                <span class="px-3 py-1 bg-ink text-paper rounded-sm font-mono text-sm font-bold uppercase tracking-wide">
                     {{ str_replace('_', ' ', $report->reason_type->value) }}
                 </span>
             </div>
@@ -113,8 +113,8 @@
 
         {{-- Metadata / Audit Trail --}}
         <div class="bg-aged/10 p-6 border border-rule">
-            <h3 class="font-mono text-[10px] text-ink font-bold uppercase tracking-[0.2em] mb-4">Audit Trail</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono text-[10px] uppercase tracking-widest text-muted">
+            <h3 class="font-mono text-sm text-ink font-bold uppercase tracking-wide mb-4">Audit Trail</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono text-sm uppercase tracking-wide text-muted">
                 <div>
                     <span class="block opacity-50 mb-1">Submitted At</span>
                     <span class="text-ink">{{ $report->created_at->format('M d, Y - H:i A') }}</span>
@@ -162,13 +162,13 @@
 
                 <button @click="handleAction('{{ route('admin.reports.dismiss', $report) }}')"
                         :disabled="processing"
-                        class="flex-1 py-3 bg-transparent border border-rule text-ink font-mono text-[10px] uppercase tracking-widest hover:border-ink transition-colors focus:outline-none disabled:opacity-50">
+                        class="flex-1 py-3 bg-transparent border border-rule text-ink font-mono text-sm uppercase tracking-wide hover:border-ink transition-colors focus:outline-none disabled:opacity-50">
                     <span x-text="processing ? 'Processing...' : 'Dismiss Report'"></span>
                 </button>
 
                 <button @click="handleAction('{{ route('admin.reports.resolve', $report) }}')"
                         :disabled="processing"
-                        class="flex-1 py-3 bg-accent-warm text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm focus:outline-none disabled:opacity-50">
+                        class="flex-1 py-3 bg-accent-warm text-paper font-mono text-sm uppercase tracking-wide hover:opacity-80 transition-opacity shadow-sm focus:outline-none disabled:opacity-50">
                     <span x-text="processing ? 'Processing...' : '{{ $report->target_type === App\Models\User::class ? 'Ban Scholar' : 'Hide Content' }}'"></span>
                 </button>
             </div>

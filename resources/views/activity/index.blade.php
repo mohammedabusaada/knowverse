@@ -20,7 +20,7 @@
         </div>
 
         <div class="mt-8">
-            {{ $activities->links() }}
+            {{ $activities->onEachSide(1)->links('pagination.academic') }}
         </div>
         
     </div>

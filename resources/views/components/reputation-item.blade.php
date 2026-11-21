@@ -44,7 +44,7 @@
                     </a>
                 @endif
             </p>
-            <p class="font-mono text-[10px] uppercase tracking-[0.15em] text-muted mt-1.5 opacity-70">
+            <p class="font-mono text-xs uppercase tracking-wide text-muted mt-1.5 opacity-70">
                 {{ $date }}
             </p>
         </div>

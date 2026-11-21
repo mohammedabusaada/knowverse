@@ -42,10 +42,10 @@
                 {{-- Detailed Activity History for the Owner --}}
                 <div class="space-y-6 mt-8">
                     <div class="flex items-center justify-between border-b border-rule pb-2">
-                        <h2 class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted font-bold">
+                        <h2 class="font-mono text-xs uppercase tracking-wide text-muted font-bold">
                             Ledger of Contributions
                         </h2>
-                        <span class="font-mono text-[9px] text-muted uppercase tracking-widest">Points Audit Trail</span>
+                        <span class="font-mono text-xs text-muted uppercase tracking-widest">Points Audit Trail</span>
                     </div>
                     
                     {{-- Chronological Reputation Adjustments --}}

@@ -72,11 +72,11 @@
     class="mb-12 border border-rule bg-paper rounded-sm shadow-sm"
 >
     <div class="flex items-center justify-between border-b border-rule px-6 py-4 bg-aged/30">
-        <label class="font-mono text-[10px] tracking-widest uppercase text-muted font-bold">
+        <label class="font-mono text-xs tracking-widest uppercase text-muted font-bold">
             {{ $label }}
         </label>
 
-        <div class="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest">
+        <div class="flex items-center gap-6 font-mono text-xs uppercase tracking-widest">
             <button 
                 type="button"
                 @click="mode = 'write'"
@@ -112,7 +112,7 @@
         ></div>
 
         @error($name)
-            <p class="text-accent-warm font-mono text-[10px] uppercase tracking-widest mt-4 font-bold px-4 pb-4">{{ $message }}</p>
+            <p class="text-accent-warm font-mono text-xs uppercase tracking-widest mt-4 font-bold px-4 pb-4">{{ $message }}</p>
         @enderror
     </div>
 </div>
@@ -125,8 +125,17 @@
             editor: null,
             compiledMarkdown: '',
 
-            init() {
-                if (this.editor) return;
+            initializing: false,
+            async init() {
+                if (this.editor || this.initializing) return;
+                this.initializing = true;
+                try {
+                    await window.loadEditorTools();
+                } catch (error) {
+                    this.initializing = false;
+                    window.showToast?.('The rich editor could not load. You can still write in the text field.', 'error');
+                    return;
+                }
 
                 let config = {
                     element: document.getElementById(editorId),
@@ -186,7 +195,7 @@
             },
 
             renderPreview() {
-                const markdownText = this.editor.value();
+                const markdownText = this.editor ? this.editor.value() : document.getElementById(editorId).value;
                 
                 if (window.marked) {
                     this.compiledMarkdown = window.marked.parse(markdownText, { breaks: true });

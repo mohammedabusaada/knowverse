@@ -1,6 +1,3 @@
-@import "easymde/dist/easymde.min.css";
-@import "katex/dist/katex.min.css";
-@import "highlight.js/styles/github-dark.min.css";
 @import "@fortawesome/fontawesome-free/css/all.css";
 
 @import "tailwindcss";
@@ -10,23 +7,23 @@
    ========================================================================== */
 @layer base {
     :root {
-        --color-paper: #f7f4ef;
-        --color-aged: #ede8df;
-        --color-ink: #1a1714;
-        --color-muted: #8c8070;
-        --color-accent: #2b4a7a;
-        --color-accent-warm: #7a3b1e;
-        --color-rule: rgba(26, 23, 20, 0.15);
+        --color-paper: #ffffff;
+        --color-aged: #f3f3f3;
+        --color-ink: #171717;
+        --color-muted: #626262;
+        --color-accent: #252525;
+        --color-accent-warm: #404040;
+        --color-rule: #dedede;
     }
 
     .dark {
-        --color-paper: #141210;
-        --color-aged: #1f1c18;
-        --color-ink: #ede8df;
-        --color-muted: #7a7060;
-        --color-accent: #6a8ac0;
-        --color-accent-warm: #a65a38;
-        --color-rule: rgba(237, 232, 223, 0.12);
+        --color-paper: #141414;
+        --color-aged: #222222;
+        --color-ink: #f3f3f3;
+        --color-muted: #ababab;
+        --color-accent: #ededed;
+        --color-accent-warm: #c7c7c7;
+        --color-rule: #3b3b3b;
     }
 
     /* Base Document Styling */
@@ -35,7 +32,7 @@
         color: var(--color-ink);
         font-family: var(--font-serif);
         /* Subtle vintage paper noise texture for light mode */
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        background-image: none;
     }
 
     .dark body {
@@ -67,9 +64,9 @@
     --color-rule: var(--color-rule);
 
     /* Typography Mapping */
-    --font-serif: 'EB Garamond', Georgia, serif;
-    --font-heading: 'Libre Baskerville', Georgia, serif;
-    --font-mono: 'DM Mono', monospace;
+    --font-serif: "Segoe UI", Arial, sans-serif;
+    --font-heading: Georgia, "Times New Roman", serif;
+    --font-mono: "Segoe UI", Arial, sans-serif;
 
     /* Global Keyframes available for arbitrary values (e.g. animate-[fadeUp...]) */
     @keyframes fadeUp {
@@ -172,4 +169,146 @@
     .prose a:hover { color: var(--color-ink); }
 
     .prose strong, .prose b { font-weight: 700; color: var(--color-ink); }
+}
+/* KnowVerse: shared academic interface. Spacing follows a 4px / 8px scale. */
+@layer base {
+    html { scroll-padding-top: 6rem; }
+    body { font-size: 1rem; line-height: 1.6; }
+    [x-cloak] { display: none !important; }
+    :focus-visible { outline: 2px solid var(--color-ink) !important; outline-offset: 4px; }
+    button, [role="button"] { cursor: pointer; }
+    button:disabled, input:disabled { cursor: not-allowed; opacity: .55; }
+    input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea { font-size: 1rem; }
+    input::placeholder, textarea::placeholder { color: var(--color-muted); opacity: 1; }
+    h1, h2, h3, p { overflow-wrap: anywhere; }
+    pre, .katex-display { overflow-x: auto; max-width: 100%; }
+    .prose p { margin-block: 1.25em; }
+}
+@layer components {
+    .app-grid { display: grid; grid-template-columns: 176px minmax(0, 1fr); gap: 40px; padding-block: 40px 72px; }
+    .app-sidebar { border-right: 1px solid var(--color-rule); padding-right: 20px; }
+    .skip-link { position: fixed; top: -100px; left: 16px; z-index: 100; padding: 12px 20px; background: var(--color-ink); color: var(--color-paper); }
+    .skip-link:focus { top: 12px; }
+    .eyebrow { font-family: var(--font-serif); font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 12px; }
+    .home-hero { padding: 40px 44px 0; border: 1px solid var(--color-rule); border-radius: 12px; background: var(--color-aged); }
+    .home-hero h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 4.4vw, 4.5rem); line-height: 1.1; letter-spacing: -.045em; font-weight: 600; }
+    .home-hero h1 em { font-weight: 400; }
+    .hero-description { max-width: 560px; color: var(--color-muted); margin-top: 24px; font-size: 1rem; line-height: 1.8; }
+    .community-metrics { display: flex; gap: 48px; padding-block: 24px; margin-top: 36px; border-top: 1px solid var(--color-rule); }
+    .community-metrics div { display: flex; flex-direction: column-reverse; }
+    .community-metrics dd { font-size: 1.5rem; font-weight: 600; letter-spacing: -.04em; }
+    .community-metrics dt { font-size: .8125rem; color: var(--color-muted); }
+    .home-columns { display: grid; grid-template-columns: minmax(0, 1fr) 264px; gap: 32px; margin-top: 40px; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+    .section-heading h2 { font-family: var(--font-heading); font-weight: 600; font-size: 1.875rem; line-height: 1.2; }
+    .section-heading .eyebrow { margin-bottom: 6px; }
+    .discussion-feed { border-top: 1px solid var(--color-rule); }
+    .discussion-preview { display: block; padding: 24px 0; border-bottom: 1px solid var(--color-rule); transition: background .15s; }
+    .discussion-preview:hover { background: var(--color-aged); }
+    .discussion-preview h3 { font-family: var(--font-heading); font-size: 1.375rem; line-height: 1.4; font-weight: 600; margin-bottom: 20px; }
+    .discussion-preview:hover h3 { text-decoration: underline; text-underline-offset: 4px; }
+    .topic-label { font-size: .75rem; color: var(--color-muted); font-weight: 500; }
+    .topic-label + .topic-label::before { content: '/'; margin-right: 8px; color: var(--color-muted); }
+    .discussion-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; font-size: .8125rem; color: var(--color-muted); }
+    .home-rail { display: flex; flex-direction: column; gap: 24px; }
+    .rail-panel { padding: 24px; background: var(--color-paper); border: 1px solid var(--color-rule); border-radius: 10px; }
+    .rail-panel h2 { font-size: 1.125rem; font-weight: 600; letter-spacing: -.025em; }
+    .rail-panel .eyebrow { font-size: .75rem; letter-spacing: .025em; }
+    .topic-link { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--color-rule); border-radius: 6px; padding: 7px 10px; font-size: .8125rem; }
+    .topic-link span { color: var(--color-muted); }
+    .topic-link:hover { background: var(--color-aged); border-color: var(--color-muted); }
+    .rail-link { display: inline-block; margin-top: 24px; font-size: .875rem; text-decoration: underline; text-underline-offset: 4px; }
+    .empty-panel { padding: 40px 24px; text-align: center; border: 1px dashed var(--color-rule); border-radius: 8px; }
+    .empty-panel h3 { font-family: var(--font-heading); font-size: 1.5rem; }
+    .empty-panel p { color: var(--color-muted); margin-block: 12px 24px; }
+    .discussion-layout { display: grid; grid-template-columns: minmax(0, 1fr) 224px; gap: 40px; }
+    .discussion-article { padding-block: 8px; }
+    .discussion-author { border-left: 1px solid var(--color-rule); padding-left: 24px; }
+    #post-content { font-family: var(--font-heading); font-size: 1.125rem; overflow-wrap: anywhere; }
+    #post-content table { display: block; overflow-x: auto; }
+    #post-content pre { padding: 16px; border-radius: 8px; background: #171717; color: #f5f5f5; }
+    #post-content pre code { border: 0; padding: 0; background: transparent; color: inherit; }
+    .app-sidebar nav a { min-height: 44px; border-radius: 6px; font-size: .875rem; font-style: normal; font-weight: 500; }
+    .app-sidebar h3 { font-size: .75rem; letter-spacing: .08em; border: 0; }
+}
+@media (max-width: 1199px) {
+    .app-grid { grid-template-columns: 148px minmax(0,1fr); gap: 24px; }
+    .home-columns { grid-template-columns: minmax(0,1fr); }
+    .home-rail { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .discussion-layout { grid-template-columns: minmax(0,1fr); }
+    .discussion-author { border-left: 0; border-top: 1px solid var(--color-rule); padding: 24px 0 0; }
+}
+@media (max-width: 767px) {
+    .app-grid { display: block; padding-block: 20px 40px; }
+    .app-sidebar { border-right: 0; padding-right: 0; margin-bottom: 24px; }
+    .app-sidebar > div { position: static; }
+    .app-sidebar > div > div:not(:first-child) { display: none; }
+    .app-sidebar h3 { display: none; }
+    .app-sidebar nav { display: flex; gap: 8px; border-bottom: 1px solid var(--color-rule); padding-bottom: 12px; }
+    .app-sidebar nav a { border-left: 0; flex: 1; justify-content: center; padding-inline: 8px; }
+    .home-hero { padding: 28px 24px 0; }
+    .home-hero h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); }
+    .community-metrics { gap: 24px; justify-content: space-between; }
+    .community-metrics dt { font-size: .75rem; }
+    .home-columns { margin-top: 32px; }
+    .home-rail { display: flex; }
+    .section-heading h2 { font-size: 1.5rem; }
+    .section-heading .eyebrow { font-size: .6875rem; }
+    .discussion-meta { gap: 8px 12px; }
+    .discussion-layout { gap: 24px; }
+    .discussion-article > h1 { font-size: 2rem; }
+    .discussion-voting { width: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+
+@layer components {
+    .discussions-page { max-width: 1040px; margin-inline: auto; }
+    .discussions-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 8px 32px; }
+    .discussions-heading h1 { font-family: var(--font-heading); font-size: clamp(2.25rem, 4vw, 3.5rem); line-height: 1.1; letter-spacing: -.04em; }
+    .discussions-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; border-block: 1px solid var(--color-rule); font-size: .875rem; }
+    .discussion-filters { margin-block: 20px; border: 1px solid var(--color-rule); border-radius: 8px; }
+    .discussion-filters summary { padding: 14px 20px; cursor: pointer; font-size: .875rem; font-weight: 600; }
+    .discussion-filters summary span { margin-left: 12px; }
+    .topic-filter-panel { padding: 4px 20px 24px; }
+    .topic-filter-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; max-height: 264px; overflow-y: auto; }
+    .topic-filter-option { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px; font-size: .875rem; border-radius: 4px; cursor: pointer; }
+    .topic-filter-option:hover { background: var(--color-aged); }
+    .topic-filter-option input { width: 18px; height: 18px; accent-color: var(--color-ink); flex-shrink: 0; }
+    .discussion-list > a { padding-block: 28px; border-radius: 0; }
+    .discussion-list h3 { font-size: 1.375rem; font-weight: 600; }
+    .academic-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid var(--color-rule); padding-top: 24px; font-size: .875rem; }
+    .pagination-summary { color: var(--color-muted); }
+    .pagination-controls, .pagination-numbers { display: flex; align-items: center; gap: 6px; }
+    .pagination-control { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; padding: 8px 12px; border: 1px solid var(--color-rule); border-radius: 6px; font-weight: 500; }
+    a.pagination-control:hover { background: var(--color-aged); border-color: var(--color-muted); }
+    .pagination-control[aria-current] { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+    .pagination-control[aria-disabled] { color: var(--color-muted); border-color: transparent; }
+    .pagination-gap { padding: 8px; color: var(--color-muted); }
+    .pagination-mobile { display: none; }
+}
+@media (max-width: 767px) {
+    .discussions-heading { align-items: flex-start; flex-direction: column; }
+    .discussions-toolbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+    .topic-filter-options { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .academic-pagination { flex-direction: column; }
+    .pagination-controls { width: 100%; justify-content: space-between; }
+    .pagination-numbers { display: none; }
+    .pagination-mobile { display: inline; color: var(--color-muted); }
+}
+@media (max-width: 399px) { .topic-filter-options { grid-template-columns: minmax(0,1fr); } }
+@layer components {
+    .discussion-card { display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 24px; padding: 24px 8px; border-bottom: 1px solid var(--color-rule); color: var(--color-ink); }
+    .discussion-card:hover { background: var(--color-aged); }
+    .discussion-card-score { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+    .discussion-card-score strong { font-size: 1.25rem; font-weight: 600; }
+    .discussion-card-score span { font-size: .75rem; color: var(--color-muted); }
+    .topics-page { max-width: 1040px; margin-inline: auto; }
+    .topic-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+    .topic-grid > article { display: flex; flex-direction: column; }
+}
+@media (max-width: 639px) {
+    .discussion-card { grid-template-columns: 36px minmax(0,1fr); gap: 12px; padding-inline: 0; }
+    .topic-grid { grid-template-columns: minmax(0,1fr); }
 }

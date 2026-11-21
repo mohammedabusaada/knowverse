@@ -6,7 +6,7 @@
 
     <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-            <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-1">
+            <p class="font-mono text-xs uppercase tracking-wide text-muted mb-1">
                 Current Standing
             </p>
             {{-- Resolves academic title dynamically from the User model --}}
@@ -17,7 +17,7 @@
 
         <div class="flex gap-10">
             <div class="text-center md:text-right">
-                <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Total Endorsements</p>
+                <p class="font-mono text-xs uppercase tracking-wide text-muted mb-1">Total Endorsements</p>
                 <p class="text-3xl font-bold text-ink">{{ number_format($user->reputation_points) }}</p>
             </div>
         </div>

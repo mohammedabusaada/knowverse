@@ -12,7 +12,7 @@
     {{ $user->display_name }}
 </p>
 
-        <p class="font-mono text-[10px] uppercase tracking-widest text-muted truncate mt-1">
+        <p class="font-mono text-xs uppercase tracking-widest text-muted truncate mt-1">
             {{ '@' . $user->username }}
         </p>
     </div>

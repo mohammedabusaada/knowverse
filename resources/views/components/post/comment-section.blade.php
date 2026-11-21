@@ -5,7 +5,7 @@
     <div class="flex items-baseline justify-between mb-8">
         <h2 class="font-heading text-2xl md:text-3xl font-bold text-ink">
             Comments
-            <sup class="font-mono text-[10px] text-muted font-normal ml-1">[{{ $post->comments_count ?? $comments->count() }}]</sup>
+            <sup class="font-mono text-xs text-muted font-normal ml-1">[{{ $post->comments_count ?? $comments->count() }}]</sup>
         </h2>
     </div>
 
@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="flex justify-end mt-4">
-                    <button type="submit" class="font-mono text-[10px] uppercase tracking-widest font-bold bg-ink text-paper px-8 py-2.5 border border-ink hover:bg-transparent hover:text-ink transition-colors shadow-sm focus:outline-none">
+                    <button type="submit" class="font-mono text-xs uppercase tracking-widest font-bold bg-ink text-paper px-8 py-2.5 border border-ink hover:bg-transparent hover:text-ink transition-colors shadow-sm focus:outline-none">
                         Post Comment
                     </button>
                 </div>

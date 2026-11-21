@@ -36,7 +36,7 @@
         <span class="opacity-30">&bull;</span>
         <span>{{ $post->created_at->format('M d, Y') }}</span>
         
-        <div class="ml-auto font-mono text-[9px] uppercase tracking-widest text-muted group-hover/link:text-ink transition-colors">
+        <div class="ml-auto font-mono text-xs uppercase tracking-widest text-muted group-hover/link:text-ink transition-colors">
             Read More &rarr;
         </div>
     </div>

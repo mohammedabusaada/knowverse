@@ -4,7 +4,7 @@
 <div class="max-w-4xl mx-auto px-4 py-10 animate-[fadeUp_0.8s_ease_both]">
 
     {{-- Header --}}
-    <nav class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-8 flex items-center gap-2">
+    <nav class="font-mono text-xs uppercase tracking-wide text-muted mb-8 flex items-center gap-2">
         <a href="{{ route('posts.show', $post) }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Discussion</a>
         <span class="opacity-50">/</span>
         <span class="text-ink font-bold">Edit</span>
@@ -55,7 +55,7 @@
                 class="w-full bg-transparent border-none text-4xl sm:text-5xl font-heading font-black text-ink placeholder:text-muted/30 focus:ring-0 p-0 transition-colors"
             />
             @error('title')
-                <p class="text-accent-warm font-mono text-[10px] uppercase tracking-widest mt-3 font-bold">{{ $message }}</p>
+                <p class="text-accent-warm font-mono text-xs uppercase tracking-widest mt-3 font-bold">{{ $message }}</p>
             @enderror
         </div>
 
@@ -77,7 +77,7 @@
 
         {{-- Cover Image Attachment --}}
         <div class="mb-12 border-t border-rule pt-8 mt-12">
-            <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-4 font-bold">
+            <label class="block font-mono text-xs uppercase tracking-widest text-muted mb-4 font-bold">
                 Cover Image (Optional)
             </label>
             
@@ -104,7 +104,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" />
                     </svg>
                     <p class="font-serif text-sm text-ink mb-1">Click to select or drag an image here</p>
-                    <p class="font-mono text-[9px] uppercase tracking-widest text-muted">PNG, JPG, WEBP (Max 5MB)</p>
+                    <p class="font-mono text-xs uppercase tracking-widest text-muted">PNG, JPG, WEBP (Max 5MB)</p>
                 </div>
 
                 {{-- Preview State --}}
@@ -118,23 +118,23 @@
                         </svg>
                     </button>
 
-                    <div class="mt-6 inline-flex items-center justify-center px-5 py-2 border border-rule bg-paper text-[10px] font-mono uppercase tracking-widest text-muted group-hover:text-ink group-hover:border-ink transition-colors">
+                    <div class="mt-6 inline-flex items-center justify-center px-5 py-2 border border-rule bg-paper text-xs font-mono uppercase tracking-widest text-muted group-hover:text-ink group-hover:border-ink transition-colors">
                         Click or drop to replace
                     </div>
                 </div>
             </div>
             
             @error('image')
-                <p class="text-accent-warm font-mono text-[10px] uppercase tracking-widest mt-3 font-bold">{{ $message }}</p>
+                <p class="text-accent-warm font-mono text-xs uppercase tracking-widest mt-3 font-bold">{{ $message }}</p>
             @enderror
         </div>
 
         {{-- Form Actions --}}
         <div class="flex items-center justify-end gap-6 pt-6 border-t border-rule mt-8">
-            <a href="{{ route('posts.show', $post) }}" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors">
+            <a href="{{ route('posts.show', $post) }}" class="font-mono text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors">
                 Cancel
             </a>
-            <button type="submit" class="bg-ink text-paper font-mono text-[10px] uppercase tracking-widest px-8 py-3 hover:bg-transparent hover:text-ink border border-ink transition-all shadow-sm">
+            <button type="submit" class="bg-ink text-paper font-mono text-xs uppercase tracking-widest px-8 py-3 hover:bg-transparent hover:text-ink border border-ink transition-all shadow-sm">
                 Update Discussion
             </button>
         </div>
@@ -150,7 +150,7 @@
                 </div>
                 <form action="{{ route('posts.destroy', $post) }}" method="POST" onsubmit="return confirm('WARNING: This action is irreversible. Proceed with deletion?');">
                     @csrf @method('DELETE')
-                    <button type="submit" class="w-full sm:w-auto bg-accent-warm text-paper font-mono text-[10px] uppercase tracking-widest px-6 py-3 hover:opacity-80 transition-opacity shadow-sm">
+                    <button type="submit" class="w-full sm:w-auto bg-accent-warm text-paper font-mono text-xs uppercase tracking-widest px-6 py-3 hover:opacity-80 transition-opacity shadow-sm">
                         Delete Discussion
                     </button>
                 </form>

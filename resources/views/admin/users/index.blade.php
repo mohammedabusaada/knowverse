@@ -18,11 +18,11 @@
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email, or username..." 
+            <input type="text" name="search" aria-label="Search users" value="{{ request('search') }}" placeholder="Search by name, email, or username..."
                    class="block w-full pl-10 pr-3 py-2 border border-rule bg-transparent text-ink font-serif text-sm focus:ring-0 focus:border-ink transition-colors">
         </form>
-        
-        <div class="font-mono text-[10px] uppercase tracking-widest text-muted font-bold">
+
+        <div class="font-mono text-sm uppercase tracking-wide text-muted font-bold">
             Total Users: {{ number_format($users->total()) }}
         </div>
     </div>
@@ -33,11 +33,11 @@
             <table class="min-w-full divide-y divide-rule">
                 <thead class="bg-aged/30">
                     <tr>
-                        <th class="px-6 py-4 text-left font-mono text-[10px] font-bold text-muted uppercase tracking-widest">User Profile</th>
-                        <th class="px-6 py-4 text-left font-mono text-[10px] font-bold text-muted uppercase tracking-widest">Role</th>
-                        <th class="px-6 py-4 text-left font-mono text-[10px] font-bold text-muted uppercase tracking-widest">Reputation</th>
-                        <th class="px-6 py-4 text-left font-mono text-[10px] font-bold text-muted uppercase tracking-widest">Joined Date</th>
-                        <th class="px-6 py-4 text-right font-mono text-[10px] font-bold text-muted uppercase tracking-widest">Actions</th>
+                        <th class="px-6 py-4 text-left font-mono text-sm font-bold text-muted uppercase tracking-wide">User Profile</th>
+                        <th class="px-6 py-4 text-left font-mono text-sm font-bold text-muted uppercase tracking-wide">Role</th>
+                        <th class="px-6 py-4 text-left font-mono text-sm font-bold text-muted uppercase tracking-wide">Reputation</th>
+                        <th class="px-6 py-4 text-left font-mono text-sm font-bold text-muted uppercase tracking-wide">Joined Date</th>
+                        <th class="px-6 py-4 text-right font-mono text-sm font-bold text-muted uppercase tracking-wide">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-rule">
@@ -50,15 +50,15 @@
                                         <div class="text-sm font-bold text-ink font-serif flex items-center gap-2">
                                             <a href="{{ route('admin.users.show', $user) }}" class="hover:text-accent transition-colors">{{ $user->full_name }}</a>
                                             @if($user->is_banned)
-                                                <span class="text-[9px] bg-accent-warm text-paper px-1.5 py-0.5 font-mono uppercase tracking-tighter">Banned</span>
+                                                <span class="text-sm bg-accent-warm text-paper px-1.5 py-0.5 font-mono uppercase tracking-tighter">Banned</span>
                                             @endif
                                         </div>
-                                        <div class="text-xs text-muted font-mono">{{ $user->email }}</div>
+                                        <div class="text-sm text-muted font-mono">{{ $user->email }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest border border-rule
+                                <span class="px-2 py-0.5 font-mono text-sm font-bold uppercase tracking-wide border border-rule
                                     {{ $user->isAdmin() ? 'bg-ink text-paper border-ink' : ($user->isModerator() ? 'bg-aged text-ink' : 'text-muted') }}">
                                     {{ $user->role->name ?? 'User' }}
                                 </span>
@@ -92,7 +92,7 @@
             </table>
         </div>
         @if($users->hasPages())
-            <div class="px-6 py-4 border-t border-rule bg-aged/10">{{ $users->links() }}</div>
+            <div class="px-6 py-4 border-t border-rule bg-aged/10">{{ $users->onEachSide(1)->links('pagination.academic') }}</div>
         @endif
     </div>
 </div>

@@ -33,8 +33,8 @@
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
             
             <div class="min-w-0 flex-1">
-                <div class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-4 flex items-center gap-2">
-                    <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Tags</a>
+                <div class="font-mono text-xs uppercase tracking-wide text-muted mb-4 flex items-center gap-2">
+                    <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Topics</a>
                     <span class="opacity-50">/</span>
                     <span class="text-ink font-bold">Discussions</span>
                 </div>
@@ -44,7 +44,7 @@
                     <div class="p-3 bg-aged/30 border border-rule rounded-md shrink-0 shadow-sm">
                         <x-tag-icon :slug="$tag->slug" classes="w-8 h-8 md:w-10 md:h-10 text-ink" />
                     </div>
-                    {{ strtolower($tag->name) }}
+                    {{ $tag->name }}
                 </h1>
                 
                 <p class="font-serif text-lg text-muted italic mb-6">
@@ -63,7 +63,7 @@
                             :class="isFollowing 
                                 ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' 
                                 : 'text-paper bg-ink border-ink hover:bg-transparent hover:text-ink'"
-                            class="font-mono text-xs uppercase tracking-[0.15em] px-6 py-2 border transition-all flex items-center justify-center gap-2 rounded-sm"
+                            class="font-mono text-xs uppercase tracking-wide px-6 py-2 border transition-all flex items-center justify-center gap-2 rounded-sm"
                             :disabled="loading">
                         
                         <svg x-show="loading" class="animate-spin h-3 w-3 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" x-cloak>
@@ -85,14 +85,14 @@
         @empty
             <div class="py-20 text-center border border-dashed border-rule bg-aged/10 rounded-xl">
                 <p class="font-serif text-muted italic text-lg mb-4">There are no discussions for this tag yet.</p>
-                <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="font-mono text-xs uppercase tracking-[0.15em] text-ink border-b border-ink hover:text-accent hover:border-accent transition-colors">
+                <a href="{{ route('posts.create', ['tag' => $tag->name]) }}" class="font-mono text-xs uppercase tracking-wide text-ink border-b border-ink hover:text-accent hover:border-accent transition-colors">
                     Start a Discussion &rarr;
                 </a>
             </div>
         @endforelse
 
         <div class="mt-12">
-            {{ $posts->links() }}
+            {{ $posts->onEachSide(1)->links('pagination.academic') }}
         </div>
     </div>
 </div>

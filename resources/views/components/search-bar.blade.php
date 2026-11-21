@@ -4,7 +4,8 @@
     'value' => null,
 ])
 
-<div x-data="searchSuggestions('{{ $value }}')" class="relative w-full">
+<div x-data="searchSuggestions(@js($value))" class="relative w-full">
+    <p x-cloak x-show="error" x-text="error" role="status" class="absolute top-full mt-2 z-50 bg-paper border border-rule rounded-md p-3 text-sm w-full"></p>
     <form action="{{ $action }}" method="GET" autocomplete="off">
         {{-- Preserve active filters when refining search --}}
         @foreach((array) request('tags', []) as $tag)
@@ -23,14 +24,15 @@
             </div>
 
             <input
-    type="text"
+    type="search"
     name="q"
     x-model="q"
     @input.debounce.300ms="fetch"
     @focus="q.length >= 2 && fetch()"
     @click.away="open = false"
     @keydown.escape="open = false"
-    placeholder="Search discussions, scholars, or topics..."
+    placeholder="{{ $placeholder }}"
+    aria-label="{{ $placeholder }}"
     class="w-full pl-10 pr-16 py-3 text-[15px] font-serif bg-aged/10 border border-rule rounded-sm text-ink placeholder:text-muted/60 focus:ring-0 focus:outline-none focus:border-ink focus:bg-paper transition-all shadow-sm"
 >
 
@@ -42,7 +44,7 @@
                     </svg>
                 </template>
                 <template x-if="!loading && !q">
-                    <kbd class="hidden md:inline-flex px-1.5 py-0.5 text-[9px] font-mono text-muted border border-rule rounded-sm bg-paper opacity-60">
+                    <kbd class="hidden md:inline-flex px-1.5 py-0.5 text-xs font-mono text-muted border border-rule rounded-sm bg-paper opacity-60">
                         CTRL K
                     </kbd>
                 </template>
@@ -62,7 +64,7 @@
             {{-- Discussions Suggestion Group --}}
             <template x-if="results.posts.length">
                 <div class="p-2 border-b border-rule bg-paper">
-                    <h3 class="px-3 py-2 text-[9px] font-mono text-muted uppercase tracking-widest font-bold">Discussions</h3>
+                    <h3 class="px-3 py-2 text-xs font-mono text-muted uppercase tracking-widest font-bold">Discussions</h3>
                     <template x-for="post in results.posts" :key="post.id">
                         <a :href="'/posts/' + post.id" @click="open = false"
                            class="flex items-center px-3 py-2 text-sm font-serif text-ink hover:bg-aged transition-colors">
@@ -76,12 +78,12 @@
             {{-- Scholars Suggestion Group --}}
             <template x-if="results.users.length">
                 <div class="p-2 bg-paper">
-                    <h3 class="px-3 py-2 text-[9px] font-mono text-muted uppercase tracking-widest font-bold">Scholars</h3>
+                    <h3 class="px-3 py-2 text-xs font-mono text-muted uppercase tracking-widest font-bold">Scholars</h3>
                     <template x-for="user in results.users" :key="user.id">
                         <a :href="'/' + user.username" @click="open = false"
                            class="flex items-center px-3 py-2 hover:bg-aged transition-colors">
                             <div class="font-heading font-bold text-ink truncate mr-2" x-text="user.full_name ?? user.username"></div>
-                            <div class="text-[10px] font-mono text-muted truncate" x-text="'@' + user.username"></div>
+                            <div class="text-xs font-mono text-muted truncate" x-text="'@' + user.username"></div>
                         </a>
                     </template>
                 </div>
@@ -90,11 +92,11 @@
             {{-- Topics Suggestion Group --}}
             <template x-if="results.tags && results.tags.length > 0">
                 <div class="p-2 border-t border-rule bg-aged/5">
-                    <h3 class="px-3 py-2 text-[9px] font-mono text-muted uppercase tracking-widest font-bold">Topics</h3>
+                    <h3 class="px-3 py-2 text-xs font-mono text-muted uppercase tracking-widest font-bold">Topics</h3>
                     <div class="flex flex-wrap gap-2 p-2">
                         <template x-for="tag in results.tags" :key="tag.id">
                             <a :href="'/tags/' + tag.slug" @click="open = false"
-                               class="inline-flex items-center px-2 py-1 bg-paper border border-rule text-[11px] font-mono text-ink hover:border-ink transition-colors">
+                               class="inline-flex items-center px-2 py-1 bg-paper border border-rule text-xs font-mono text-ink hover:border-ink transition-colors">
                                 #<span x-text="tag.name"></span>
                             </a>
                         </template>
