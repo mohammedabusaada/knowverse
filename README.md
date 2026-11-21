@@ -5,9 +5,62 @@
 [![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-KnowVerse is a secure, web-based academic discussion platform designed to provide a structured and credible environment for scholarly dialogue. Built to address the shortcomings of general-purpose knowledge-sharing networks, KnowVerse integrates a strict reputation-based governance model, real-time interactivity, and advanced content moderation to ensure academic integrity and meaningful collaboration.
+KnowVerse is an academic discussion platform built with **Laravel 12, Blade, Tailwind CSS, Alpine.js, and Laravel Reverb**. Scholars can publish discussions, write threaded replies, vote, follow topics, and receive real-time notifications. Moderation combines role-based permissions with reputation-based participation privileges.
 
-This project was developed as a Bachelor's Graduation Project for the Web Technology & Information Security (WIS) program.
+Developed as a five-person Bachelor's graduation project in Web Technology & Information Security, the application includes an **auditable, append-only reputation ledger**, authorization policies, and automated regression tests.
+
+## Preview
+
+Screenshots show the application running locally with synthetic demonstration data; names, activity, and counts are not real usage statistics.
+
+![KnowVerse home page with recent academic discussions](.github/screenshots/home-final.jpg)
+
+<details>
+<summary>Discussion browsing, article view, and administration</summary>
+
+**Discussion browsing** — readable summaries, topic filters, and pagination.
+
+![KnowVerse discussion list](.github/screenshots/discussions-final.jpg)
+
+**Discussion page** — scholarly content, voting controls, and threaded responses.
+
+![KnowVerse discussion page](.github/screenshots/discussion-final.jpg)
+
+**Administration dashboard** — community metrics and moderation overview.
+
+![KnowVerse administration dashboard](.github/screenshots/admin-final.jpg)
+
+</details>
+
+## My Contribution — Mohammed AbuSaada
+
+I was the project's **lead developer**, working primarily on the backend and contributing to parts of the frontend.
+
+- Designed the complete relational database schema and relationships.
+- Implemented the application's authorization policies.
+- Contributed to selected frontend features alongside the team's other developers.
+
+The full development team and academic supervisor are credited in [Academic Team & Supervision](#academic-team--supervision).
+
+## Portfolio Summary
+
+> Lead developer on a five-person Laravel academic discussion platform. Designed the complete relational database schema and implemented authorization policies, with additional frontend contributions. The application combines threaded discussions, Markdown/LaTeX authoring, moderation, and an auditable reputation ledger.
+
+### Interface Refresh
+
+The current interface uses an academic black, white, and gray visual system, with responsive discussion lists, topic filters, consistent pagination, and clearer account and administration controls. Markdown editing, syntax highlighting, and mathematical rendering load on demand.
+
+In the local production build, the main JavaScript entry decreased from **1,782.90 kB to 166.27 kB** before gzip (from **570.20 kB to 55.48 kB** gzipped). These are bundle sizes, not measured page-load times: the editor and content-rendering chunks are still downloaded on pages that need them.
+
+## Engineering Highlights
+
+- **Data integrity:** reputation changes are recorded as ledger entries; reversals append compensating entries instead of rewriting history.
+- **Atomic operations:** votes and their associated side effects run within database transactions, with row locking for concurrent writes.
+- **Authorization:** role-based access and reputation-based participation privileges have separate responsibilities.
+- **Regression testing:** Pest tests cover ledger consistency, vote reversals, access control, account erasure, and injection defenses. GitHub Actions runs the suite on PHP 8.2 and 8.3 and checks PHP code style.
+- **Reproducible experiments:** benchmark commands and archived outputs document performance and concurrency measurements; see [the reproduction guide](benchmarks/REPRODUCING.md).
+
+[Setup](#installation--setup) · [Tests](#quality-assurance) · [Benchmarks](#performance-benchmarks) · [Team](#academic-team--supervision)
 
 ---
 
@@ -138,13 +191,16 @@ Follow these instructions to set up the KnowVerse platform in a local developmen
 ## Quality Assurance
 
 The platform is covered by an automated regression suite built with **Pest**, executed on
-every push and pull request by GitHub Actions across PHP 8.2 and 8.3.
+every push and pull request to `main` by GitHub Actions across PHP 8.2 and 8.3.
+The current PHP suite contains **129 tests and 324 assertions**. Three additional JavaScript tests cover stale search responses, cleared queries, and recoverable request failures.
 
 ```bash
 php artisan test                        # full suite
 php artisan test --testsuite=Feature    # HTTP, authorization and governance behaviour
 php artisan test --testsuite=Unit       # pure logic, no database
 php artisan test --filter=Security      # security regression tests only
+node --test tests/js/search-suggestions.test.js  # search interaction tests
+npm run build                          # production assets
 ```
 
 The suite runs against an in-memory SQLite database and the `null` broadcast driver
