@@ -35,7 +35,7 @@
                     </div>
                     <h3 class="font-serif text-lg text-ink font-bold mb-1">Restricted Ledger</h3>
                     <p class="font-serif text-sm text-muted italic">
-                        Detailed ledger entries are strictly confidential and accessible only to the authenticated scholar.
+                        Detailed ledger entries are available to this scholar and authorized moderators or administrators.
                     </p>
                 </div>
             @else

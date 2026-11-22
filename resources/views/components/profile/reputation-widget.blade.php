@@ -17,7 +17,7 @@
 
         <div class="flex gap-10">
             <div class="text-center md:text-right">
-                <p class="font-mono text-xs uppercase tracking-wide text-muted mb-1">Total Endorsements</p>
+                <p class="font-mono text-xs uppercase tracking-wide text-muted mb-1">Reputation Points</p>
                 <p class="text-3xl font-bold text-ink">{{ number_format($user->reputation_points) }}</p>
             </div>
         </div>
