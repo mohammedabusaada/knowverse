@@ -23,7 +23,7 @@
 
             @if(count($visibleTypes) > 0)
                 <section>
-                    <h3 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-5 border-b border-rule pb-2">
+                    <h3 class="text-sm font-mono font-bold uppercase tracking-wide text-muted mb-5 border-b border-rule pb-2">
                         {{ ucfirst($categoryName) }}
                     </h3>
 
@@ -59,7 +59,7 @@
         @endforeach
 
         <div class="pt-8 border-t border-rule flex justify-end">
-            <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity shadow-sm">
+            <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-sm uppercase tracking-wide hover:opacity-80 transition-opacity shadow-sm">
                 Save Preferences
             </button>
         </div>

@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KnowVerse - Register</title>
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.includes.theme-init')
 </head>
 
 <body class="min-h-screen flex bg-paper text-ink font-serif antialiased selection:bg-accent selection:text-paper">
@@ -50,8 +48,8 @@
 
                 {{-- Full Name Field --}}
                 <div>
-                    <label for="full_name" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">
-                        Full Name <span class="text-[9px] lowercase opacity-50">(Optional)</span>
+                    <label for="full_name" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">
+                        Full Name <span class="text-sm lowercase opacity-50">(Optional)</span>
                     </label>
                     <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" 
                            class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
@@ -60,7 +58,7 @@
 
                 {{-- Username Field --}}
                 <div>
-                    <label for="username" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Username</label>
+                    <label for="username" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Username</label>
                     <input type="text" id="username" name="username" value="{{ old('username') }}" required
                            class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
                            placeholder="Choose a username..." />
@@ -68,7 +66,7 @@
 
                 {{-- Email Field --}}
                 <div>
-                    <label for="email" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Email Address</label>
+                    <label for="email" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Email Address</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required
                            class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
@@ -76,20 +74,20 @@
                 {{-- Password Grid --}}
                 <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label for="password" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Password</label>
+                        <label for="password" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Password</label>
                         <input type="password" id="password" name="password" required
                                class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
                                placeholder="••••••••" />
                     </div>
                     <div>
-                        <label for="password_confirmation" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Confirm</label>
+                        <label for="password_confirmation" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Confirm</label>
                         <input type="password" id="password_confirmation" name="password_confirmation" required
                                class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80"
                                placeholder="••••••••" />
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-xs py-4 transition-colors mt-6">
+                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-sm py-4 transition-colors mt-6">
                     Create Account
                 </button>
             </form>

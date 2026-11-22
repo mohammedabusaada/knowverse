@@ -1,99 +1,44 @@
 @extends('layouts.app')
-
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-[fadeUp_0.8s_ease_both]" x-data="{ search: '' }">
-    
-    {{-- Header & Search --}}
-    <div class="mb-12">
-        <h1 class="font-heading text-4xl md:text-5xl font-bold text-ink tracking-tight mb-4">Explore Tags</h1>
-        <p class="font-serif text-lg text-muted italic mb-8">
-            Follow your favorite academic topics.
-        </p>
-
-        {{-- Search Filter --}}
-        <div class="relative w-full max-w-lg border-b border-rule pb-2">
-            <div class="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none pb-2">
-                <span class="font-serif text-lg text-muted opacity-50">§</span>
-            </div>
-            <input 
-                x-model="search"
-                type="text" 
-                placeholder="Filter tags..." 
-                class="block w-full pl-6 pr-3 py-2 bg-transparent border-none text-ink font-serif text-lg placeholder:text-muted focus:ring-0 transition-colors"
-            >
-        </div>
-    </div>
-
-    {{-- Tags List with Icons --}}
-    <div class="flex flex-col border-t border-rule">
-        @foreach($tags as $tag)
-            @php
-                $isFollowing = auth()->check() && auth()->user()->followedTags->contains($tag->id);
-            @endphp
-
-            <div 
-                x-show="'{{ strtolower($tag->name) }}'.includes(search.toLowerCase())"
-                x-data="{ 
-                    following: {{ $isFollowing ? 'true' : 'false' }},
-                    toggle() {
+<section class="topics-page" x-data="{ search: '', topics: @js($tags->pluck('name')->values()) }">
+    <header class="mb-8">
+        <p class="eyebrow">Find your field</p>
+        <h1 class="font-heading text-4xl sm:text-5xl font-semibold tracking-tight">Explore topics</h1>
+        <p class="text-muted mt-4">Discover conversations in your field and follow the subjects you care about.</p>
+    </header>
+    <label for="topic-search" class="block text-sm font-semibold mb-2">Filter topics on this page</label>
+    <input id="topic-search" type="search" x-model="search" placeholder="Find a topic" class="w-full max-w-lg rounded-md border border-rule bg-paper text-ink px-4 py-3 mb-8" />
+    <div class="topic-grid">
+        @forelse($tags as $tag)
+            @php $isFollowing = auth()->check() && auth()->user()->followedTags->contains($tag->id); @endphp
+            <article class="rail-panel" x-show="@js(mb_strtolower($tag->name)).includes(search.toLowerCase())"
+                x-data="{ following: @js($isFollowing), loading: false, error: '', async toggle() {
+                    if (this.loading) return;
+                    this.loading = true; this.error = '';
+                    try {
+                        const response = await fetch(@js(route('tags.follow', $tag)), { method: this.following ? 'DELETE' : 'POST', headers: { 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' } });
+                        if (!response.ok) throw new Error();
                         this.following = !this.following;
-                        fetch('{{ route('tags.follow', $tag) }}', {
-                            method: this.following ? 'POST' : 'DELETE',
-                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                        }).catch(() => this.following = !this.following);
-                    }
-                }"
-                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-b border-rule hover:bg-aged/20 transition-colors group px-2"
-            >
-                <div class="min-w-0 flex-1">
-                    {{-- Adding the Icon next to the Tag Name --}}
-                    <h2 class="font-heading text-xl font-bold text-ink mb-1">
-                        <a href="{{ route('tags.show', $tag->slug) }}" class="flex items-center gap-2.5 hover:text-accent transition-colors">
-                            <span class="p-1.5 bg-paper border border-rule rounded-md shrink-0 text-muted group-hover:text-accent transition-colors shadow-sm">
-                                <x-tag-icon :slug="$tag->slug" classes="w-5 h-5" />
-                            </span>
-                            {{ strtolower($tag->name) }}
-                        </a>
-                    </h2>
-                    
-                    <p class="font-serif text-[15px] text-muted line-clamp-2 leading-relaxed italic mb-2 mt-2">
-                        {{ $tag->description ?? 'Academic discussions and research related to ' . strtolower($tag->name) . '.' }}
-                    </p>
-
-                    <div class="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-muted">
-                        <span>{{ number_format($tag->posts_count) }} discussions</span>
-                        <span>&bull;</span>
-                        <a href="{{ route('tags.show', $tag->slug) }}" class="text-ink hover:text-accent transition-colors">
-                            Explore &rarr;
-                        </a>
-                    </div>
-                </div>
-
-                <div class="shrink-0 sm:self-start mt-2 sm:mt-0">
+                    } catch { this.error = 'Could not update this topic. Check your connection and account verification, then try again.'; }
+                    finally { this.loading = false; }
+                } }">
+                <h2><a href="{{ route('tags.show', $tag->slug) }}" class="flex items-center gap-3 hover:underline"><x-tag-icon :slug="$tag->slug" classes="w-5 h-5 shrink-0" />{{ $tag->name }}</a></h2>
+                <p class="text-muted text-sm leading-relaxed mt-4 mb-5">{{ $tag->description ?? 'Academic discussions and research related to '.$tag->name.'.' }}</p>
+                <div class="flex flex-wrap items-center justify-between gap-3 mt-auto">
+                    <a href="{{ route('tags.show', $tag->slug) }}" class="text-sm underline underline-offset-4">{{ $tag->posts_count }} {{ Str::plural('discussion', $tag->posts_count) }}</a>
                     @auth
-                        <button 
-                            @click="toggle()"
-                            :class="following ? 'text-muted border-rule hover:text-accent-warm hover:border-accent-warm' : 'text-ink border-ink hover:bg-ink hover:text-paper'"
-                            class="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-1.5 border transition-all rounded-sm"
-                        >
-                            <span x-text="following ? 'Unfollow' : 'Follow'"></span>
-                        </button>
+                        <button type="button" @click="toggle()" :disabled="loading" :aria-pressed="following" class="min-h-11 px-4 py-2 border border-rule rounded-md text-sm font-semibold hover:bg-aged"><span x-text="loading ? 'Saving…' : (following ? 'Following' : 'Follow')"></span></button>
+                    @else
+                        <a href="{{ route('login') }}" class="min-h-11 px-4 py-2 border border-rule rounded-md text-sm font-semibold hover:bg-aged">Follow</a>
                     @endauth
                 </div>
-            </div>
-        @endforeach
+                <p x-cloak x-show="error" x-text="error" role="status" class="text-sm mt-4"></p>
+            </article>
+        @empty
+            <div class="empty-panel"><h2 class="font-heading text-2xl">No topics yet</h2><p>Topics will appear here as the community grows.</p></div>
+        @endforelse
     </div>
-
-    {{-- Pagination --}}
-    <div class="mt-12">
-        {{ $tags->links() }}
-    </div>
-</div>
-
-<style>
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(18px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-</style>
+    @if($tags->count())<p x-cloak x-show="!topics.some(topic => topic.toLowerCase().includes(search.toLowerCase()))" role="status" class="empty-panel">No matching topics on this page. Try another term or browse the next page.</p>@endif
+    <div class="mt-8">{{ $tags->onEachSide(1)->links('pagination.academic') }}</div>
+</section>
 @endsection

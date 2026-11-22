@@ -4,7 +4,7 @@
 <div class="max-w-4xl mx-auto px-4 py-8 animate-[fadeUp_0.8s_ease_both]">
     
     {{-- Configuration Navigation Routing --}}
-    <nav class="flex flex-wrap gap-6 border-b border-rule mb-10 pb-2 font-mono text-[10px] uppercase tracking-widest">
+    <nav class="flex flex-wrap gap-6 border-b border-rule mb-10 pb-2 font-mono text-sm uppercase tracking-wide">
         <a href="{{ route('profile.show', auth()->user()->username) }}" class="text-muted hover:text-ink transition-colors flex items-center gap-1.5 mr-auto">
             &larr; Back to Profile
         </a>

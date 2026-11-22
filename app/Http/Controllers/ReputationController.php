@@ -19,7 +19,7 @@ class ReputationController extends Controller
 
         // Fetch data only if authorized, otherwise return an empty paginator
         $history = $canView
-            ? $user->reputations()->with('source')->orderByDesc('created_at')->paginate(20)
+            ? $user->reputations()->with('source')->orderByDesc('created_at')->orderByDesc('id')->paginate(20)
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         return view('reputation.index', [

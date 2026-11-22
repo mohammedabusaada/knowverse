@@ -8,13 +8,13 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-muted">
-            <a href="#" class="hover:text-ink transition-colors">About</a>
-            <a href="#" class="hover:text-ink transition-colors">Guidelines</a>
-            <a href="#" class="hover:text-ink transition-colors">Privacy</a>
+        <div class="flex items-center gap-6 font-mono text-xs uppercase tracking-widest text-muted">
+            <a href="{{ route('posts.index') }}" class="hover:text-ink transition-colors">Discussions</a>
+            <a href="{{ route('tags.index') }}" class="hover:text-ink transition-colors">Topics</a>
+            <a href="{{ route('search') }}" class="hover:text-ink transition-colors">Search</a>
         </div>
 
-        <div class="font-mono text-[10px] text-muted">
+        <div class="font-mono text-xs text-muted">
             &copy; {{ date('Y') }} KnowVerse.
         </div>
     </div>

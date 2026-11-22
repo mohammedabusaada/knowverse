@@ -7,7 +7,7 @@
     <div class="text-3xl font-heading font-black text-ink mb-1">
         {{ is_numeric($value) ? number_format($value) : $value }}
     </div>
-    <div class="text-muted text-[10px] uppercase font-mono font-bold tracking-widest">
+    <div class="text-muted text-xs uppercase font-mono font-bold tracking-widest">
         {{ $label }}
     </div>
 </div>

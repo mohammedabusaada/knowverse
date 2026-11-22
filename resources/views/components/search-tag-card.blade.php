@@ -10,7 +10,7 @@
             <span class="font-mono text-xs uppercase tracking-[0.1em] text-ink font-bold group-hover:text-accent transition-colors">
                 {{ strtolower($tag->name) }}
             </span>
-            <p class="font-mono text-[9px] text-muted uppercase tracking-widest mt-0.5">
+            <p class="font-mono text-xs text-muted uppercase tracking-widest mt-0.5">
                 {{ number_format($tag->posts_count ?? 0) }} documented records
             </p>
         </div>

@@ -38,7 +38,7 @@
                 </svg>
             </div>
             <p class="font-serif text-lg text-muted italic">This list is classified as private.</p>
-            <p class="font-mono text-[10px] uppercase tracking-widest text-muted mt-2">Only {{ $user->display_name }} holds access clearance.</p>
+            <p class="font-mono text-sm uppercase tracking-wide text-muted mt-2">Only {{ $user->display_name }} holds access clearance.</p>
         </div>
     @else
         {{-- Reactive Grid Layout --}}
@@ -56,7 +56,7 @@
 
         @if($followers->hasPages())
             <div class="mt-8 pt-4 border-t border-rule" x-show="search === ''">
-                {{ $followers->links() }}
+                {{ $followers->onEachSide(1)->links('pagination.academic') }}
             </div>
         @endif
     @endif

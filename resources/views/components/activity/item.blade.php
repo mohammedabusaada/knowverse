@@ -12,7 +12,7 @@
             {!! activity_description($activity) !!}
         </div>
 
-        <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-muted mt-2">
+        <div class="font-mono text-xs uppercase tracking-[0.1em] text-muted mt-2">
             {{ $activity->created_at->diffForHumans() }}
         </div>
     </div>

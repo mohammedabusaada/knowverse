@@ -39,7 +39,7 @@
         Synchronizes social visibility settings with the profile backend.
     --}}
     <div class="mb-12">
-        <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+        <h2 class="text-sm font-mono font-bold uppercase tracking-wide text-muted mb-6 border-b border-rule pb-2">
             Privacy
         </h2>
         
@@ -62,7 +62,7 @@
                     </p>
                     
                     @if($errors->has('public_follow_lists') || $errors->any())
-                        <p class="text-xs font-mono text-accent-warm mt-2 font-bold">
+                        <p class="text-sm font-mono text-accent-warm mt-2 font-bold">
                             {{ $errors->first() }}
                         </p>
                     @endif
@@ -85,7 +85,7 @@
         Facilitates secure password updates with standard verification protocols.
     --}}
     <div class="mb-16">
-        <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+        <h2 class="text-sm font-mono font-bold uppercase tracking-wide text-muted mb-6 border-b border-rule pb-2">
             Change Password
         </h2>
         <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
@@ -94,30 +94,30 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="col-span-2 md:col-span-1">
-                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Current Password</label>
+                    <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-2 font-bold">Current Password</label>
                     <input type="password" name="current_password" required
                            class="w-full px-4 py-3 border border-rule bg-paper focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg rounded-sm" />
-                    @error('current_password', 'updatePassword') <span class="text-xs font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
+                    @error('current_password', 'updatePassword') <span class="text-sm font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="hidden md:block"></div>
 
                 <div>
-                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">New Password</label>
+                    <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-2 font-bold">New Password</label>
                     <input type="password" name="password" required
                            class="w-full px-4 py-3 border border-rule bg-paper focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg rounded-sm" />
-                    @error('password', 'updatePassword') <span class="text-xs font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
+                    @error('password', 'updatePassword') <span class="text-sm font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
-                    <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">Confirm New Password</label>
+                    <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-2 font-bold">Confirm New Password</label>
                     <input type="password" name="password_confirmation" required
                            class="w-full px-4 py-3 border border-rule bg-paper focus:ring-0 focus:border-ink transition-colors text-ink font-serif text-lg rounded-sm" />
                 </div>
             </div>
 
             <div class="pt-4">
-                <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-80 shadow-sm transition-opacity">
+                <button type="submit" class="px-8 py-3 bg-ink text-paper font-mono text-sm uppercase tracking-wide hover:opacity-80 shadow-sm transition-opacity">
                     Update Password
                 </button>
             </div>
@@ -130,7 +130,7 @@
         Handles destructive and reversible account status transitions.
     --}}
     <div class="pt-8 border-t border-rule mt-12">
-        <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted mb-6 border-b border-rule pb-2">
+        <h2 class="text-sm font-mono font-bold uppercase tracking-wide text-muted mb-6 border-b border-rule pb-2">
             Account Status
         </h2>
 
@@ -143,7 +143,7 @@
 
             <div x-data="{ open: {{ $errors->userDeactivation->any() ? 'true' : 'false' }} }">
                 <button type="button" @click="open = true" 
-                        class="px-6 py-2.5 border border-ink text-ink font-mono text-[10px] uppercase tracking-widest hover:bg-ink hover:text-paper transition-all focus:outline-none">
+                        class="px-6 py-2.5 border border-ink text-ink font-mono text-sm uppercase tracking-wide hover:bg-ink hover:text-paper transition-all focus:outline-none">
                     Deactivate Account
                 </button>
 
@@ -155,13 +155,13 @@
                             <h2 class="text-2xl font-heading font-bold text-ink mb-3">Confirm Deactivation</h2>
                             <p class="text-sm font-serif text-muted mb-6 italic">Please provide your password to confirm account deactivation.</p>
                             <div class="mb-6">
-                                <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1 font-bold">Password</label>
+                                <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-1 font-bold">Password</label>
                                 <input type="password" name="password" required class="w-full px-4 py-3 border border-rule bg-paper text-ink font-serif text-lg rounded-sm" />
-                                @error('password', 'userDeactivation') <span class="text-xs font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
+                                @error('password', 'userDeactivation') <span class="text-sm font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
                             </div>
                             <div class="flex justify-end gap-6 items-center">
-                                <button type="button" @click="open = false" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink">Cancel</button>
-                                <button type="submit" class="px-6 py-3 bg-ink text-paper font-mono text-[10px] uppercase tracking-widest hover:opacity-90">Deactivate</button>
+                                <button type="button" @click="open = false" class="font-mono text-sm uppercase tracking-wide text-muted hover:text-ink">Cancel</button>
+                                <button type="submit" class="px-6 py-3 bg-ink text-paper font-mono text-sm uppercase tracking-wide hover:opacity-90">Deactivate</button>
                             </div>
                         </form>
                     </div>
@@ -178,7 +178,7 @@
 
             <div x-data="{ open: {{ $errors->userDeletion->any() ? 'true' : 'false' }}, confirmText: '' }">
                 <button type="button" @click="open = true" 
-                        class="px-6 py-2.5 border border-accent-warm text-accent-warm font-mono text-[10px] uppercase tracking-widest hover:bg-accent-warm hover:text-paper transition-all focus:outline-none">
+                        class="px-6 py-2.5 border border-accent-warm text-accent-warm font-mono text-sm uppercase tracking-wide hover:bg-accent-warm hover:text-paper transition-all focus:outline-none">
                     Delete Account
                 </button>
 
@@ -192,22 +192,22 @@
                             </p>
                             
                             <div class="mb-4">
-                                <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1 font-bold">Password</label>
+                                <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-1 font-bold">Password</label>
                                 <input type="password" name="password" required class="w-full px-4 py-3 border border-rule bg-paper text-ink font-serif text-lg rounded-sm" />
-                                @error('password', 'userDeletion') <span class="text-xs font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
+                                @error('password', 'userDeletion') <span class="text-sm font-mono text-accent-warm block mt-2">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="mb-6">
-                                <label class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-1 font-bold">Verification Word</label>
+                                <label class="block font-mono text-sm uppercase tracking-wide text-muted mb-1 font-bold">Verification Word</label>
                                 <input type="text" x-model="confirmText" placeholder="Type DELETE" required class="w-full px-4 py-3 border border-rule bg-paper text-accent-warm font-mono text-lg rounded-sm" />
                             </div>
 
                             <div class="flex justify-end gap-6 items-center">
-                                <button type="button" @click="open = false; confirmText = ''" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink">Cancel</button>
+                                <button type="button" @click="open = false; confirmText = ''" class="font-mono text-sm uppercase tracking-wide text-muted hover:text-ink">Cancel</button>
                                 <button type="submit" 
                                         :disabled="confirmText !== 'DELETE'" 
                                         :class="confirmText !== 'DELETE' ? 'opacity-30 cursor-not-allowed' : 'hover:opacity-80'" 
-                                        class="px-6 py-3 bg-accent-warm text-paper font-mono text-[10px] uppercase tracking-widest transition-all">
+                                        class="px-6 py-3 bg-accent-warm text-paper font-mono text-sm uppercase tracking-wide transition-all">
                                     Final Delete
                                 </button>
                             </div>

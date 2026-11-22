@@ -35,7 +35,7 @@
     <div class="flex flex-wrap gap-2 mb-3 min-h-[32px]">
         <template x-for="id in selected" :key="id">
             <span
-                class="flex items-center gap-2 px-3 py-1 font-mono text-[11px] tracking-wider text-ink bg-aged border border-rule rounded-sm"
+                class="flex items-center gap-2 px-3 py-1 font-mono text-xs tracking-wider text-ink bg-aged border border-rule rounded-sm"
             >
                 <span class="opacity-40 font-serif text-sm leading-none">§</span>
                 <span x-text="$refs['tag-' + id].textContent.trim().toLowerCase()"></span>
@@ -83,7 +83,7 @@
         <input type="hidden" name="tag_ids[]" :value="id">
     </template>
 
-    <p class="mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+    <p class="mt-3 font-mono text-xs uppercase tracking-[0.1em] text-muted">
         Select up to {{ $max }} tags.
     </p>
 </div>

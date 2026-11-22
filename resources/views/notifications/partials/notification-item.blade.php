@@ -42,7 +42,7 @@
             </a>
 
             {{-- Metadata --}}
-            <div class="flex flex-wrap items-center mt-2 space-x-3 font-mono text-[9px] uppercase tracking-widest text-muted">
+            <div class="flex flex-wrap items-center mt-2 space-x-3 font-mono text-xs uppercase tracking-widest text-muted">
                 <span>{{ str_replace('_', ' ', $notification->type->value) }}</span>
                 <span>&bull;</span>
                 <span>{{ $notification->created_at->diffForHumans() }}</span>

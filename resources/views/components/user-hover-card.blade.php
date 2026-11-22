@@ -66,7 +66,7 @@
                             <span class="text-sm font-black text-black dark:text-white">
                                 {{ number_format($user->followers_count ?? 0) }}
                             </span>
-                            <span class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest">
                                 Followers
                             </span>
                         </div>
@@ -75,7 +75,7 @@
                             <span class="text-sm font-black text-black dark:text-white">
                                 {{ number_format($user->posts_count ?? 0) }}
                             </span>
-                            <span class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest">
                                 Posts
                             </span>
                         </div>

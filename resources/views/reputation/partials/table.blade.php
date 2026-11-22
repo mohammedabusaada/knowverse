@@ -18,7 +18,7 @@
 
     @if($history->hasPages())
         <div class="p-5 border-t border-rule bg-aged/30">
-            {{ $history->links() }}
+            {{ $history->onEachSide(1)->links('pagination.academic') }}
         </div>
     @endif
 </div>

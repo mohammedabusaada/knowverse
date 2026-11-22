@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>KnowVerse - Forgot Password</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" />
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.includes.theme-init')
 </head>
 <body class="min-h-screen flex bg-paper text-ink font-serif antialiased">
 
@@ -32,18 +30,18 @@
             <form action="{{ route('password.email') }}" method="POST" class="space-y-8">
                 @csrf
                 <div>
-                    <label for="email" class="block font-mono text-[10px] uppercase tracking-widest text-muted mb-2">Email Address</label>
+                    <label for="email" class="block font-mono text-sm uppercase tracking-wide text-muted mb-2">Email Address</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
                            class="w-full px-4 py-3 border border-rule bg-paper rounded-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ink focus:border-ink transition-all text-ink font-serif text-lg placeholder:text-muted/80" />
                 </div>
 
-                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-xs py-4 transition-colors">
+                <button type="submit" class="w-full bg-ink hover:bg-transparent hover:text-ink border border-ink text-paper font-mono uppercase tracking-[0.15em] text-sm py-4 transition-colors">
                     Send Reset Link
                 </button>
             </form>
 
             <div class="mt-12 text-center">
-                <a href="{{ route('login') }}" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors border-b border-rule pb-1">
+                <a href="{{ route('login') }}" class="font-mono text-sm uppercase tracking-wide text-muted hover:text-ink transition-colors border-b border-rule pb-1">
                     &larr; Back to Login
                 </a>
             </div>

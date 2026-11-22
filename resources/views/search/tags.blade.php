@@ -29,7 +29,7 @@
         </div>
 
         <div class="mt-12">
-            {{ $tags->links() }}
+            {{ $tags->onEachSide(1)->links('pagination.academic') }}
         </div>
     @endif
 </div>

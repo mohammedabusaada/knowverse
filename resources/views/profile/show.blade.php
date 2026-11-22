@@ -4,7 +4,7 @@
     <div class="max-w-4xl">
         {{-- Scholar Biography Section --}}
         <div class="bg-paper border border-rule shadow-sm rounded-sm p-8">
-            <h3 class="text-xs font-mono font-bold text-muted mb-6 uppercase tracking-[0.2em] border-b border-rule pb-2">
+            <h3 class="text-sm font-mono font-bold text-muted mb-6 uppercase tracking-wide border-b border-rule pb-2">
                 About Scholar
             </h3>
             

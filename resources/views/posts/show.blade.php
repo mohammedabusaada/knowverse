@@ -3,13 +3,13 @@
 @section('content')
     <x-post.progress-bar />
 
-    <div class="max-w-5xl mx-auto px-4 py-8 lg:flex lg:gap-12 animate-[fadeUp_0.8s_ease_both]">
+    <div class="discussion-layout">
         
         {{-- Main Article Area --}}
-        <article class="lg:w-3/4 min-w-0">
+        <article class="discussion-article min-w-0">
             
             {{-- Breadcrumb Navigation --}}
-            <nav class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted mb-6 flex items-center gap-2">
+            <nav aria-label="Breadcrumb" class="text-sm text-muted mb-6 flex items-center gap-2">
                 <a href="{{ route('posts.index') }}" class="hover:text-ink transition-colors border-b border-transparent hover:border-ink">Discussions</a>
                 <span class="opacity-50">/</span>
                 <span class="text-ink font-bold">Discussion</span>
@@ -17,7 +17,7 @@
 
             {{-- Pinned Indicator --}}
             @if($post->isPinned())
-                <div class="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 bg-accent/10 border border-accent/30 text-accent font-mono text-[10px] uppercase tracking-widest font-bold">
+                <div class="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 bg-accent/10 border border-accent/30 text-accent font-mono text-xs uppercase tracking-widest font-bold">
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 9V4h1a1 1 0 0 0 0-2H7a1 1 0 0 0 0 2h1v5a3 3 0 0 1-3 3v2h5.97v7l1 1 1-1v-7H19v-2a3 3 0 0 1-3-3Z"/></svg>
                     Pinned Discussion
                 </div>
@@ -29,7 +29,7 @@
             </h1>
 
             {{-- Metadata Ribbon --}}
-            <div class="flex flex-wrap items-center justify-between gap-y-4 text-[13px] font-serif text-muted italic border-b border-rule pb-5 mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-y-4 text-sm font-serif text-muted border-b border-rule pb-5 mb-8">
                 
                 {{-- Author & Date info --}}
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -85,7 +85,7 @@
             <div class="flex gap-4 md:gap-8">
                 
                 {{-- Left Sidebar: Voting & Bookmarking --}}
-                <div class="hidden sm:flex flex-col items-center shrink-0 w-10 pt-1">
+                <div class="flex flex-col items-center shrink-0 w-10 pt-1 discussion-voting">
                     <x-post-vote :post="$post" />
                     <div class="mt-5 border-t border-rule pt-4 w-full flex justify-center">
                         <x-post.save-post-button :post="$post" />
@@ -107,14 +107,14 @@
                     @endif
 
                     {{-- Rendered Markdown Content --}}
-                    <div class="prose prose-lg dark:prose-invert max-w-none text-ink font-serif leading-[1.8] mb-10" id="post-content">
+                    <div class="prose prose-lg dark:prose-invert max-w-none text-ink leading-[1.8] mb-10" id="post-content">
                         {!! $post->formatted_body !!}
                     </div>
 
                     {{-- Topics / Tags --}}
                     @if($post->tags->isNotEmpty())
                         <div class="flex flex-wrap items-center gap-2 pt-6 border-t border-rule mb-10">
-                            <span class="flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest text-muted mr-2">
+                            <span class="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-muted mr-2">
                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
                                 Topics:
                             </span>
@@ -138,7 +138,7 @@
         </article>
 
         {{-- Right Sidebar (Desktop) --}}
-        <aside class="hidden lg:block lg:w-1/4 shrink-0 border-l border-rule pl-8">
+        <aside class="discussion-author">
             <x-post.sidebar-author :user="$post->user" />
         </aside>
     </div>
@@ -201,7 +201,12 @@
 
 @push('scripts')
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", async function() {
+            try {
+                await window.loadContentTools();
+            } catch (error) {
+                return; // The server-rendered article remains readable if enhancement fails.
+            }
             const contentContainer = document.querySelector('article');
             
             if (contentContainer && window.renderMathInElement && window.hljs) {

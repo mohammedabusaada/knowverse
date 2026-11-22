@@ -30,25 +30,25 @@
 
                     {{-- Original Author Badge --}}
                     @if($comment->user_id === $comment->post->user_id)
-                        <span class="font-mono text-[8px] bg-ink text-paper px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
+                        <span class="font-mono text-xs bg-ink text-paper px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
                             Author
                         </span>
                     @endif
 
-                    <span class="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    <span class="font-mono text-xs uppercase tracking-widest text-muted">
                         {{ $comment->created_at->diffForHumans() }}
                     </span>
 
                     {{-- Visibility Flag --}}
                     @if($comment->is_hidden)
-                        <span class="font-mono text-[9px] uppercase tracking-widest text-accent-warm border border-accent-warm/30 px-1.5 py-0.5 ml-2">
+                        <span class="font-mono text-xs uppercase tracking-widest text-accent-warm border border-accent-warm/30 px-1.5 py-0.5 ml-2">
                             Hidden
                         </span>
                     @endif
 
                     {{-- Author's Pick Badge --}}
                     @if ($comment->post->best_comment_id === $comment->id)
-                        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-paper bg-accent border border-accent px-2 py-0.5 ml-2 flex items-center gap-1 shadow-sm">
+                        <span class="font-mono text-xs uppercase tracking-wide text-paper bg-accent border border-accent px-2 py-0.5 ml-2 flex items-center gap-1 shadow-sm">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             Author's Pick
                         </span>
@@ -112,8 +112,8 @@
 </x-markdown-editor>
                         
                         <div class="flex gap-3 mt-2 justify-end p-2 border-t border-rule bg-aged/10">
-                            <button type="button" @click="showEdit = false" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
-                            <button type="submit" class="font-mono text-[10px] uppercase tracking-widest text-paper bg-accent px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Update</button>
+                            <button type="button" @click="showEdit = false" class="font-mono text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
+                            <button type="submit" class="font-mono text-xs uppercase tracking-widest text-paper bg-accent px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Update</button>
                         </div>
                     </form>
                 </div>
@@ -121,7 +121,7 @@
 
             {{-- Reply Toggle Button --}}
             @auth
-                <button @click="showReply = !showReply" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-accent transition-colors pb-0.5 border-b border-transparent hover:border-accent focus:outline-none">
+                <button @click="showReply = !showReply" class="font-mono text-xs uppercase tracking-widest text-muted hover:text-accent transition-colors pb-0.5 border-b border-transparent hover:border-accent focus:outline-none">
                     Reply
                 </button>
             @endauth
@@ -135,8 +135,8 @@
                     <x-markdown-editor name="body" id="reply-comment-{{ $comment->id }}" required />
                     
                     <div class="flex gap-3 mt-2 justify-end p-2 border-t border-rule">
-                        <button type="button" @click="showReply = false" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
-                        <button type="submit" class="font-mono text-[10px] uppercase tracking-widest text-paper bg-ink px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Post Reply</button>
+                        <button type="button" @click="showReply = false" class="font-mono text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors focus:outline-none">Cancel</button>
+                        <button type="submit" class="font-mono text-xs uppercase tracking-widest text-paper bg-ink px-5 py-2 hover:opacity-80 transition-opacity focus:outline-none">Post Reply</button>
                     </div>
                 </form>
             </div>

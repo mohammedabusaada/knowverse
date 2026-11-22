@@ -35,7 +35,7 @@
                         </p>
                     </div>
 
-                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[9px] uppercase tracking-widest text-ink pr-4 hidden sm:block">
+                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs uppercase tracking-widest text-ink pr-4 hidden sm:block">
                         View User &rarr;
                     </div>
                 </a>
@@ -43,7 +43,7 @@
         </div>
 
         <div class="mt-12">
-            {{ $users->links() }}
+            {{ $users->onEachSide(1)->links('pagination.academic') }}
         </div>
     @endif
 </div>

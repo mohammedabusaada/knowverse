@@ -32,7 +32,7 @@
         <span x-show="unreadCount > 0"
               x-text="unreadCount"
               x-cloak
-              class="absolute top-0 right-0 flex items-center justify-center min-w-[16px] h-[16px] px-1 font-mono text-[9px] font-bold text-paper bg-accent-warm rounded-sm transition-all duration-300 transform scale-100">
+              class="absolute top-0 right-0 flex items-center justify-center min-w-[16px] h-[16px] px-1 font-mono text-xs font-bold text-paper bg-accent-warm rounded-sm transition-all duration-300 transform scale-100">
         </span>
     </button>
 
@@ -59,12 +59,12 @@
             >
                 {{-- Header --}}
                 <div class="px-5 py-3 border-b border-rule bg-aged/30 flex justify-between items-center">
-                    <h3 class="font-mono text-[10px] font-bold text-muted uppercase tracking-[0.2em]">
+                    <h3 class="font-mono text-xs font-bold text-muted uppercase tracking-wide">
                         Notifications
                     </h3>
                     <form method="POST" action="{{ route('notifications.readAll') }}">
                         @csrf
-                        <button type="submit" class="font-mono text-[9px] text-ink hover:text-accent-warm uppercase tracking-widest transition-colors focus:outline-none">
+                        <button type="submit" class="font-mono text-xs text-ink hover:text-accent-warm uppercase tracking-widest transition-colors focus:outline-none">
                             Mark all read
                         </button>
                     </form>
@@ -91,28 +91,28 @@
                 <div class="px-5 py-3 border-t border-rule bg-aged/30 flex justify-between items-center" x-data="{ confirmingClear: false }">
                     
                     {{-- Navigation Link --}}
-                    <a href="{{ route('notifications.index') }}" class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink hover:text-accent transition-colors focus:outline-none">
+                    <a href="{{ route('notifications.index') }}" class="font-mono text-xs uppercase tracking-[0.1em] text-ink hover:text-accent transition-colors focus:outline-none">
                         View All &rarr;
                     </a>
 
                     {{-- Destructive Actions Container --}}
                     <div>
                         {{-- Default State: Clear Button --}}
-                        <button type="button" x-show="!confirmingClear" @click="confirmingClear = true" class="font-mono text-[9px] uppercase tracking-widest text-accent-warm hover:opacity-70 transition-opacity focus:outline-none">
+                        <button type="button" x-show="!confirmingClear" @click="confirmingClear = true" class="font-mono text-xs uppercase tracking-widest text-accent-warm hover:opacity-70 transition-opacity focus:outline-none">
                             Clear
                         </button>
 
                         {{-- Confirmation State: Inline Are You Sure? --}}
                         <div x-show="confirmingClear" x-cloak class="flex items-center gap-3">
-                            <span class="font-serif text-[10px] text-muted italic">Are you sure?</span>
+                            <span class="font-serif text-xs text-muted italic">Are you sure?</span>
                             
-                            <button type="button" @click="confirmingClear = false" class="font-mono text-[9px] uppercase tracking-widest text-ink hover:opacity-70 transition-opacity focus:outline-none">
+                            <button type="button" @click="confirmingClear = false" class="font-mono text-xs uppercase tracking-widest text-ink hover:opacity-70 transition-opacity focus:outline-none">
                                 No
                             </button>
                             
                             <form method="POST" action="{{ route('notifications.clear') }}" class="inline-block m-0 p-0">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="font-mono text-[9px] uppercase tracking-widest text-accent-warm hover:opacity-70 transition-opacity focus:outline-none">
+                                <button type="submit" class="font-mono text-xs uppercase tracking-widest text-accent-warm hover:opacity-70 transition-opacity focus:outline-none">
                                     Yes
                                 </button>
                             </form>

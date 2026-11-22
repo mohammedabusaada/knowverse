@@ -32,14 +32,14 @@
 
             <form method="POST" action="{{ route('verification.send') }}">
                 @csrf
-                <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-widest text-xs py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
+                <button type="submit" class="w-full bg-ink text-paper font-mono uppercase tracking-wide text-sm py-4 hover:bg-transparent hover:text-ink border border-ink transition-all">
                     Resend Email
                 </button>
             </form>
 
             <form method="POST" action="{{ route('logout') }}" class="mt-8 text-center">
                 @csrf
-                <button type="submit" class="font-mono text-[10px] uppercase tracking-widest text-muted hover:text-ink transition-colors border-b border-rule pb-1">
+                <button type="submit" class="font-mono text-sm uppercase tracking-wide text-muted hover:text-ink transition-colors border-b border-rule pb-1">
                     Log Out
                 </button>
             </form>

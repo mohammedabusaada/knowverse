@@ -2,7 +2,7 @@
 
     {{-- Primary Navigation --}}
     <div>
-        <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2 font-bold">
+        <h3 class="font-mono text-xs text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2 font-bold">
             Navigation
         </h3>
         <nav class="space-y-1">
@@ -29,7 +29,7 @@
     @endphp
 
     <div>
-        <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2 font-bold">
+        <h3 class="font-mono text-xs text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2 font-bold">
             My Account
         </h3>
         <nav class="space-y-1">
@@ -58,7 +58,7 @@
     {{-- Suggested Topics to Follow (Protected by @auth) --}}
     @if(isset($recommendedTags) && $recommendedTags->count() > 0)
     <div>
-        <h3 class="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mb-4 border-b border-rule pb-2 font-bold">
+        <h3 class="font-mono text-xs text-muted uppercase tracking-wide mb-4 border-b border-rule pb-2 font-bold">
             Discover
         </h3>
         <div class="space-y-3">
@@ -80,7 +80,7 @@
                     {{ strtolower($recTag->name) }}
                 </a>
 
-                <button @click="toggle()" class="font-mono text-[9px] uppercase tracking-widest text-muted hover:text-ink transition-colors shrink-0 ml-2 focus:outline-none">
+                <button @click="toggle()" class="font-mono text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors shrink-0 ml-2 focus:outline-none">
                     Follow
                 </button>
             </div>

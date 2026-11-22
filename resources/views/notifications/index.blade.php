@@ -13,14 +13,14 @@
         <div class="flex items-center gap-4 shrink-0">
             <form method="POST" action="{{ route('notifications.readAll') }}">
                 @csrf
-                <button class="font-mono text-[10px] uppercase tracking-[0.1em] px-4 py-1.5 border border-rule text-ink hover:bg-aged transition-colors rounded-sm shadow-sm focus:outline-none">
+                <button class="font-mono text-xs uppercase tracking-[0.1em] px-4 py-1.5 border border-rule text-ink hover:bg-aged transition-colors rounded-sm shadow-sm focus:outline-none">
                     Mark all read
                 </button>
             </form>
 
             <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Clear all notifications?');">
                 @csrf @method('DELETE')
-                <button class="font-mono text-[10px] uppercase tracking-[0.1em] px-4 py-1.5 border border-accent-warm/30 text-accent-warm hover:bg-accent-warm/10 transition-colors rounded-sm shadow-sm focus:outline-none">
+                <button class="font-mono text-xs uppercase tracking-[0.1em] px-4 py-1.5 border border-accent-warm/30 text-accent-warm hover:bg-accent-warm/10 transition-colors rounded-sm shadow-sm focus:outline-none">
                     Clear all
                 </button>
             </form>
@@ -45,7 +45,7 @@
     </div>
 
     <div class="mt-8">
-        {{ $notifications->links() }}
+        {{ $notifications->onEachSide(1)->links('pagination.academic') }}
     </div>
 </div>
 @endsection

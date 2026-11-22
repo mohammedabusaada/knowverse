@@ -35,17 +35,17 @@
                     </div>
                     <h3 class="font-serif text-lg text-ink font-bold mb-1">Restricted Ledger</h3>
                     <p class="font-serif text-sm text-muted italic">
-                        Detailed ledger entries are strictly confidential and accessible only to the authenticated scholar.
+                        Detailed ledger entries are available to this scholar and authorized moderators or administrators.
                     </p>
                 </div>
             @else
                 {{-- Detailed Activity History for the Owner --}}
                 <div class="space-y-6 mt-8">
                     <div class="flex items-center justify-between border-b border-rule pb-2">
-                        <h2 class="font-mono text-[10px] uppercase tracking-[0.2em] text-muted font-bold">
+                        <h2 class="font-mono text-xs uppercase tracking-wide text-muted font-bold">
                             Ledger of Contributions
                         </h2>
-                        <span class="font-mono text-[9px] text-muted uppercase tracking-widest">Points Audit Trail</span>
+                        <span class="font-mono text-xs text-muted uppercase tracking-widest">Points Audit Trail</span>
                     </div>
                     
                     {{-- Chronological Reputation Adjustments --}}

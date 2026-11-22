@@ -17,7 +17,7 @@
         </div>
 
         <div class="mt-12">
-            {{ $savedPosts->links() }}
+            {{ $savedPosts->onEachSide(1)->links('pagination.academic') }}
         </div>
     @endif
 </div>

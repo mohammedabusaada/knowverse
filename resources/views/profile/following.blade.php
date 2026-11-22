@@ -33,12 +33,12 @@
             <div class="flex bg-aged/30 p-1 rounded-sm shrink-0 border border-rule">
                 <button @click="tab = 'people'; search = ''" 
                     :class="tab === 'people' ? 'bg-ink shadow-sm text-paper' : 'text-muted hover:text-ink'"
-                    class="px-5 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] rounded-sm transition-all focus:outline-none">
+                    class="px-5 py-1.5 font-mono text-sm uppercase tracking-wide rounded-sm transition-all focus:outline-none">
                     Scholars
                 </button>
                 <button @click="tab = 'tags'; search = ''" 
                     :class="tab === 'tags' ? 'bg-ink shadow-sm text-paper' : 'text-muted hover:text-ink'"
-                    class="px-5 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] rounded-sm transition-all focus:outline-none">
+                    class="px-5 py-1.5 font-mono text-sm uppercase tracking-wide rounded-sm transition-all focus:outline-none">
                     Topics
                 </button>
             </div>
@@ -67,7 +67,7 @@
                     <div class="col-span-2 py-12 text-center text-muted font-serif italic border border-dashed border-rule bg-aged/5">Not following any scholars yet.</div>
                 @endforelse
             </div>
-            <div class="mt-8 pt-4 border-t border-rule" x-show="search === ''">{{ $following->appends(['tab' => 'people'])->links() }}</div>
+            <div class="mt-8 pt-4 border-t border-rule" x-show="search === ''">{{ $following->appends(['tab' => 'people'])->onEachSide(1)->links('pagination.academic') }}</div>
         </div>
 
         {{-- Tab 2: Topic Following --}}
@@ -84,7 +84,7 @@
                                 <a href="{{ route('tags.show', $tag->slug) }}" class="font-heading font-bold text-ink hover:text-accent-warm block truncate text-lg transition-colors">
                                     {{ strtolower($tag->name) }}
                                 </a>
-                                <p class="font-mono text-[9px] text-muted uppercase tracking-widest mt-1">{{ number_format($tag->posts_count ?? 0) }} documented records</p>
+                                <p class="font-mono text-sm text-muted uppercase tracking-wide mt-1">{{ number_format($tag->posts_count ?? 0) }} documented records</p>
                             </div>
                         </div>
 
@@ -93,7 +93,7 @@
                             <button x-data="{ unfollowed: false }" 
                                     x-show="!unfollowed"
                                     @click="fetch('{{ route('tags.unfollow', $tag) }}', {method: 'DELETE', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}' }}); unfollowed = true"
-                                    class="font-mono text-[9px] uppercase tracking-widest text-muted hover:text-accent-warm transition-colors ml-2 shrink-0 focus:outline-none">
+                                    class="font-mono text-sm uppercase tracking-wide text-muted hover:text-accent-warm transition-colors ml-2 shrink-0 focus:outline-none">
                                 Unfollow
                             </button>
                         @endif
@@ -102,7 +102,7 @@
                     <div class="col-span-2 py-12 text-center text-muted font-serif italic border border-dashed border-rule bg-aged/5">Not following any topics yet.</div>
                 @endforelse
             </div>
-            <div class="mt-8 pt-4 border-t border-rule" x-show="search === ''">{{ $followingTags->appends(['tab' => 'tags'])->links() }}</div>
+            <div class="mt-8 pt-4 border-t border-rule" x-show="search === ''">{{ $followingTags->appends(['tab' => 'tags'])->onEachSide(1)->links('pagination.academic') }}</div>
         </div>
     @endif
 </div>
