@@ -16,7 +16,7 @@ Screenshots show the application running locally with synthetic demonstration da
 ![KnowVerse home page with recent academic discussions](.github/screenshots/home-final.jpg)
 
 <details>
-<summary>Discussion browsing, article view, and administration</summary>
+<summary>Discussions, reputation audit trail, mobile layout, and administration</summary>
 
 **Discussion browsing** — readable summaries, topic filters, and pagination.
 
@@ -26,11 +26,43 @@ Screenshots show the application running locally with synthetic demonstration da
 
 ![KnowVerse discussion page](.github/screenshots/discussion-final.jpg)
 
+**Threaded responses** — a selected answer and a follow-up from the discussion author, shown in light mode.
+
+![Selected answer and threaded replies](.github/screenshots/discussion-replies.jpg)
+
+**Reputation ledger** — a focused view of Sara's 90-point balance and recent entries, including a vote retraction and an author's-pick award. The full demonstration history contains 24 entries; the cached balance equals their sum.
+
+![Reputation ledger with awards and a compensating reversal](.github/screenshots/reputation-final.jpg)
+
+**Mobile ledger** — the same audit trail at a 390px viewport width.
+
+<img src=".github/screenshots/reputation-mobile.jpg" alt="KnowVerse reputation ledger on a narrow phone viewport" width="390">
+
+**Mobile home** — navigation, introduction, and community summary in light mode.
+
+<img src=".github/screenshots/home-mobile.jpg" alt="KnowVerse homepage on a narrow phone viewport in light mode" width="390">
+
+**Light reading mode** — the same discussion with a light background.
+
+![Discussion in light mode](.github/screenshots/discussion-light.jpg)
+
 **Administration dashboard** — community metrics and moderation overview.
 
 ![KnowVerse administration dashboard](.github/screenshots/admin-final.jpg)
 
 </details>
+
+### Reproduce the demonstration content
+
+After completing local installation and migrations, optionally run:
+
+```bash
+php artisan db:seed --class=PortfolioDemoSeeder
+```
+
+This opt-in seeder adds six fictional scholars, ten curated discussions, and 22 comments/replies without removing existing content. It uses model observers, the voting domain operations, and the author's-pick controller to create ledger-backed activity. It verifies every demonstration account's balance against its ledger sum and skips a repeat run when the `demo_sara` account already exists. It is restricted to `local` and `testing` environments and is not part of the default seeding process.
+
+Demonstration accounts have randomly generated passwords. Use an existing local administrator or moderator to review `/demo_sara/reputation`; ordinary visitors retain the normal restricted-ledger view. Notifications are stored during seeding, while external broadcasting is disabled for that command only. Ledger timestamps reflect insertion time; the content dates are synthetic.
 
 ## My Contribution — Mohammed AbuSaada
 
@@ -192,7 +224,7 @@ Follow these instructions to set up the KnowVerse platform in a local developmen
 
 The platform is covered by an automated regression suite built with **Pest**, executed on
 every push and pull request to `main` by GitHub Actions across PHP 8.2 and 8.3.
-The current PHP suite contains **129 tests and 324 assertions**. Three additional JavaScript tests cover stale search responses, cleared queries, and recoverable request failures.
+The current PHP suite contains **131 tests and 341 assertions**. Three additional JavaScript tests cover stale search responses, cleared queries, and recoverable request failures.
 
 ```bash
 php artisan test                        # full suite
